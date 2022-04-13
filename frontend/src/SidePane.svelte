@@ -9,7 +9,7 @@
     export let units;
     export let updateUnit;
     export let removeUnit;
-    export let defaultRadius;
+    export let stationRanges;
     export let updateAllStations;
     export let updateAllUnits;
 
@@ -17,8 +17,7 @@
     let unitsHidden = false;
 
     const addStation = () => {
-        const location = map.getCenter();
-        const newStation = [...stations, {lat: map.getCenter().lat(), lng: map.getCenter().lng(), radius:   defaultRadius}];
+        const newStation = [...stations, {lat: map.getCenter().lat(), lng: map.getCenter().lng(), radius: stationRanges[0]}];
         updateAllStations(newStation);
     };
 
@@ -50,7 +49,7 @@
     <hr>
     {#if !stationsHidden}
         {#each stations as station, index}
-            <Station index={index} station={station} update={updateStation} remove={removeStation} /> 
+            <Station index={index} station={station} update={updateStation} remove={removeStation} ranges={stationRanges}/> 
         {/each}
         <div class="row">
             <button class="addButton btn btn-primary" on:click={() => {addStation();}}>

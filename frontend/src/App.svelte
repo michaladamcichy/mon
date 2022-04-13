@@ -11,13 +11,39 @@
 
 	let map;
 
-	let defaultRadius = 50000;
+	let stationRanges = [20, 30, 50];
+	let oldRanges = [...stationRanges];
+	let defaultRadius = stationRanges[0];
+
+	const updateRanges = (ranges) => {
+		for(let i =0; i < ranges.length - 1; i++) {
+			if(ranges[i] >= ranges[i+1]) {
+				stationRanges = [...oldRanges];
+				return;
+			}
+		}
+
+		stationRanges = ranges;
+		console.log(stations);
+		console.log(oldRanges[0]);
+		console.log(ranges[0]);
+		updateAllStations(stations.map(station => {
+			const index = oldRanges.indexOf(station.radius);
+			if(index >= 0) {
+				station.radius = ranges[index];
+			} else {
+				console.log('custom radius');
+			}
+			return station;
+		}));
+		oldRanges = [...ranges];
+	};
 
 	let stations = [
-		{lat: 52.2297, lng: 21.0122, radius: defaultRadius },
-		{lat: 52.2297, lng: 21.0122, radius: defaultRadius },
-		{lat: 52.2297, lng: 21.0122, radius: defaultRadius },
-		{lat: 52.2297, lng: 21.0122, radius: defaultRadius },
+		{lat: 52.2297, lng: 21.0122, radius: stationRanges[0] },
+		{lat: 52.2297, lng: 21.0122, radius: stationRanges[0] },
+		{lat: 52.2297, lng: 21.0122, radius: stationRanges[0] },
+		{lat: 52.2297, lng: 21.0122, radius: stationRanges[0] },
 		];
 
 	let units = [
@@ -28,11 +54,11 @@
 	];
 
 	onMount(() => {
+		console.log(stations);
 	});
 
 	const updateAllStations = _stations => {
 		stations = _stations;
-		console.log(stations);
 	};
 
 	const updateStation = station => {
@@ -84,10 +110,6 @@
 	const setMap = _map => {
 		map = _map;
 	}
-
-	onMount(() => {
-	
-	})
 </script>
 
 <svelte:head>
@@ -97,29 +119,32 @@
 	</script>
 </svelte:head>
 
-<div id="topRow"class="row">
-	<div class="col-8">
-		{#if ready}
-		<Map map={map} setMap={setMap} stations={stations} updateStation={updateStation} units={units} updateUnit={updateUnit}/>
-		{/if}
+<div class="row">
+
+	<div id="leftCol" class="col-8">
+		<div id="leftTop" class="row">
+			{#if ready}
+			<Map map={map} setMap={setMap} stations={stations} updateStation={updateStation} units={units} updateUnit={updateUnit}/>
+			{/if}
+		</div>
+		<div id="leftBottom" class="row">
+			<BottomPane stationRanges={stationRanges} updateRanges={updateRanges}/>
+		</div>
 	</div>
-	<div class="col-4">
-		<SidePane
-			map={map}
-			stations={stations}
-			updateStation={updateStation}
-			removeStation={removeStation}
-			updateAllStations={updateAllStations}
-			units={units}
-			updateUnit={updateUnit}
-			removeUnit={removeUnit}
-			updateAllUnits={updateAllUnits}
-			defaultRadius={defaultRadius}/>
+	<div id="rightCol" class="col-4">
+			<SidePane
+				map={map}
+				stations={stations}
+				updateStation={updateStation}
+				removeStation={removeStation}
+				updateAllStations={updateAllStations}
+				units={units}
+				updateUnit={updateUnit}
+				removeUnit={removeUnit}
+				updateAllUnits={updateAllUnits}
+				stationRanges={stationRanges}/>
 	</div>
 </div>
-<!-- <div id="bottomRow" class="row">
-	<BottomPane />
-</div> -->
 
 <style>
 	div {
@@ -129,10 +154,26 @@
 	#topRow {
 		 
 		padding: 0;
-		/* height: 74vh; */
-		height: 98vh;
+		height: 74vh;
+		/* height: 98vh; */
 	}
 	#bottomRow {
 		height: 24vh;
+	}
+
+	#leftCol {
+		height: 98vh;
+	}
+
+	#rightCol {
+		height: 98vh;
+	}
+
+	#leftTop {
+		height: 74vh;
+	}
+
+	#leftBottom {
+
 	}
 </style>

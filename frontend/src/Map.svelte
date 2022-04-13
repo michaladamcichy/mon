@@ -21,7 +21,7 @@ import { onMount } from "svelte";
 
     onMount(async () => {
             const _map = new google.maps.Map(container, {
-                center: { lat: 53.015959, lng: 18.608620 },
+                center: { lat: 53.015959, lng: 18.608620 }, //alert hardcoding
                 zoom: 6,
             });
 
@@ -99,7 +99,7 @@ import { onMount } from "svelte";
                 fillOpacity: 0.1,
                 map,
                 center: {lat: unit.lat, lng: unit.lng},
-                radius: unit.radius,
+                radius: unit.radius * 1000,
             });
             circle.bindTo('center', markers[index], 'position');
             circles.push(circle);
