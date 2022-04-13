@@ -1,5 +1,5 @@
 <script>
-import { update_await_block_branch } from "svelte/internal";
+import { onMount, update_await_block_branch } from "svelte/internal";
 
 
 export let index;
@@ -7,16 +7,25 @@ export let station;
 export let update;
 export let remove;
 
+let lat;
+let lng;
+
 const latlngStep = 0.1;
+
+// onMount(() => {
+//     lat = station.lat;
+//     lng = station.lng;
+// });
+
 </script>
 
 <div class="container">
     <div id="controlsContainer" class="form-group row d-flex justify-content-center align-items-center">
         <label class="col">{`${index + 1}.`}</label>
         <label class="col col-form-label">lat:</label>
-        <input type="number" class="col" bind:value={station.lat} on:change={() => {station = station; update(station);}} step={latlngStep}/>
+        <input type="number" class="col" bind:value={station.lat} on:change={() => {update(station);}} step={latlngStep}/>
         <label class="col col-form-label">lng:</label>
-        <input type="number" class="col" bind:value={station.lng} on:change={() => {station = station; update(station);}} step={latlngStep}/>
+        <input type="number" class="col" bind:value={station.lng} on:change={() => {update(station);}} step={latlngStep}/>
         <button class="btn btn-danger" on:click={() => {remove(station);}}>X</button>
     </div>
 </div>

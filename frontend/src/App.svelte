@@ -49,7 +49,7 @@
 		console.log('removing');
 		const index = stations.indexOf(station);
         if(index >= 0) {
-            delete stations[index];
+			stations = stations.filter((item, _index) => _index != index);
             updateAllStations(stations);
         } else {
             console.log('error');
@@ -71,10 +71,11 @@
 	};
 
 	const removeUnit = unit => {
-		const index = stations.indexOf(unit);
+		console.log('removing');
+		const index = units.indexOf(unit);
         if(index >= 0) {
-            delete units[index];
-            updateAllStations(stations);
+            units = units.filter((item, _index) => _index != index); 
+            updateAllUnits(units);
         } else {
             console.log('error');
         }
@@ -83,6 +84,10 @@
 	const setMap = _map => {
 		map = _map;
 	}
+
+	onMount(() => {
+	
+	})
 </script>
 
 <svelte:head>
