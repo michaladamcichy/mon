@@ -14,9 +14,9 @@ const latlngStep = 0.1;
     <div id="controlsContainer" class="form-group row d-flex justify-content-center align-items-center">
         <label class="col">{`${index + 1}.`}</label>
         <label class="col col-form-label">lat:</label>
-        <input type="number" class="col" bind:value={unit.lat} on:change={() => {update(unit);}} step={latlngStep}/>
+        <input type="number" class="col" bind:value={unit.position.lat} on:change={() => {update(unit);}} step={latlngStep}/>
         <label class="col col-form-label">lng:</label>
-        <input type="number" class="col" bind:value={unit.lng} on:change={() => {update(unit);}} step={latlngStep}/>
+        <input type="number" class="col" bind:value={unit.position.lng} on:change={() => {update(unit);}} step={latlngStep}/>
         <button class="btn btn-danger" on:click={() => {remove(unit);}}>X</button>
     </div>
     <!-- <div class="row">

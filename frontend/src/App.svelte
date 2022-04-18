@@ -4,8 +4,10 @@
 	import SidePane from './SidePane.svelte';
 	import BottomPane from './BottomPane.svelte';
 
-	import {maps} from '../lib/maps.js';
 	import { onMount } from 'svelte';
+
+	import {maps} from '../lib/maps.js';
+	import {api} from '../lib/api';
 
 	export let ready;
 
@@ -13,7 +15,7 @@
 
 	let stationRanges = [20, 30, 50];
 	let oldRanges = [...stationRanges];
-	let defaultRadius = stationRanges[0];
+	let defaultRange = stationRanges[0];
 
 	const updateRanges = (ranges) => {
 		for(let i =0; i < ranges.length - 1; i++) {
@@ -28,11 +30,11 @@
 		console.log(oldRanges[0]);
 		console.log(ranges[0]);
 		updateAllStations(stations.map(station => {
-			const index = oldRanges.indexOf(station.radius);
+			const index = oldRanges.indexOf(station.range);
 			if(index >= 0) {
-				station.radius = ranges[index];
+				station.range = ranges[index];
 			} else {
-				console.log('custom radius');
+				console.log('custom range');
 			}
 			return station;
 		}));
@@ -40,21 +42,21 @@
 	};
 
 	let stations = [
-		{lat: 52.2297, lng: 21.0122, radius: stationRanges[0] },
-		{lat: 52.2297, lng: 21.0122, radius: stationRanges[0] },
-		{lat: 52.2297, lng: 21.0122, radius: stationRanges[0] },
-		{lat: 52.2297, lng: 21.0122, radius: stationRanges[0] },
+		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
+		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
+		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
+		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
 		];
 
 	let units = [
-		{lat: 51.2297, lng: 21.0122 },
-		{lat: 51.2297, lng: 21.0122 },
-		{lat: 51.2297, lng: 21.0122 },
-		{lat: 51.2297, lng: 21.0122 },
+		{position: {lat: 51.2297, lng: 21.0122 }},
+		{position: {lat: 51.2297, lng: 21.0122 }},
+		{position: {lat: 51.2297, lng: 21.0122 }},
+		{position: {lat: 51.2297, lng: 21.0122 }},
 	];
 
 	onMount(() => {
-		console.log(stations);
+		api.test();
 	});
 
 	const updateAllStations = _stations => {

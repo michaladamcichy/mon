@@ -1,18 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace backend.Controllers
 {
+    public class A
+    {
+        public string x { get; set; } = "hello";
+        public ArrayList arrayList { get; set; } = new ArrayList { "a", "b", "c" };
+
+ 
+    }
+
     [Route("api/[controller]")]
     [ApiController]
-    public class ExampleController : ControllerBase
+    public class AlgorithmController : ControllerBase
     {
         // GET: api/<ValuesController>
+        ///[EnableCors("_myAllowSpecificOrigins")]
         [HttpGet]
-        public IEnumerable<string> Get()
+        public A Get()
         {
-            return new string[] { "value1", "value2" };
+            //return new string[] { "value1", "value2" };
+            //return new string[] { "value1", "value2" };
+            //return new ArrayList { "a", "b", "c" };
+            var a = new A();
+            return a;
         }
 
         // GET api/<ValuesController>/5
