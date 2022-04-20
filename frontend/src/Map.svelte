@@ -21,7 +21,7 @@ import { onMount } from "svelte";
 
     onMount(async () => {
             const _map = new google.maps.Map(container, {
-                center: { lat: 53.015959, lng: 18.608620 },
+                center: { lat: 53.015959, lng: 18.608620 }, //alert hardcoding
                 zoom: 6,
             });
 
@@ -53,10 +53,10 @@ import { onMount } from "svelte";
         fontWeight: 'bold',
     };
 
-    const generateMarkers = (map, locations, update) => {
-        locations.forEach((location, index) => {
+    const generateMarkers = (map, mapObjects, update) => {
+        mapObjects.forEach((mapObject, index) => {
             const marker = new google.maps.Marker({
-                position: location,
+                position: mapObject.position,
                 map,
                 label: {
                     text: '' + (index + 1),
@@ -65,12 +65,12 @@ import { onMount } from "svelte";
                     color:'black'
                 },
                 draggable: true,
-                icon: locations == stations ? stationMarkerIcon : locations == units ? unitMarkerIcon : null,
+                icon: mapObjects == stations ? stationMarkerIcon : mapObjects == units ? unitMarkerIcon : null,
             });
             marker.addListener('dragend', () => {
-                location.lat = marker.getPosition().lat();
-                location.lng = marker.getPosition().lng();
-                update(location);
+                mapObject.position.lat = marker.getPosition().lat();
+                mapObject.position.lng = marker.getPosition().lng();
+                update(mapObject);
             });
 
             markers.push(marker);
@@ -98,8 +98,8 @@ import { onMount } from "svelte";
                 fillColor: "#FF0000",   
                 fillOpacity: 0.1,
                 map,
-                center: {lat: unit.lat, lng: unit.lng},
-                radius: unit.radius,
+                center: unit.position,
+                radius: unit.range * 1000,
             });
             circle.bindTo('center', markers[index], 'position');
             circles.push(circle);

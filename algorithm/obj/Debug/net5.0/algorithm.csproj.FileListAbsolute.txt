@@ -1,0 +1,16 @@
+D:\STUDIA\mon\algorithm\bin\Debug\net5.0\algorithm.exe
+D:\STUDIA\mon\algorithm\bin\Debug\net5.0\algorithm.deps.json
+D:\STUDIA\mon\algorithm\bin\Debug\net5.0\algorithm.runtimeconfig.json
+D:\STUDIA\mon\algorithm\bin\Debug\net5.0\algorithm.runtimeconfig.dev.json
+D:\STUDIA\mon\algorithm\bin\Debug\net5.0\algorithm.dll
+D:\STUDIA\mon\algorithm\bin\Debug\net5.0\algorithm.pdb
+D:\STUDIA\mon\algorithm\obj\Debug\net5.0\algorithm.csproj.AssemblyReference.cache
+D:\STUDIA\mon\algorithm\obj\Debug\net5.0\algorithm.GeneratedMSBuildEditorConfig.editorconfig
+D:\STUDIA\mon\algorithm\obj\Debug\net5.0\algorithm.AssemblyInfoInputs.cache
+D:\STUDIA\mon\algorithm\obj\Debug\net5.0\algorithm.AssemblyInfo.cs
+D:\STUDIA\mon\algorithm\obj\Debug\net5.0\algorithm.csproj.CoreCompileInputs.cache
+D:\STUDIA\mon\algorithm\obj\Debug\net5.0\algorithm.dll
+D:\STUDIA\mon\algorithm\obj\Debug\net5.0\refint\algorithm.dll
+D:\STUDIA\mon\algorithm\obj\Debug\net5.0\algorithm.pdb
+D:\STUDIA\mon\algorithm\obj\Debug\net5.0\algorithm.genruntimeconfig.cache
+D:\STUDIA\mon\algorithm\obj\Debug\net5.0\ref\algorithm.dll
