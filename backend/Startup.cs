@@ -15,7 +15,6 @@ namespace backend
 {
     public class Startup
     {
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -34,7 +33,9 @@ namespace backend
                                       policy.WithOrigins("http://localhost:5688",
                                                           "http://localhost:8080",
                                                           "http://127.0.0.1:8080",
-                                                          "http://127.0.0.1:5688");
+                                                          "http://127.0.0.1:5688")
+                                        .AllowAnyHeader()
+                                        .AllowAnyMethod();
                                   });
             });
             services.AddControllers();

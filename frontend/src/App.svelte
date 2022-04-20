@@ -14,6 +14,8 @@
 	let map;
 
 	let stationRanges = [20, 30, 50];
+	let stationCounts = [1000,1000,1000];
+	let isConnected = null;
 	let oldRanges = [...stationRanges];
 	let defaultRange = stationRanges[0];
 
@@ -56,8 +58,18 @@
 	];
 
 	onMount(() => {
-		api.test();
+		//api.test();
+		// setInterval(async () => {
+		// 	isConnected = await api.isConnected(stationRanges, stationCounts, stations, units); //alert
+		// }, 1000);
+			
 	});
+
+	$: {
+		(async () => {
+			isConnected = await api.isConnected(stationRanges, stationCounts, stations, units);
+		})();
+	}
 
 	const updateAllStations = _stations => {
 		stations = _stations;
@@ -130,7 +142,7 @@
 			{/if}
 		</div>
 		<div id="leftBottom" class="row">
-			<BottomPane stationRanges={stationRanges} updateRanges={updateRanges}/>
+			<BottomPane stationRanges={stationRanges} updateRanges={updateRanges} isConnected={isConnected}/>
 		</div>
 	</div>
 	<div id="rightCol" class="col-4">

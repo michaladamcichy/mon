@@ -26,3 +26,9 @@ D:\STUDIA\mon\backend\obj\Debug\net5.0\refint\backend.dll
 D:\STUDIA\mon\backend\obj\Debug\net5.0\backend.pdb
 D:\STUDIA\mon\backend\obj\Debug\net5.0\backend.genruntimeconfig.cache
 D:\STUDIA\mon\backend\obj\Debug\net5.0\ref\backend.dll
+D:\STUDIA\mon\backend\bin\Debug\net5.0\algorithm.deps.json
+D:\STUDIA\mon\backend\bin\Debug\net5.0\algorithm.runtimeconfig.json
+D:\STUDIA\mon\backend\bin\Debug\net5.0\algorithm.runtimeconfig.dev.json
+D:\STUDIA\mon\backend\bin\Debug\net5.0\algorithm.exe
+D:\STUDIA\mon\backend\bin\Debug\net5.0\algorithm.dll
+D:\STUDIA\mon\backend\bin\Debug\net5.0\algorithm.pdb

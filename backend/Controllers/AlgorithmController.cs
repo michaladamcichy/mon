@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+using algorithm;
 
 namespace backend.Controllers
 {
@@ -27,6 +28,8 @@ namespace backend.Controllers
             //return new string[] { "value1", "value2" };
             //return new string[] { "value1", "value2" };
             //return new ArrayList { "a", "b", "c" };
+            System.Diagnostics.Debug.WriteLine("HELLO");
+            var station = new Station();
             var a = new A();
             return a;
         }
@@ -35,13 +38,18 @@ namespace backend.Controllers
         [HttpGet("{id}")]
         public string Get(int id)
         {
+            
             return "value";
         }
 
         // POST api/<ValuesController>
         [HttpPost]
-        public void Post([FromBody] string value)
-        {
+        [Route("isConnected")]
+        public bool Post(Instance instance) {
+            return instance.IsConnected();
+            //return MapObject.Distance(instance.units[0], instance.units[1]);
+            //System.Diagnostics.Debug.WriteLine(position.ToString());
+            //Log.
         }
 
         // PUT api/<ValuesController>/5

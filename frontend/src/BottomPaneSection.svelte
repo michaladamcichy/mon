@@ -14,5 +14,7 @@
     .main {
         border-right: 2px solid lightgrey;
         height: 24vh;
+        margin: 5px;
     }
+
 </style>

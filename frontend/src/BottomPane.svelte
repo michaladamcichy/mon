@@ -5,6 +5,7 @@ import { onMount } from "svelte";
 
     export let stationRanges;
     export let updateRanges;
+    export let isConnected;
 
     let oldStationRanges;
 
@@ -28,7 +29,17 @@ import { onMount } from "svelte";
         </div>
     </BottomPaneSection>
     <BottomPaneSection title={''}></BottomPaneSection>
-    <BottomPaneSection title={''}></BottomPaneSection>
+    <BottomPaneSection title={'Status'}>
+        <div class="row">
+            {#if isConnected == true}
+            <badge class='col btn btn-success'>{'Connected'}</badge>
+            {:else if isConnected == false}
+            <badge class='col btn btn-danger'>{'Disconnected'}</badge>
+            {:else if isConnected == null} 
+            <badge class='col btn btn-warning'>{'Server unavailable'}</badge>
+            {/if}
+        </div>
+    </BottomPaneSection>
 </div>
 
 <style>
