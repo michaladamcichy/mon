@@ -25,6 +25,21 @@ api.isConnected = async (stationRanges, stationCounts, stations, units) => {
     return parsed;
 };
 
+api.simpleArrangeAlgorithm = async (stationRanges, stationCounts, stations, units) => {
+    const instance = {stationRanges, stationCounts, stations, units};
+    console.log(instance);
+    const result = await fetch(`${api.url}/simpleArrangeAlgorithm`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
+    //alert todo obsluga bledow
+    if(!result.ok) {
+        console.log('request failed');
+        return;
+    }
+
+    const calculatedStations = await result.json();
+    console.log(calculatedStations);
+    return calculatedStations;
+}
+
 api.testPost = async (stationRanges, stations, units) => {
     const instance = {stationRanges, stationCounts: [1000,1000,1000], stations, units};
     const result = await fetch(api.url, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
@@ -32,3 +47,4 @@ api.testPost = async (stationRanges, stations, units) => {
     console.log('post response:')
     console.log(parsed);
 }
+

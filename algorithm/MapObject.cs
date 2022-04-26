@@ -11,17 +11,19 @@ namespace algorithm
         public double lat { get; set; }
         public double lng { get; set; }
     }
-    public class MapObject : ICloneable
+    public class MapObject //: ICloneable
     {
         public Position position { get; set; } = new Position();
 
         public List<MapObject> hosts { get; set; } = new List<MapObject>();
         public List<MapObject> clients { get; set; } = new List<MapObject>();
 
+        public MapObject() { }
         public MapObject(Position position)
         {
             this.position = position;
         }
+
         public object Clone()
         {
             return new MapObject(this.position);
@@ -45,7 +47,7 @@ namespace algorithm
             return 12742 * Math.Asin(Math.Sqrt(a)); // 2 * R; R = 6371 
         }
 
-        public static double MinCoveringCircleRadius(List<MapObject> mapObjects)
+        public static double MinCoveringCircleRadius(List<MapObject> mapObjects) //alert not tested
         {
             double maxDistance = 0f;
 
@@ -61,13 +63,57 @@ namespace algorithm
         }
     }
 
+    public class StationJSON
+    {
+        public Position position { get; set; } = new Position();
+        public double range { get; set; } = 0.0;
+
+        public StationJSON(Position position, double range)
+        {
+            this.position = position;
+            this.range = range;
+        }
+
+        public StationJSON() { }
+    }
     public class Station : MapObject
     {
         public double range { get; set; }
+
+        public Station(StationJSON stationJSON) : base(stationJSON.position)
+        {
+            this.range = stationJSON.range;
+        }
+
+        public StationJSON GetJSON()
+        {
+            return new StationJSON(this.position, this.range);
+        }
+    }
+
+    public class UnitJSON
+    {
+        public Position position {  get; set; } = new Position();
+
+        public UnitJSON()
+        {
+
+        }
+
+        public UnitJSON(Position position)
+        {
+            this.position = position;
+        }
     }
 
     public class Unit : MapObject
     {
+        public Unit(UnitJSON unitJSON) : base(unitJSON.position)
+        {
+
+        }
+        public Unit() { }
+
     }
 
     public enum StationType

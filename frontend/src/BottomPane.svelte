@@ -1,10 +1,15 @@
 <script>
 import { onMount } from "svelte";
+import { api } from "../lib/api";
 
     import BottomPaneSection from "./BottomPaneSection.svelte";
 
+    export let stations;
+    export let units;
     export let stationRanges;
+    export let stationCounts;
     export let updateRanges;
+    export let updateStations;
     export let isConnected;
 
     let oldStationRanges;
@@ -12,6 +17,15 @@ import { onMount } from "svelte";
     onMount(() => {
         oldStationRanges = [...stationRanges];
     });
+
+    const onSimpleArrangeAlgorithmClicked = async () => {
+        const calculatedStations = await api.simpleArrangeAlgorithm(stationRanges, stationCounts, stations, units);
+        if(!calculatedStations) {
+            console.log('request failed');
+            return;
+        }
+        updateStations(calculatedStations);
+    };
 </script>
 
 <div class="row">
@@ -28,7 +42,13 @@ import { onMount } from "svelte";
             {/each}
         </div>
     </BottomPaneSection>
-    <BottomPaneSection title={''}></BottomPaneSection>
+    <BottomPaneSection title={'Algorithms'}>
+        <div class="row">
+            <button class="btn btn-primary" on:click={() => onSimpleArrangeAlgorithmClicked()}>
+                Simple arrange algorithm
+            </button>
+        </div>
+    </BottomPaneSection>
     <BottomPaneSection title={'Status'}>
         <div class="row">
             {#if isConnected == true}

@@ -58,16 +58,14 @@
 	];
 
 	onMount(() => {
-		//api.test();
-		// setInterval(async () => {
-		// 	isConnected = await api.isConnected(stationRanges, stationCounts, stations, units); //alert
-		// }, 1000);
-			
 	});
 
 	$: {
 		(async () => {
+			let serverNotResponding = true;
+			setTimeout(() => {if(serverNotResponding) isConnected = null;}, 5000);
 			isConnected = await api.isConnected(stationRanges, stationCounts, stations, units);
+			serverNotResponding = false;
 		})();
 	}
 
@@ -142,7 +140,14 @@
 			{/if}
 		</div>
 		<div id="leftBottom" class="row">
-			<BottomPane stationRanges={stationRanges} updateRanges={updateRanges} isConnected={isConnected}/>
+			<BottomPane
+				stations={stations}
+				units={units}
+				stationRanges={stationRanges}
+				stationCounts={stationCounts}
+				updateRanges={updateRanges}
+				updateStations={updateAllStations}
+				isConnected={isConnected}/>
 		</div>
 	</div>
 	<div id="rightCol" class="col-4">
