@@ -29,6 +29,13 @@ namespace algorithm
             return new MapObject(this.position);
         }
 
+        public List<MapObject> GetNearestMapObjects(List<MapObject> mapObjects)
+        {
+            var toSort = new List<MapObject>(mapObjects).FindAll(item => item != this);
+            mapObjects.Sort((item1, item2) => Distance(this, item1).CompareTo(Distance(this, item2)));
+            return toSort;
+        }
+
         public static double Distance(MapObject first, MapObject second)
         {
             return Distance(first.position, second.position);
@@ -61,6 +68,27 @@ namespace algorithm
 
             return maxDistance / 2.0;
         }
+
+        public static Position Center(List<MapObject> mapObjects) //alert czy można uśredniać lat i lng??
+        {
+            if(mapObjects.Count == 0)
+            {
+                return new Position();
+            }
+
+            var center = new Position();
+
+            foreach(var mapObject in mapObjects) 
+            {
+                center.lat += mapObject.position.lat;
+                center.lng += mapObject.position.lng;
+            }
+
+            center.lat /= mapObjects.Count;
+            center.lng /= mapObjects.Count;
+
+            return center;
+        }
     }
 
     public class StationJSON
@@ -79,6 +107,11 @@ namespace algorithm
     public class Station : MapObject
     {
         public double range { get; set; }
+
+        public Station(Position position, double range) : base(position)
+        {
+            this.range = range;
+        }
 
         public Station(StationJSON stationJSON) : base(stationJSON.position)
         {

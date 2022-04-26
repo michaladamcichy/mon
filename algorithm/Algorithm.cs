@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,63 @@ namespace algorithm
         {
             //var stations = new List<Station>();
             //stations.Add(instance.stations[0]); //alert czy nie muszę się odwoływać wyłącznie do mapObjects?
-            return instance.Stations; //return instance.Stations;
+
+            var solution = new List<Station>();
+
+            var connected = new Dictionary<Unit, bool>();
+
+            foreach(var unit in instance.Units)
+            {
+                connected[unit] = false; 
+            }
+
+            while (connected.Any(item => item.Value == false))
+            {
+                foreach (var unit in instance.Units.FindAll(item => connected[item] == false))
+                {
+                    if (connected[unit] == true) continue;
+
+                    double selectedRange = instance.StationRanges.Min(); //alert
+                    var neareastUnits = unit.GetNearestMapObjects(instance.MapObjects).FindAll(item => item is Unit && connected[unit] == false).Cast<Unit>().ToList();
+                    var selectedUnits = new List<Unit>();
+
+                    selectedUnits.Add(unit);
+
+                    foreach (var nearestUnit in neareastUnits)
+                    {
+                        if(connected[nearestUnit] == true) continue;
+
+                        var temporarySelectedUnits = new List<Unit>(selectedUnits);
+                        
+                        temporarySelectedUnits.Add(nearestUnit);
+
+                        var minCoveringRadius = MapObject.MinCoveringCircleRadius(temporarySelectedUnits.Cast<MapObject>().ToList());
+                        if (minCoveringRadius > instance.StationRanges.Max())
+                        {
+                            continue;
+                        }
+                        
+                        foreach(var range in instance.StationRanges)
+                        {
+                            if(minCoveringRadius <= range)
+                            {
+                                selectedUnits = temporarySelectedUnits;
+                                selectedRange = range;
+                                break;
+                            }
+                        }
+                    }
+                    var center = MapObject.Center(selectedUnits.Cast<MapObject>().ToList()); //alert zwraca 0,0 moze lepiej null?
+                    foreach(var selectedUnit in selectedUnits)
+                    {
+                        connected[selectedUnit] = true;
+                    }
+                    solution.Add(new Station(center, selectedRange));
+                }
+            }
+
+            
+            return solution; //return instance.Stations;
         }
     }
 
