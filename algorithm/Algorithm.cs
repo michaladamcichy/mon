@@ -1,122 +1,103 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace algorithm
 {
-    public class Position
+    public interface IArrangeStationsAlgorithm
     {
-        public double lat { get; set; }
-        public double lng { get; set; }
+        List<Station> Run(Instance instance);
     }
 
-    public class MapObject
+    public class SimpleArrangeStationsAlgorithm : IArrangeStationsAlgorithm
     {
-        public Position position { get; set; } = new Position();
-
-        public List<MapObject> hosts { get; set; } = new List<MapObject>();
-        public List<MapObject> clients { get; set; } = new List<MapObject>();
-
-        //public static double Distance(MapObject first, MapObject second)
-        //{
-        //    double x = Math.Abs(first.position.lat - second.position.lat) * 110.574; //alert na odwrót //alert //alert!
-        //    double y = (first.position.lng - second.position.lng) * Math.Cos((first.position.lat + second.position.lat) / 2.0 * Math.PI / 180.0) * 111.320f; //alert
-
-
-        //    return Math.Sqrt(x * x + y * y);
-        //}
-
-        public static double Distance(MapObject first, MapObject second)
+        public List<Station> Run(Instance instance)
         {
-            return Distance(first.position, second.position);
-        }
-        public static double Distance(Position first, Position second) 
-        {
-            //alert do weryfikacji - zarówno algorytm jak i przekopiowany kod!!!
-            ////wzięte żywcem z js, trzeba zweryfikować
-            //https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
-            //
-            double p = 0.017453292519943295;    // Math.PI / 
-            double a = 0.5 - Math.Cos((second.lat - first.lat) * p) / 2 +
-                    Math.Cos(first.lat * p) * Math.Cos(second.lat * p) *
-                    (1 - Math.Cos((second.lng - first.lng) * p)) / 2;
+            //var stations = new List<Station>();
+            //stations.Add(instance.stations[0]); //alert czy nie muszę się odwoływać wyłącznie do mapObjects?
 
-            return 12742 * Math.Asin(Math.Sqrt(a)); // 2 * R; R = 6371 
-        }
-    }
+            var solution = new List<Station>();
 
-    public class Station : MapObject
-    {
-        public double range { get; set; }
-    }
+            var connected = new Dictionary<Unit, bool>();
 
-    public class Unit : MapObject
-    {
-    }
-
-    public enum StationType
-    {
-        A = 0,
-        B = 1,
-        C = 2,
-        Count = 3
-    }
-    public class Instance
-    {
-        public double[] stationRanges { get; set; } = new double[0];
-        public int[] stationCounts { get; set; } = new int[0];
-        public List<Station> stations { get; set; } = new List<Station>();
-        public List<Unit> units { get; set; } = new List<Unit>();
-        
-        List<MapObject> mapObjects = new List<MapObject>();
-
-        public Instance(double[] stationRanges, int[] stationCounts, List<Station> stations, List<Unit> units)
-        {
-            this.stationRanges = stationRanges;
-            this.stationCounts = stationCounts;
-
-            this.mapObjects = stations.Cast<MapObject>().Concat(units.Cast<MapObject>()).ToList();
-
-            prepareDataStructures();
-        }
-
-        void prepareDataStructures()
-        {
-            foreach(MapObject first in mapObjects)
+            foreach(var unit in instance.Units)
             {
-                foreach(MapObject second in mapObjects)
-                {
-                    if (first == second || second is not Station) continue;
+                connected[unit] = false; 
+            }
 
-                    if (MapObject.Distance(first, second) <= ((Station) second).range)
+            while (connected.Any(item => item.Value == false))
+            {
+                foreach (var unit in instance.Units.FindAll(item => connected[item] == false))
+                {
+                    if (connected[unit] == true) continue;
+
+                    double selectedRange = instance.StationRanges.Min(); //alert
+                    var neareastUnits = unit.GetNearestMapObjects(instance.MapObjects).FindAll(item => item is Unit && connected[unit] == false).Cast<Unit>().ToList();
+                    var selectedUnits = new List<Unit>();
+
+                    selectedUnits.Add(unit);
+
+                    foreach (var nearestUnit in neareastUnits)
                     {
-                        first.hosts.Add(second);
-                        second.clients.Add(first);
+                        if(connected[nearestUnit] == true) continue;
+
+                        var temporarySelectedUnits = new List<Unit>(selectedUnits);
+                        
+                        temporarySelectedUnits.Add(nearestUnit);
+
+                        var minCoveringRadius = MapObject.MinCoveringCircleRadius(temporarySelectedUnits.Cast<MapObject>().ToList());
+                        if (minCoveringRadius > instance.StationRanges.Max())
+                        {
+                            continue;
+                        }
+                        
+                        foreach(var range in instance.StationRanges)
+                        {
+                            if(minCoveringRadius <= range)
+                            {
+                                selectedUnits = temporarySelectedUnits;
+                                selectedRange = range;
+                                break;
+                            }
+                        }
                     }
+                    var center = MapObject.Center(selectedUnits.Cast<MapObject>().ToList()); //alert zwraca 0,0 moze lepiej null?
+                    foreach(var selectedUnit in selectedUnits)
+                    {
+                        connected[selectedUnit] = true;
+                    }
+                    solution.Add(new Station(center, selectedRange));
                 }
             }
-        }
 
-        public bool IsConnected()
+            
+            return solution; //return instance.Stations;
+        }
+    }
+
+    public class ConnectionCheckAlgorithm
+    {
+        public bool Run(Instance instance)
         {
-            if (mapObjects.Count == 0)
+            if (instance.MapObjects.Count == 0)
             {
                 return true;
             }
 
-            foreach(var unit in mapObjects.FindAll(item => item is Unit))
+            foreach (var unit in instance.MapObjects.FindAll(item => item is Unit))
             {
                 var visited = new Dictionary<MapObject, bool>();
 
-                mapObjects.ForEach(mapObject => visited.Add(mapObject, false));
+                instance.MapObjects.ForEach(mapObject => visited.Add(mapObject, false));
 
                 DFS(unit, visited);
 
                 bool allConnected = visited.All(item => item.Key is not Unit || item.Value == true);
-                if(!allConnected)
+                if (!allConnected)
                 {
                     return false;
                 }
@@ -135,7 +116,7 @@ namespace algorithm
                 DFS(host, visited);
             }
 
-            if(start is Station)
+            if (start is Station)
             {
                 foreach (var client in start.clients.FindAll(item => item is Unit))
                 {
@@ -145,15 +126,18 @@ namespace algorithm
                 }
             }
         }
-
     }
 
     public class Algorithm
     {
+        public static bool IsConnected(Instance instance)
+        {
+            return new ConnectionCheckAlgorithm().Run(instance);
+        }
 
-        //public DFS()
-        //{
-
-        //}
+        public static List<Station> SimpleArrangeAlgorithm(Instance instance)
+        {
+            return new SimpleArrangeStationsAlgorithm().Run(instance);
+        }
     }
 }

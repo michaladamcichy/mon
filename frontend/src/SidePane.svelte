@@ -17,7 +17,7 @@
     let unitsHidden = false;
 
     const addStation = () => {
-        const newStation = [...stations, {lat: map.getCenter().lat(), lng: map.getCenter().lng(), range: stationRanges[0]}];
+        const newStation = [...stations, {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: stationRanges[0]}];
         updateAllStations(newStation);
     };
 
@@ -27,7 +27,7 @@
 
     const addUnit = () => {
         const position = map.getCenter();
-        const newUnit = [...units, {lat: map.getCenter().lat(), lng: map.getCenter().lng()}];
+        const newUnit = [...units, {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}}];
         updateAllUnits(newUnit);
     };
 

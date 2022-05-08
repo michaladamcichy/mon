@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using algorithm;
 
@@ -12,8 +13,6 @@ namespace backend.Controllers
     {
         public string x { get; set; } = "hello";
         public ArrayList arrayList { get; set; } = new ArrayList { "a", "b", "c" };
-
- 
     }
 
     [Route("api/[controller]")]
@@ -29,7 +28,7 @@ namespace backend.Controllers
             //return new string[] { "value1", "value2" };
             //return new ArrayList { "a", "b", "c" };
             System.Diagnostics.Debug.WriteLine("HELLO");
-            var station = new Station();
+           
             var a = new A();
             return a;
         }
@@ -45,12 +44,20 @@ namespace backend.Controllers
         // POST api/<ValuesController>
         [HttpPost]
         [Route("isConnected")]
-        public bool Post(Instance instance) {
-            return instance.IsConnected();
-            //return MapObject.Distance(instance.units[0], instance.units[1]);
-            //System.Diagnostics.Debug.WriteLine(position.ToString());
-            //Log.
+        public bool Post(InstanceJSON instanceJSON) {
+            var instance = new Instance(instanceJSON);
+            return Algorithm.IsConnected(instance);
         }
+
+        [HttpPost]
+        [Route("simpleArrangeAlgorithm")]
+        public List<StationJSON> simpleArrangeAlgorithm(InstanceJSON instanceJSON)
+        {
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.SimpleArrangeAlgorithm(instance).Select(item => item.GetJSON()).ToList();
+            return ret;
+        }
+
 
         // PUT api/<ValuesController>/5
         [HttpPut("{id}")]
