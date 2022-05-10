@@ -46,16 +46,27 @@ namespace algorithm
         {
             var mapObjects = stations.Cast<MapObject>().Concat(units.Cast<MapObject>()).ToList();
 
-            foreach (MapObject first in mapObjects)
+            foreach(var first in mapObjects)
             {
-                foreach (MapObject second in mapObjects)
+                foreach(var second in stations)
                 {
-                    if (first == second || second is not Station) continue;
+                    if (first == second) continue;
 
-                    if (MapObject.Distance(first, second) <= ((Station)second).range)
+                    if(MapObject.Distance(first, second) <= second.Range)
                     {
-                        first.hosts.Add(second);
-                        second.clients.Add(first);
+                        first.AddSender(second);
+                        second.AddReceiver(first);
+                    }
+                }
+            }
+
+            foreach(var station in stations)
+            {
+                foreach(var unit in units)
+                {
+                    if(!unit.HasAttachement() && !station.IsAttached() && station.Position.Equals(unit.Position)) //alert to powinno byc property
+                    {
+                        MapObject.Attach(station, unit);
                     }
                 }
             }

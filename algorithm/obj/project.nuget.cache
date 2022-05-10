@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "SfYYyI0yEeot0xeNyEWfV1xuz+AEc/xdLaLl2AQfmLVTUUZnc9TXiiDqpUERKOmxY7t1tis3o2qsz/mnKknNzA==",
+  "dgSpecHash": "B2/HODv5+XrhqIHyvEIvwEQerSMuTIB66IM3UC9n2ymq0EdlW2VB8l2Nc8aeR1qSuSdO8XZyRaWzf31FPYYYeA==",
   "success": true,
   "projectFilePath": "D:\\STUDIA\\mon\\algorithm\\algorithm.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
+    "C:\\Users\\BijBolszewika\\.nuget\\packages\\mstest.testframework\\2.2.10\\mstest.testframework.2.2.10.nupkg.sha512",
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\system.collections.nongeneric\\4.3.0\\system.collections.nongeneric.4.3.0.nupkg.sha512",
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\system.diagnostics.debug\\4.3.0\\system.diagnostics.debug.4.3.0.nupkg.sha512",
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\system.globalization\\4.3.0\\system.globalization.4.3.0.nupkg.sha512",

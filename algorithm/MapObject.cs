@@ -8,37 +8,65 @@ namespace algorithm
 {
     public class Position
     {
-        public double lat { get; set; }
-        public double lng { get; set; }
+        public double lat { get; set; } = 0.0;
+        public double lng { get; set; } = 0.0;
+
+        public Position() { }
+        public Position(double lat, double lng)
+        {
+            this.lat = lat; this.lng = lng;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return lat == ((Position) obj).lat && lng == ((Position) obj).lng;
+        }
     }
     public class MapObject //: ICloneable
     {
-        public Position position { get; set; } = new Position();
+        public Position Position { get; set; } = new Position();
 
-        public List<MapObject> hosts { get; set; } = new List<MapObject>();
-        public List<MapObject> clients { get; set; } = new List<MapObject>();
+        public HashSet<MapObject> Senders { get; set; } = new HashSet<MapObject>();
+        public HashSet<MapObject> Receivers { get; set; } = new HashSet<MapObject>();
 
         public MapObject() { }
         public MapObject(Position position)
         {
-            this.position = position;
+            this.Position = position;
         }
 
+        public override bool Equals(Object other)
+        {
+            return Position == ((MapObject) other).Position;
+        }
         public object Clone()
         {
-            return new MapObject(this.position);
+            return new MapObject(Position); //alert dla dziedziczących też by raczej trzeba przeciążyć
         }
 
         public List<MapObject> GetNearestMapObjects(List<MapObject> mapObjects)
         {
-            var toSort = new List<MapObject>(mapObjects).FindAll(item => item != this);
-            mapObjects.Sort((item1, item2) => Distance(this, item1).CompareTo(Distance(this, item2)));
+            var toSort = mapObjects.FindAll(item => item != this);
+            toSort.Sort((item1, item2) => Distance(this, item1).CompareTo(Distance(this, item2)));
             return toSort;
+        }
+
+        public List<Station> GetNearestStations(List<MapObject> mapObjects)
+        {
+            var stations = mapObjects.FindAll(item => item != this && item is Station).Cast<Station>().ToList();
+            mapObjects.Sort((item1, item2) => Distance(this, item1).CompareTo(Distance(this, item2)));
+            return stations;
+        }
+        public List<Unit> GetNearestUnits(List<MapObject> mapObjects)
+        {
+            var units = mapObjects.FindAll(item => item != this && item is Unit).Cast<Unit>().ToList();
+            mapObjects.Sort((item1, item2) => Distance(this, item1).CompareTo(Distance(this, item2)));
+            return units;
         }
 
         public static double Distance(MapObject first, MapObject second)
         {
-            return Distance(first.position, second.position);
+            return Distance(first.Position, second.Position);
         }
         public static double Distance(Position first, Position second)
         {
@@ -80,14 +108,30 @@ namespace algorithm
 
             foreach(var mapObject in mapObjects) 
             {
-                center.lat += mapObject.position.lat;
-                center.lng += mapObject.position.lng;
+                center.lat += mapObject.Position.lat;
+                center.lng += mapObject.Position.lng;
             }
 
             center.lat /= mapObjects.Count;
             center.lng /= mapObjects.Count;
 
             return center;
+        }
+
+        public static void Attach(Station station, Unit unit)
+        {
+            station.AttachTo(unit);
+            unit.Attach(station);
+        }
+
+        public void AddSender(MapObject sender)
+        {
+            Senders.Add(sender);
+        }
+
+        public void AddReceiver(MapObject receiver)
+        {
+            Receivers.Add(receiver);
         }
     }
 
@@ -106,25 +150,42 @@ namespace algorithm
     }
     public class Station : MapObject
     {
-        public double range { get; set; }
+        public double Range { get; set; }
 
+
+        public Station(double range)
+        {
+            this.Range = range;
+        }
         public Station(Position position, double range) : base(position)
         {
-            this.range = range;
+            this.Range = range;
         }
 
         public Station(StationJSON stationJSON) : base(stationJSON.position)
         {
-            this.range = stationJSON.range;
+            this.Range = stationJSON.range;
         }
 
         public StationJSON GetJSON()
         {
-            return new StationJSON(this.position, this.range);
+            return new StationJSON(Position, Range);
+        }
+
+        public void AttachTo(Unit unit)
+        {
+            Position = unit.Position;
+            Senders.RemoveWhere(item => item is Unit);
+            Senders.Add(unit);
+        }
+
+        public bool IsAttached()
+        {
+            return Senders.Any(item => item is Unit);
         }
     }
 
-    public class UnitJSON
+    public class UnitJSON //alert todo dać dziedziczenie może będzie działać
     {
         public Position position {  get; set; } = new Position();
 
@@ -147,6 +208,16 @@ namespace algorithm
         }
         public Unit() { }
 
+        public void Attach(Station station)
+        {
+            Receivers.Clear();
+            Receivers.Add(station);
+        }
+
+        public bool HasAttachement()
+        {
+            return Receivers.Count > 0;
+        }
     }
 
     public enum StationType

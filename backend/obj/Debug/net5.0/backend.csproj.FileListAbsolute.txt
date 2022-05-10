@@ -32,3 +32,4 @@ D:\STUDIA\mon\backend\bin\Debug\net5.0\algorithm.runtimeconfig.dev.json
 D:\STUDIA\mon\backend\bin\Debug\net5.0\algorithm.exe
 D:\STUDIA\mon\backend\bin\Debug\net5.0\algorithm.dll
 D:\STUDIA\mon\backend\bin\Debug\net5.0\algorithm.pdb
+D:\STUDIA\mon\backend\bin\Debug\net5.0\Microsoft.VisualStudio.TestPlatform.TestFramework.dll

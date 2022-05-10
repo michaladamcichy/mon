@@ -14,6 +14,8 @@ import { onMount } from "svelte";
     let markers = [];
     let circles = [];
 
+    let selectedToCopyPosition = null;
+
     $: {
         updateMarkers(map, stations, units);
         updateCircles(map, stations);
@@ -67,10 +69,31 @@ import { onMount } from "svelte";
                 draggable: true,
                 icon: mapObjects == stations ? stationMarkerIcon : mapObjects == units ? unitMarkerIcon : null,
             });
-            marker.addListener('dragend', () => {
+            marker.addListener('dragend', e => {
                 mapObject.position.lat = marker.getPosition().lat();
                 mapObject.position.lng = marker.getPosition().lng();
                 update(mapObject);
+            });
+
+            marker.addListener('click', e => {
+                console.log('start');
+                if(!e.domEvent.shiftKey) {
+                    console.log('!shift');
+                    selectedToCopyPosition = null;
+                    return;
+                }
+
+                if(!selectedToCopyPosition) {
+                    console.log('!selectedToCopy');
+                    selectedToCopyPosition = marker;
+                    return;
+                }
+
+                console.log('else');
+                mapObject.position.lat = selectedToCopyPosition.getPosition().lat();
+                mapObject.position.lng = selectedToCopyPosition.getPosition().lng();
+                update(mapObject);
+                selectedToCopyPosition = null;
             });
 
             markers.push(marker);

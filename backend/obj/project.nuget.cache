@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "oCPeLSddOxN2Td3HHQXCx8ejXUso2IMPVvp7xL9DXjCqnnYTOmv1YoMZ4KC0S/kSk1zR4dEVs/uafDKbLfIXcA==",
+  "dgSpecHash": "hXRoUNxb+3YN5T1o1rLpw7n3f/zzCJzRyEpPl8nPy5nEyaFvV+wNfAqIWZFQGMh+uJHHQpjISlm6moeoM+szzw==",
   "success": true,
   "projectFilePath": "D:\\STUDIA\\mon\\backend\\backend.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,7 @@
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\BijBolszewika\\.nuget\\packages\\mstest.testframework\\2.2.10\\mstest.testframework.2.2.10.nupkg.sha512",
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\swashbuckle.aspnetcore\\5.6.3\\swashbuckle.aspnetcore.5.6.3.nupkg.sha512",
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\5.6.3\\swashbuckle.aspnetcore.swagger.5.6.3.nupkg.sha512",
     "C:\\Users\\BijBolszewika\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\5.6.3\\swashbuckle.aspnetcore.swaggergen.5.6.3.nupkg.sha512",
