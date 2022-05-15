@@ -133,6 +133,8 @@ namespace algorithm
         {
             Receivers.Add(receiver);
         }
+
+
     }
 
     public class StationJSON

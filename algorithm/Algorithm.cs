@@ -74,8 +74,6 @@ namespace algorithm
                 var nearestStations = first.GetNearestStations(instance.MapObjects);
 
                 var removed = new HashSet<Station>();
-
-                var stations = new HashSet<Station>[2] {temp, removed};
                
                 foreach (var second in nearestStations)
                 {
@@ -161,13 +159,18 @@ namespace algorithm
                     temp.ToList().ForEach(item => item.Range = stationRange);
                 }
 
-                if(Algorithm.IsConnected(temp.ToList()))
+                if (Algorithm.IsConnected(temp.ToList()) && temp.All(item => item.Range <= range))
                 {
                     continue;
                 }
+                //alert to wymaga większego przemyślenia
+                //np byla taka sytuacja, ze stacje mialy duzy zasięg  - i algorytm się kończył, a 
+                //lepije by  było, jakby miały mały zasięg i wstawić małą stację międzyu nie
+                //bo chodzi o to, że linijkka po ifie może zmniejszyć zasięg stacji przy jednostkach
 
                 temp.ToList().ForEach(item => item.Range = range.Value);
-                
+
+                //return temp.ToList();//alert
                 solution.Add(new Station(MapObject.Center(temp.Cast<MapObject>().ToList()), range.Value));
             }
                 //alert ważne wydaje mi się, że na tym etapie opłaca się operować na stałych zasięgach (ale stałych w obrębie grup)
@@ -175,74 +178,49 @@ namespace algorithm
 
 
             return solution;
-            //while (connected.Any(item => item.Value == false))
-            //{
-            //    foreach (var unit in instance.Units.FindAll(item => connected[item] == false))
-            //    {
-            //        if (connected[unit] == true) continue;
-
-
-
-            //        double selectedRange = instance.StationRanges.Min(); //alert
-            //        var neareastUnits = unit.GetNearestMapObjects(instance.MapObjects).FindAll(item => item is Unit && connected[unit] == false).Cast<Unit>().ToList();
-            //        var selectedUnits = new List<Unit>();
-
-            //        selectedUnits.Add(unit);
-
-            //        foreach (var nearestUnit in neareastUnits)
-            //        {
-            //            if(connected[nearestUnit] == true) continue;
-
-            //            var temporarySelectedUnits = new List<Unit>(selectedUnits);
-                        
-            //            temporarySelectedUnits.Add(nearestUnit);
-
-            //            var minCoveringRadius = MapObject.MinCoveringCircleRadius(temporarySelectedUnits.Cast<MapObject>().ToList());
-            //            if (minCoveringRadius > instance.StationRanges.Max())
-            //            {
-            //                continue;
-            //            }
-                        
-            //            foreach(var range in instance.StationRanges)
-            //            {
-            //                if(minCoveringRadius <= range)
-            //                {
-            //                    selectedUnits = temporarySelectedUnits;
-            //                    selectedRange = range;
-            //                    break;
-            //                }
-            //            }
-            //        }
-            //        var center = MapObject.Center(selectedUnits.Cast<MapObject>().ToList()); //alert zwraca 0,0 moze lepiej null?
-            //        foreach(var selectedUnit in selectedUnits)
-            //        {
-            //            connected[selectedUnit] = true;
-            //        }
-            //        solution.Add(new Station(center, selectedRange));
-            //    }
-            //}
-
-            //return solution;
         }
+
+        //alert scenariusze łączęnia grup:
+        //zbuduje drogę miedzy stacjami
+        //powiększ którąś ze stacji!
     }
 
     public class ConnectionCheckAlgorithm
     {
         public bool Run(Instance instance)
         {
-            if(instance.MapObjects.Count == 0)
+            var units = instance.MapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList();
+
+            if (units.Count == 1 ) return true;
+            
+            if(units.Count == 0)
             {
+                foreach (var station in instance.MapObjects.FindAll(item => item is Station))
+                {
+                    var visited = new Dictionary<MapObject, bool>();
+                    instance.MapObjects.ForEach(mapObject => visited.Add(mapObject, false));
+                    DFS(station, visited);
+                    bool notAllConnected = visited.Any(item => item.Value == false);
+
+                    if (notAllConnected)
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 
+            if (units.Any(item => !item.HasAttachement())) return false;
+            
             foreach(var unit in instance.MapObjects.FindAll(item => item is Unit))
             {
                 var visited = new Dictionary<MapObject, bool>();
                 instance.MapObjects.ForEach(mapObject => visited.Add(mapObject, false));
                 DFS(unit, visited);
-                bool allConnected = visited.All(item => item.Key is not Unit || item.Value == true);
+                bool notAllConnected = visited.Any(item => item.Value == false);
                 
-                if(!allConnected)
+                if(notAllConnected)
                 {
                     return false;
                 }
@@ -253,25 +231,26 @@ namespace algorithm
 
         public bool Run(List<Station> stations)
         {
-            if (stations.Count == 0)
-            {
-                return true;
-            }
+            return Run(new Instance(stations));
+            //if (stations.Count == 0)
+            //{
+            //    return true;
+            //}
 
-            foreach (var station in stations)
-            {
-                var visited = new Dictionary<MapObject, bool>();
-                stations.ForEach(mapObject => visited.Add(mapObject, false));
-                DFS(station, visited);
-                bool allConnected = visited.All(item => item.Value == true);
+            //foreach (var station in stations)
+            //{
+            //    var visited = new Dictionary<MapObject, bool>();
+            //    stations.ForEach(mapObject => visited.Add(mapObject, false));
+            //    DFS(station, visited);
+            //    bool allConnected = visited.All(item => item.Value == true);
 
-                if (!allConnected)
-                {
-                    return false;
-                }
-            }
+            //    if (!allConnected)
+            //    {
+            //        return false;
+            //    }
+            //}
 
-            return true;
+            //return true;
         }
         public void DFS(MapObject start, Dictionary<MapObject, bool> visited)
         {
@@ -296,7 +275,6 @@ namespace algorithm
         {
             return new ConnectionCheckAlgorithm().Run(stations);
         }
-
         public static List<Station> SimpleArrangeAlgorithm(Instance instance)
         {
             return new SimpleArrangeStationsAlgorithm().Run(instance);
