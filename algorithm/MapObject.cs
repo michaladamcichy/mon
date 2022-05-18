@@ -26,8 +26,8 @@ namespace algorithm
     {
         public Position Position { get; set; } = new Position();
 
-        public HashSet<MapObject> Senders { get; set; } = new HashSet<MapObject>();
-        public HashSet<MapObject> Receivers { get; set; } = new HashSet<MapObject>();
+        public List<MapObject> Senders { get; set; } = new List<MapObject>();
+        public List<MapObject> Receivers { get; set; } = new List<MapObject>();
 
         public MapObject() { }
         public MapObject(Position position)
@@ -152,8 +152,11 @@ namespace algorithm
     }
     public class Station : MapObject
     {
+        static int _id = 0;
+        public int id { get; } = ++_id;
         public double Range { get; set; }
-
+        
+        
 
         public Station(double range)
         {
@@ -177,7 +180,7 @@ namespace algorithm
         public void AttachTo(Unit unit)
         {
             Position = unit.Position;
-            Senders.RemoveWhere(item => item is Unit);
+            Senders.RemoveAll(item => item is Unit);
             Senders.Add(unit);
         }
 

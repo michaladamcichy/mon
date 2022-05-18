@@ -48,14 +48,14 @@
     </div>
     <hr>
     {#if !stationsHidden}
-        {#each stations as station, index}
-            <Station index={index} station={station} update={updateStation} remove={removeStation} ranges={stationRanges}/> 
-        {/each}
         <div class="row">
             <button class="addButton btn btn-primary" on:click={() => {addStation();}}>
                 +
             </button>
         </div>
+        {#each stations as station, index}
+            <Station index={index} station={station} update={updateStation} remove={removeStation} ranges={stationRanges}/> 
+        {/each}
     {/if}
     <hr>
     <div class="row">
@@ -68,14 +68,14 @@
     </div>
     <hr>
     {#if !unitsHidden}
-        {#each units as unit, index}
-            <Unit index={index} unit={unit} update={updateUnit} remove={removeUnit}/>
-        {/each}
         <div class="row">
             <button class="addButton btn btn-primary" on:click={() => {addUnit();}}>
                 +
             </button>
         </div>
+        {#each units as unit, index}
+            <Unit index={index} unit={unit} update={updateUnit} remove={removeUnit}/>
+        {/each}
     {/if}
     <hr>
 </div>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,13 +31,13 @@ namespace algorithm
             return null;
         }
 
-        static void Add(HashSet<Station> stations, Station station, Dictionary<Station, bool> connected)
+        static void Add(List<Station> stations, Station station, Dictionary<Station, bool> connected)
         {
             stations.Add(station);
             connected[station] = true;
         }
 
-        static void Remove(HashSet<Station> stations, Station station, Dictionary<Station, bool> connected)
+        static void Remove(List<Station> stations, Station station, Dictionary<Station, bool> connected)
         {
             stations.Remove(station);
             connected[station] = false;
@@ -44,11 +45,51 @@ namespace algorithm
 
         public List<Station> Run(Instance instance)
         {
+            List<Group> grouped = CreateGroups(instance);
+            List<Station> joined = JoinGroups(grouped);
+
+            return joined;
+        }
+
+        //public Dictionary<Tuple<Group, Group>, double> CreateMatrix(List<Group> groups)
+        //{
+        //    var matrix = new Dictionary<Tuple<Group, Group>, double>;
+
+        //    foreach(var first in groups)
+        //    {
+        //        foreach(var second in groups)
+        //        {
+        //            if(first == second)
+        //            {
+        //                //matrix[]
+        //            }
+        //        }
+        //    }
+
+        //    return matrix;
+        //}
+
+        //public List<Group> SalesmanRoute(List<Group> groups)
+        //{
+        //    var pairs = new List<Tuple<Group, Group>>();
+
+        //    groups.ForEach(first => { groups.ForEach(second => { pairs.Add(new Tuple<Group, Group>(first, second)); });
+
+        //    //Group
+
+        //    return groups; //alert
+        //}
+
+        List<Station> JoinGroups(List<Group> groups)
+        {
+            return Group.Flatten(groups);
+        }
+        List<Group> CreateGroups(Instance instance)
+        {
             instance.MapObjects.RemoveAll(item => item is Station); //alert!!
 
             var connected = new Dictionary<Station, bool>(); //alert - jak zrobić, żeby były tylko stacje związane z jednostkami?
             
-
             foreach(var unit in instance.Units)
             {
                 var station = new Station(instance.StationRanges.Min()); //alert przydałaby się faza dobierania rozmiaru stacji
@@ -61,36 +102,35 @@ namespace algorithm
             }
 
             instance.Stations.ForEach(item => connected[item] = false);
-            var solution = new List<Station>(instance.Stations);
-            //var tempSolution = new List<Station>(solution);
-
+            var groups = new List<Group>();
+            
             foreach(var first in instance.Stations)
             {
                 if (connected[first] == true) continue; //alert a może nie należy używać tych connected - może należy pozwolić, aby powstały grupy nakładające się na siebie i wtedy wybrać?
 
-                var temp = new HashSet<Station>();
-                Add(temp, first, connected);
+                var group = new Group();
+                group.Add(first, connected);
 
                 var nearestStations = first.GetNearestStations(instance.MapObjects);
 
-                var removed = new HashSet<Station>();
+                var removed = new List<Station>();
                
                 foreach (var second in nearestStations)
                 {
                     if (connected[second]) continue;
 
-                    var minCoveringRangeBeforeAdding = MinCoveringRange(instance.StationRanges, temp.Cast<MapObject>().ToList());
-                    Add(temp, second, connected);
+                    var minCoveringRangeBeforeAdding = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
+                    group.Add(second, connected);
 
-                    var minCoveringRangeAfterAdding = MinCoveringRange(instance.StationRanges, temp.Cast<MapObject>().ToList());
+                    var minCoveringRangeAfterAdding = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
 
-                    var center = MapObject.Center(temp.Cast<MapObject>().ToList());
+                    var center = MapObject.Center(group.ToMapObjects());
                     //var furthestFromCenter = temp.Max(item => MapObject.Distance(item.Position, center));
-                    var furthestFromCenter = temp.Aggregate((first, second) => MapObject.Distance(first.Position, center) > MapObject.Distance(second.Position, center) ? first : second);
+                    var furthestFromCenter = group.Aggregate((first, second) => MapObject.Distance(first.Position, center) > MapObject.Distance(second.Position, center) ? first : second);
 
-                    Remove(temp, furthestFromCenter, connected);
+                    group.Remove(furthestFromCenter, connected);
                     removed.Add(furthestFromCenter);
-                    var alternativeMinCoveringRange = MinCoveringRange(instance.StationRanges, temp.Cast<MapObject>().ToList());
+                    var alternativeMinCoveringRange = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
 
                     //alert todo! być może opłaca się podejmować poniższą decyzję nie na podstawie minCoveringRange lecz minCoveringRadius??
                     //premiowanie skupienia nawet, jeśli chwilowo nie zmienia to sytuacji ze stacjami?
@@ -100,7 +140,7 @@ namespace algorithm
                     //alert ważna decyzja < czy = //chcemy pływanie lub nie, może być ono korzystne
                     if (minCoveringRangeAfterAdding != null && alternativeMinCoveringRange != null && minCoveringRangeAfterAdding <= alternativeMinCoveringRange)
                     {
-                        Add(temp, furthestFromCenter, connected);
+                        group.Add(furthestFromCenter, connected);
                         removed.Remove(furthestFromCenter);
                         continue;
                     }
@@ -117,50 +157,52 @@ namespace algorithm
                             continue;
                         }
                     }
-                    Add(temp, furthestFromCenter, connected);
+                    group.Add(furthestFromCenter, connected);
                     removed.Remove(furthestFromCenter);
-                    Remove(temp, second, connected);
+                    group.Remove(second, connected);
                 }
 
                 foreach(var removedStation in removed)
                 {
                     if (connected[removedStation]) continue; //alert chyba niepotrzebne
 
-                    var minCoveringRangeBeforeAdding = MinCoveringRange(instance.StationRanges, temp.Cast<MapObject>().ToList());
-                    Add(temp, removedStation, connected);
+                    var minCoveringRangeBeforeAdding = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
+                    group.Add(removedStation, connected);
 
-                    var minCoveringRangeAfterAdding = MinCoveringRange(instance.StationRanges, temp.Cast<MapObject>().ToList());
+                    var minCoveringRangeAfterAdding = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
 
                     if (minCoveringRangeAfterAdding == null)
                     {
-                        Remove(temp, removedStation, connected);
+                        group.Remove(removedStation, connected);
+                        removedStation.Range = instance.StationRanges.Min();
                         continue;
                     }
                 }
 
-                var range = MinCoveringRange(instance.StationRanges, temp.Cast<MapObject>().ToList());
+                var range = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
                 if(range == null)
                 {
-                    return new List<Station>();
+                    Assert.IsTrue(false); //alert
                 }
 
                 foreach(var stationRange in instance.StationRanges)
                 {
-                    if(temp.ToList()[0].Range >= stationRange) //alert
+                    if(group.Any(item => item.Range >= stationRange)) //alert
                     {
                         continue;
                     }
 
-                    if (Algorithm.IsConnected(temp.ToList()))
+                    if (Algorithm.IsConnected(group.ToList()))
                     {
                         break;
                     }
 
-                    temp.ToList().ForEach(item => item.Range = stationRange);
+                    group.ToList().ForEach(item => item.Range = stationRange);
                 }
 
-                if (Algorithm.IsConnected(temp.ToList()) && temp.All(item => item.Range <= range))
+                if (Algorithm.IsConnected(group.ToList()) && group.All(item => item.Range <= range))
                 {
+                    groups.Add(group);
                     continue;
                 }
                 //alert to wymaga większego przemyślenia
@@ -168,21 +210,35 @@ namespace algorithm
                 //lepije by  było, jakby miały mały zasięg i wstawić małą stację międzyu nie
                 //bo chodzi o to, że linijkka po ifie może zmniejszyć zasięg stacji przy jednostkach
 
-                temp.ToList().ForEach(item => item.Range = range.Value);
+                group.ToList().ForEach(item => item.Range = range.Value);
 
                 //return temp.ToList();//alert
-                solution.Add(new Station(MapObject.Center(temp.Cast<MapObject>().ToList()), range.Value));
+                
+                group.Add(new Station(MapObject.Center(group.ToMapObjects()), range.Value));
+                groups.Add(group);
+            }
+
+            foreach(var station in instance.Stations)
+            {
+                if(connected[station] == false)
+                {
+                    var group = new Group();
+                    group.Add(station);
+                    groups.Add(group);
+                }
             }
                 //alert ważne wydaje mi się, że na tym etapie opłaca się operować na stałych zasięgach (ale stałych w obrębie grup)
                 //i potem łączyć grupy jak największymi stacjami
 
-
-            return solution;
+            return groups;
         }
 
         //alert scenariusze łączęnia grup:
         //zbuduje drogę miedzy stacjami
         //powiększ którąś ze stacji!
+        //pytanie: czy lepiej powiększać czy lepiej dostawiać
+        //a może może lepiej dążyć do równych rozmiarów stacji sąsiadujących?
+        //może to jest klucz do dobrego planaowania?
     }
 
     public class ConnectionCheckAlgorithm
