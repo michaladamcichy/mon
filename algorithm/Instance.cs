@@ -42,20 +42,44 @@ namespace algorithm
             this.MapObjects = prepareMapObjects(stations, units);
         }
 
+        public Instance(List<Station> stations, List<Unit> units)
+        {
+            var ranges = new List<double>();
+            stations.ForEach(item => ranges.Add(item.Range));
+
+            this.StationRanges = ranges.ToArray();
+            this.StationCounts = new int[3] { 1000, 1000, 1000 }; // alert!
+
+            this.MapObjects = prepareMapObjects(stations, units);
+        }
+
+        public Instance(List<Station> stations) : this(stations, new List<Unit>()) {}
+
         List<MapObject> prepareMapObjects(List<Station> stations, List<Unit> units)
         {
             var mapObjects = stations.Cast<MapObject>().Concat(units.Cast<MapObject>()).ToList();
 
-            foreach (MapObject first in mapObjects)
+            foreach(var first in mapObjects)
             {
-                foreach (MapObject second in mapObjects)
+                foreach(var second in stations)
                 {
-                    if (first == second || second is not Station) continue;
+                    if (first == second) continue;
 
-                    if (MapObject.Distance(first, second) <= ((Station)second).range)
+                    if(MapObject.Distance(first, second) <= second.Range)
                     {
-                        first.hosts.Add(second);
-                        second.clients.Add(first);
+                        first.AddSender(second);
+                        second.AddReceiver(first);
+                    }
+                }
+            }
+
+            foreach(var station in stations)
+            {
+                foreach(var unit in units)
+                {
+                    if(!unit.HasAttachement() && !station.IsAttached() && station.Position.Equals(unit.Position)) //alert to powinno byc property
+                    {
+                        MapObject.Attach(station, unit);
                     }
                 }
             }
