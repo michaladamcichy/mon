@@ -3,6 +3,7 @@ import { onMount } from "svelte";
 import { api } from "../lib/api";
 
     import BottomPaneSection from "./BottomPaneSection.svelte";
+import Station from "./Station.svelte";
 
     export let stations;
     export let units;
@@ -17,6 +18,19 @@ import { api } from "../lib/api";
     onMount(() => {
         oldStationRanges = [...stationRanges];
     });
+
+    const getStationsStats = (stations) => {
+        const sizes = stations.map(item => item.range);
+        console.log(sizes);
+        const uniqueSizes = new Set(sizes);
+
+        let counts = [];
+        uniqueSizes.forEach(size => {
+            counts.push({range: size, count: sizes.filter(item => item == size).length});
+        });
+        console.log(counts);
+        return counts;
+    };
 
     const onSimpleArrangeAlgorithmClicked = async () => {
         const calculatedStations = await api.simpleArrangeAlgorithm(stationRanges, stationCounts, stations, units);
@@ -50,7 +64,7 @@ import { api } from "../lib/api";
         </div>
     </BottomPaneSection>
     <BottomPaneSection title={'Status'}>
-        <div class="row">
+        <div class="row status">
             {#if isConnected == true}
             <badge class='col btn btn-success'>{'Connected'}</badge>
             {:else if isConnected == false}
@@ -59,9 +73,19 @@ import { api } from "../lib/api";
             <badge class='col btn btn-warning'>{'Server unavailable'}</badge>
             {/if}
         </div>
+        <div class="row">
+            <div class="col"><p><b>{units.length}</b> {' units, '} <b>{stations.length}</b> {' stations'}</p></div>
+        </div>
+        <div class="row">
+        {#each getStationsStats(stations) as stat}
+            <div class="col"><p><b>{stat.count}</b> {`x ${stat.range}km `}</p></div>
+        {/each}
+        </div>
     </BottomPaneSection>
 </div>
 
 <style>
-    
+    .status {
+        margin-bottom: 15px;
+    }
 </style>
