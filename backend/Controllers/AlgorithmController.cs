@@ -50,14 +50,31 @@ namespace backend.Controllers
         }
 
         [HttpPost]
+        [Route("naiveArrangeAlgorithm")]
+        public List<StationJSON> naiveArrangeAlgorithm(InstanceJSON instanceJSON)
+        {
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.NaiveArrange(instance).Select(item => item.GetJSON()).ToList();
+            return ret;
+        }
+
+        [HttpPost]
         [Route("simpleArrangeAlgorithm")]
         public List<StationJSON> simpleArrangeAlgorithm(InstanceJSON instanceJSON)
         {
             var instance = new Instance(instanceJSON);
-            var ret = Algorithm.SimpleArrangeAlgorithm(instance).Select(item => item.GetJSON()).ToList();
+            var ret = Algorithm.SimpleArrange(instance).Select(item => item.GetJSON()).ToList();
             return ret;
         }
 
+        [HttpPost]
+        [Route("greedySalesmanAlgorithm")]
+        public List<StationJSON> greedySalesmanAlgorithm(InstanceJSON instanceJSON)
+        {
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.GreedySalesman(instance.Stations.Cast<IDistancable>().ToList()).Cast<Station>().Select(item => item.GetJSON()).ToList();
+            return ret;
+        }
 
         // PUT api/<ValuesController>/5
         [HttpPut("{id}")]

@@ -9,13 +9,15 @@ namespace algorithm
     {
         static void Main(string[] args)
         {
-            List<int> list = (new int[] { 1, 2, 3 }).ToList();
+            List<int> list1 = (new int[] { 2, 3, 4 }).ToList();
+            List<int> list2 = (new int[] { 2, 3, 4 }).ToList();
 
-            foreach(var i in list)
-            {
-                Console.WriteLine(i);
-                list.Add(i);
-            }
+            var min = list1.Min(first => list2.Min(second => first * second));
+            var max = list1.Max(first => list2.Max(second => first * second));
+
+            Console.WriteLine(min);
+            Console.WriteLine(max);
+
         }
     }
 }

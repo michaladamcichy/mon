@@ -32,8 +32,8 @@ import Station from "./Station.svelte";
         return counts;
     };
 
-    const onSimpleArrangeAlgorithmClicked = async () => {
-        const calculatedStations = await api.simpleArrangeAlgorithm(stationRanges, stationCounts, stations, units);
+    const onAlgorithmClicked = async (type) => {
+        const calculatedStations = await api.algorithm(type, stationRanges, stationCounts, stations, units);
         if(!calculatedStations) {
             console.log('request failed');
             return;
@@ -58,8 +58,18 @@ import Station from "./Station.svelte";
     </BottomPaneSection>
     <BottomPaneSection title={'Algorithms'}>
         <div class="row">
-            <button class="btn btn-primary" on:click={() => onSimpleArrangeAlgorithmClicked()}>
+            <button class="btn btn-primary" on:click={() => onAlgorithmClicked("naiveArrange")}>
+                Naive arrange algorithm
+            </button>
+        </div>
+        <div class="row">
+            <button class="btn btn-primary" on:click={() => onAlgorithmClicked("simpleArrange")}>
                 Simple arrange algorithm
+            </button>
+        </div>
+        <div class="row">
+            <button class="btn btn-primary" on:click={() => onAlgorithmClicked("greedySalesman")}>
+                Gridy salesman algorithm
             </button>
         </div>
     </BottomPaneSection>

@@ -1,1 +1,22 @@
+FRONTEND
+--------
 poprawna obłsuga błędów w catchu
+
+
+
+
+
+--------
+BACKEND
+--------
+Docelowo wszystko robić na IDistancable??
+    Robienie na MapObject i Group nie jest aż takie złe
+    Natomiast Salesman już był świetny dzięki temu
+Najprostszy najnaiwniejszy algorytm Greedy
+Mój algorytm grupowania + łączenie Greedy
+Mój algorytm grupowania + komiwojażer
+Mój algorytm grupowania + wybór: tworzenie hubów/komiwojażer, także uwzględniając trójkąty
+Przeglądanie wyłącznie trójkątami
+
+MYŚLĘ, ŻE KURDE TRZEBABY ZAPEWNIĆ ZAWSZE KOMUNIKACJĘ W 2 STRONY MIĘDZY SĄSIADAMI
+    ZAWSZE
