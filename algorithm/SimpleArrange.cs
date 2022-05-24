@@ -37,11 +37,10 @@ namespace algorithm
 
         public List<Station> Run(Instance instance)
         {
-            //List<Group> grouped = CreateGroups(instance);
-            //List<Station> joined = JoinGroups(instance.StationRanges, grouped);
+            List<Group> grouped = CreateGroups(instance);
+            List<Station> joined = JoinGroups(instance.StationRanges, grouped);
 
-            //return joined;
-            return new List<Station>();
+            return joined;
         }
 
         List<Station> ArrangeBetween(double[] ranges, Station first, Station second)
@@ -52,23 +51,31 @@ namespace algorithm
             first.Range = commonRange;
             second.Range = commonRange;
 
-            var distanceToCover = first.GetDistance(second) - commonRange * 2;
+            var distanceToCover = first.GetDistance(second);
 
-            var stationsCount = (int) Math.Floor(distanceToCover / ranges.Max()) - 1; //alert!
+            var stationsCount = (int) Math.Ceiling(distanceToCover / ranges.Max()); //alert! alert może być niepoprawne
             var stepLength = ranges.Max();
-            var stepLat = second.Position.lat - first.Position.lat;
-            var stepLng = second.Position.lng - first.Position.lng;
+            var stepLat = (second.Position.lat - first.Position.lat) / stationsCount;
+            var stepLng = (second.Position.lng - first.Position.lng) / stationsCount;
 
-            for (var i = 1; i < stationsCount; i++)
+            for (var i = 1; i <= stationsCount; i++)
             {
-                var station = new Station(new Position(first.Position.lat + stepLat * i, second.Position.lng + stepLng * i), ranges.Max());
+                var station = new Station(new Position(first.Position.lat + stepLat * i, first.Position.lng + stepLng * i), ranges.Max());
                 stations.Add(station);
+            }
+
+            if(stations.Count == 0)
+            {
+                if (!second.IsInRange(first))
+                {
+                    stations.Add(new Station(MapObject.Center((new MapObject[]{ first, second }).ToList()), ranges.Max())); //alert dorobić dostosowanie rozmiaru
+                    return stations;
+                }
             }
 
             if(!second.IsInRange(stations.Last()))
             {
-                List<Station> additionalStations = ArrangeBetween(ranges, stations.Last(), second);
-                stations.AddRange(additionalStations);
+                stations.Add(new Station(MapObject.Center((new MapObject[] { second, stations.Last() }).ToList()), ranges.Max())); //alert dostosować rozmiar
             }
 
             return stations;
@@ -97,7 +104,7 @@ namespace algorithm
             var f = first is Group ? ((Group) first).GetNearest(second) : first;
             var s = second is Group? ((Group)second).GetNearest(first) : second;
 
-            return Join(ranges, f, s);
+            return Join(ranges, (Station)f, (Station)s);
         }
 
         List<Station> Join(double[] ranges, Station first, Station second) //alert męczące to przekazywanie atrybutów instancji//chociaz może to będzie przydatne przy ograniczeniach??
@@ -136,14 +143,55 @@ namespace algorithm
 
         List<Station> JoinGroups(double[] ranges, List<Group> groups)
         {
-            var scheduled = Algorithm.GreedySalesman(groups.Cast<IDistancable>().ToList());
+            //var scheduled = Algorithm.GreedySalesman(groups.Cast<IDistancable>().ToList());
 
-            for(var i = 1; i < scheduled.Count; i++)
+            //var stations = new List<Station>();
+            //for(var i = 1; i < scheduled.Count; i++)
+            //{
+            //    var additionalStations = Join(ranges, scheduled[i], scheduled[i - 1]);
+            //    stations.AddRange(additionalStations);
+            //}
+            if(groups.Count == 1)
             {
-                Join(ranges, scheduled[i], scheduled[i - 1]);
+                return Group.Flatten(groups);
             }
 
+            var connectedGroups = new HashSet<Group>();
+            var additionalStations = new List<Station>();
 
+            foreach (var group in groups)
+            {
+                if (connectedGroups.Contains(group))
+                {
+                    continue;
+                }
+
+                Group nearest = null;
+                var minValue = 0.0;
+
+                foreach(var otherGroup in groups)
+                {
+                    if (group == otherGroup) continue;
+
+                    if(nearest == null)
+                    {
+                        nearest = otherGroup;
+                        minValue = group.GetDistance(nearest);
+                    } else if(group.GetDistance(otherGroup) < minValue)
+                    {
+                        nearest = otherGroup;
+                        minValue = group.GetDistance(otherGroup);
+                    }
+                }
+
+                if(nearest != null)
+                {
+                    additionalStations.AddRange(Join(ranges, group, nearest));
+                    connectedGroups.Add(group);
+                }
+            }
+
+            groups.Add(new Group(additionalStations));//alert! nioelogiczne
             return Group.Flatten(groups);
         }
         List<Group> CreateGroups(Instance instance)

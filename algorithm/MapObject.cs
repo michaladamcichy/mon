@@ -150,6 +150,12 @@ namespace algorithm
 
         public double GetDistance(IDistancable other)
         {
+            if(other is MapObject)
+            {
+                var mapObject = (MapObject)other;
+                return Distance(this, mapObject);
+            }
+
             var o = other is Group ? ((Group)other).GetNearest(this) : other;
             return Distance(this, o);
         }
@@ -170,7 +176,7 @@ namespace algorithm
     }
     public class Station : MapObject, IRangable
     {
-        public static double RangeTolerance { get; } = 1.0; //alert alert! nie koniecznie to co można pomyśleć
+        public static double RangeTolerance { get; } = 5.0; //alert alert! nie koniecznie to co można pomyśleć
         static int _id = 0;
         public int id { get; } = ++_id;
         public double Range { get; set; }

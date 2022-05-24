@@ -46,7 +46,8 @@ namespace backend.Controllers
         [Route("isConnected")]
         public bool Post(InstanceJSON instanceJSON) {
             var instance = new Instance(instanceJSON);
-            return Algorithm.IsConnected(instance);
+            return Algorithm.IsConnected(instance); //alert
+            return false;
         }
 
         [HttpPost]

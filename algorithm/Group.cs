@@ -8,6 +8,12 @@ namespace algorithm
 {
     public class Group : List<Station>, IDistancable
     {
+        public Group() : base() { }
+
+        public Group(List<Station> stations) : base(stations)
+        {
+
+        }
         public void Add(Station station, Dictionary<Station, bool> connected) //alert czy connected wciąż potrzebne?? raczej nie
         {
             Add(station);
@@ -35,7 +41,7 @@ namespace algorithm
                     list.Add(station);
                 }
             }
-            list.Sort((item1, item2) => item1.id - item2.id); //alert opakować to
+            list.Sort((item1, item2) => item1.id - item2.id); //alert opakować to, alert straciłem kolejność, czemu?
 
             return list;
         }
@@ -58,7 +64,7 @@ namespace algorithm
             throw new Exception();
         }
 
-        static double Distance(Group first, Group second)
+        static double Distance(IDistancable first, IDistancable second)
         {
             return first.GetDistance(second);
         }
@@ -70,6 +76,28 @@ namespace algorithm
 
         public Station GetNearest(IDistancable other)
         {
+            //return null; //alert
+            if(other is Group)
+            {
+                var min = this.First();
+                var minValue = Distance(this.First(), ((Group)other).First());
+                foreach(var first in this)
+                {
+                    foreach(var second in (Group)other)
+                    {
+                        if (first == second) continue;
+
+                        if(Distance(first, second) < minValue)
+                        {
+                            min = first;
+                            minValue = Distance(first, second);
+                        }
+                    }
+                }
+
+                return min;
+            }
+
             return this.Aggregate((item1, item2) => item1.GetDistance(other) < item2.GetDistance(other) ? item1 : item2); //alert stabilność najmniejszych elementów
         }
     }
