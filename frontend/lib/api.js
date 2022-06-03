@@ -1,6 +1,6 @@
 export const api = {};
 
-api.url = `http://localhost:5688/api/algorithm`;
+api.url = `http://localhost:443/api/algorithm`;
 // api.headers = {mode: 'cors'};
 api.headers = {'Content-Type' : 'application/json'};
 // api.headers = {'Content-Type' : 'application/json', Accept : 'application/json'};
