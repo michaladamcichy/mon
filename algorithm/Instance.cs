@@ -65,7 +65,7 @@ namespace algorithm
                 {
                     if (first == second) continue;
 
-                    if(MapObject.Distance(first, second) <= second.Range)
+                    if(first.IsInRange(second))
                     {
                         first.AddSender(second);
                         second.AddReceiver(first);

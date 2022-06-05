@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,7 @@ namespace algorithm
             return lat == ((Position) obj).lat && lng == ((Position) obj).lng;
         }
     }
-    public class MapObject //: ICloneable
+    public class MapObject : IDistancable
     {
         public Position Position { get; set; } = new Position();
 
@@ -64,16 +65,20 @@ namespace algorithm
             return units;
         }
 
-        public static double Distance(MapObject first, MapObject second)
+        public static double Distance(IDistancable first, IDistancable second)
         {
-            return Distance(first.Position, second.Position);
+            var f = first is Group ? ((Group)first).GetNearest(second) : first;
+            var s = second is Group ? ((Group)second).GetNearest(first) : second;
+
+            return Distance(f, s);
         }
+
         public static double Distance(Position first, Position second)
         {
             //alert do weryfikacji - zarówno algorytm jak i przekopiowany kod!!!
             ////wzięte żywcem z js, trzeba zweryfikować
             //https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
-            //
+
             double p = 0.017453292519943295;    // Math.PI / 
             double a = 0.5 - Math.Cos((second.lat - first.lat) * p) / 2 +
                     Math.Cos(first.lat * p) * Math.Cos(second.lat * p) *
@@ -82,6 +87,10 @@ namespace algorithm
             return 12742 * Math.Asin(Math.Sqrt(a)); // 2 * R; R = 6371 
         }
 
+        public static double Distance(MapObject first, MapObject second)
+        {
+            return Distance(first.Position, second.Position);
+        }
         public static double MinCoveringCircleRadius(List<MapObject> mapObjects) //alert not tested
         {
             double maxDistance = 0f;
@@ -134,7 +143,22 @@ namespace algorithm
             Receivers.Add(receiver);
         }
 
+        public virtual bool IsInRange(IRangable other) //alert dont know what im doing - vritual
+        {
+            return GetDistance(other) <= other.Range + Station.RangeTolerance;
+        }
 
+        public double GetDistance(IDistancable other)
+        {
+            if(other is MapObject)
+            {
+                var mapObject = (MapObject)other;
+                return Distance(this, mapObject);
+            }
+
+            var o = other is Group ? ((Group)other).GetNearest(this) : other;
+            return Distance(this, o);
+        }
     }
 
     public class StationJSON
@@ -150,14 +174,13 @@ namespace algorithm
 
         public StationJSON() { }
     }
-    public class Station : MapObject
+    public class Station : MapObject, IRangable
     {
+        public static double RangeTolerance { get; } = 5.0; //alert alert! nie koniecznie to co można pomyśleć
         static int _id = 0;
         public int id { get; } = ++_id;
         public double Range { get; set; }
-        
-        
-
+       
         public Station(double range)
         {
             this.Range = range;
@@ -187,6 +210,23 @@ namespace algorithm
         public bool IsAttached()
         {
             return Senders.Any(item => item is Unit);
+        }
+
+        public bool IsInRange(IRangable other)
+        {
+            if(other is Station)
+            {
+                var station = (Station)other;
+                return Distance(this, station) <= station.Range + RangeTolerance;
+            }
+
+            if(other is Group)
+            {
+                var group = (Group)other;
+                group.Any(item => Distance(this, item) < item.Range + RangeTolerance);
+            }
+
+            throw new Exception();
         }
     }
 
@@ -222,6 +262,11 @@ namespace algorithm
         public bool HasAttachement()
         {
             return Receivers.Count > 0;
+        }
+
+        public override bool IsInRange(IRangable other)
+        {
+            return GetDistance(other) <= Station.RangeTolerance;
         }
     }
 
