@@ -9,6 +9,7 @@ namespace backend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [RequireHttps]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
