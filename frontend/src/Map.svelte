@@ -55,6 +55,14 @@ import { onMount } from "svelte";
         fontWeight: 'bold',
     };
 
+    const getUnitIcon = (unit) => {
+        //const icons = {4: google.maps.SymbolPath.,}
+        let shape;
+
+        //return {...unitMarkerIcon, path: goo}
+    };
+
+
     const generateMarkers = (map, mapObjects, update) => {
         mapObjects.forEach((mapObject, index) => {
             const marker = new google.maps.Marker({

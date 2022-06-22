@@ -26,8 +26,12 @@
     };
 
     const addUnit = () => {
-        const position = map.getCenter();
-        const newUnit = [...units, {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}}];
+        const newUnit = [...units,
+            {
+                position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, 
+                priority: 1,
+            }
+        ];
         updateAllUnits(newUnit);
     };
 

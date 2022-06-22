@@ -51,10 +51,10 @@
 		];
 
 	let units = [
-		{position: {lat: 51.2297, lng: 21.0122 }},
-		{position: {lat: 51.2297, lng: 21.0122 }},
-		{position: {lat: 51.2297, lng: 21.0122 }},
-		{position: {lat: 51.2297, lng: 21.0122 }},
+		{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
+		{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
+		{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
+		{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
 	];
 
 	onMount(() => {

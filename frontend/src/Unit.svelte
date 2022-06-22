@@ -8,6 +8,13 @@ export let update;
 export let remove;
 
 const latlngStep = 0.1;
+
+const priorities = [
+    {priority: 4, icon: 'fa fa-exclamation'},
+    {priority: 3, icon: 'fa fa-truck'},
+    {priority: 2, icon: 'fa fa-star'},
+    {priority: 1, icon: 'fa fa-male'},
+    ];
 </script>
 
 <div class="container">
@@ -17,11 +24,23 @@ const latlngStep = 0.1;
         <input type="number" class="col" bind:value={unit.position.lat} on:change={() => {update(unit);}} step={latlngStep}/>
         <label class="col col-form-label">lng:</label>
         <input type="number" class="col" bind:value={unit.position.lng} on:change={() => {update(unit);}} step={latlngStep}/>
-        <button class="btn btn-danger" on:click={() => {remove(unit);}}>X</button>
+        <button id="removeButton" class="btn btn-danger" on:click={() => {remove(unit);}}>X</button>
     </div>
-    <!-- <div class="row">
-        <input type="text">
-    </div> -->
+    <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
+        <label class="col">{''}</label>
+        <label class="col">{'range:'}</label>
+        {#each priorities as priority}
+            <button
+                class={`col btn selectButton ${unit.priority == priority.priority ? 'btn-success' : 'btn-primary'}`}
+                    on:click={() => {unit.priority = priority.priority; update(unit);}}>
+                <i class={priority.icon}></i>
+            </button>
+        {/each}
+        <label class="col">{'km'}</label>
+        <label class="col">{''}</label>
+        <label class="col">{''}</label>
+        <label class="col">{''}</label>
+    </div>
 </div>
 
 <style>
@@ -29,7 +48,13 @@ const latlngStep = 0.1;
         min-width: 100px;
         margin-right: 20px;
     }
-    button {
+    .selectButton {
+        width: 60px;
+        /* height: 30px; */
+        font-size: 20px;
+        font-weight: bold;
+    }
+    #removeButton {
         width: 30px;
         height: 30px;
         font-size: 10px;
