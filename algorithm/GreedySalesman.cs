@@ -8,20 +8,20 @@ namespace algorithm
 {
     public class GreedySalesman
     {
-        public List<IDistancable> Run(List<IDistancable> items)
+        public List<MapObject> Run(List<MapObject> items)
         {
-            var solution = new List<IDistancable>();
+            var solution = new List<MapObject>();
 
-            var itemsLeft = new List<IDistancable>(items);
+            var itemsLeft = new List<MapObject>(items);
 
-            if (items.Count == 0) return new List<IDistancable>();
+            if (items.Count == 0) return new List<MapObject>();
             if(items.Count == 1)
             {
                 solution.Add(items[0]);
                 return solution;
             }
             var min = items.First();
-            var val = items.First().GetDistance(items[1]); //alert!!!
+            var val = items.First().GetDistanceFrom(items[1]); //alert!!!
 
             foreach (var f in items)
             {
@@ -32,9 +32,9 @@ namespace algorithm
                         continue;
                     }
 
-                    if (f.GetDistance(s) < val)
+                    if (f.GetDistanceFrom(s) < val)
                     {
-                        val = f.GetDistance(s);
+                        val = f.GetDistanceFrom(s);
                         min = f;
                     }
                 }
@@ -46,7 +46,7 @@ namespace algorithm
 
             while (itemsLeft.Count > 0)
             {
-                var nearest = itemsLeft.Aggregate((item1, item2) => first.GetDistance(item1) < first.GetDistance(item2) ? item1 : item2);
+                var nearest = itemsLeft.Aggregate((item1, item2) => first.GetDistanceFrom(item1) < first.GetDistanceFrom(item2) ? item1 : item2);
                 solution.Add(nearest);
                 first = nearest;
                 itemsLeft.Remove(nearest);

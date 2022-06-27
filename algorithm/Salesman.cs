@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace algorithm
 {
-    public class Salesman
+   /* public class Salesman
     {
-        public static double Evaluate(List<IDistancable> items)
+        public static double Evaluate(List<MapObject> items)
         {
             var score = 0.0;
 
@@ -31,9 +31,9 @@ namespace algorithm
 
             return score;
         }
-        Dictionary<Tuple<IDistancable, IDistancable>, double> CreateMatrix(List<IDistancable> items)
+        Dictionary<Tuple<MapObject, MapObject>, double> CreateMatrix(List<MapObject> items)
         {
-            var matrix = new Dictionary<Tuple<IDistancable, IDistancable>, double>();
+            var matrix = new Dictionary<Tuple<MapObject, MapObject>, double>();
 
             foreach (var first in items)
             {
@@ -41,24 +41,24 @@ namespace algorithm
                 {
                     if (first == second) continue;
 
-                    matrix[new Tuple<IDistancable, IDistancable>(first, second)] = first.GetDistance(second);
+                    matrix[new Tuple<MapObject, MapObject>(first, second)] = first.GetDistance(second);
                 }
             }
 
             return matrix; //alert
         }
 
-        bool IsReady(List<IDistancable> items, Dictionary<Tuple<IDistancable, IDistancable>, bool> mask)
+        bool IsReady(List<MapObject> items, Dictionary<Tuple<MapObject, MapObject>, bool> mask)
         {
-            var rows = new HashSet<IDistancable>();
-            var columns = new HashSet<IDistancable>();
+            var rows = new HashSet<MapObject>();
+            var columns = new HashSet<MapObject>();
 
             foreach (var first in items)
             {
                 foreach (var second in items)
                 {
                     if (rows.Contains(first)) continue;
-                    if (mask[new Tuple<IDistancable, IDistancable>(first, second)]) //ALERT SYMETRCZYNE TYLKO DZIAŁA
+                    if (mask[new Tuple<MapObject, MapObject>(first, second)]) //ALERT SYMETRCZYNE TYLKO DZIAŁA
                     {
                         rows.Add(first);
                         if (rows.Count >= items.Count) return true;
@@ -71,7 +71,7 @@ namespace algorithm
             return rows.Count >= items.Count;  //alert tu robię bez minus 1, a usuwam gdzie indziej ostatnią krawędź
         }
 
-        void TraceEdges(List<Tuple<IDistancable, IDistancable>> edges)
+        void TraceEdges(List<Tuple<MapObject, MapObject>> edges)
         {
             var ids = new List<int>();
             edges.ForEach(item => { ids.Add(((Station)item.Item1).id); ids.Add(((Station)item.Item2).id); });
@@ -82,7 +82,7 @@ namespace algorithm
             }
         }
 
-        void TraceSchedule(List<IDistancable> schedule)
+        void TraceSchedule(List<MapObject> schedule)
         {
             var ids = new List<int>();
             schedule.ForEach(item => { ids.Add(((Station)item).id); });
@@ -94,19 +94,19 @@ namespace algorithm
             }
             Trace.WriteLine("");
         }
-        public List<IDistancable> Run(List<IDistancable> items)
+        public List<MapObject> Run(List<MapObject> items)
         {
             var matrix = CreateMatrix(items);
 
-            var tempMatrix = new Dictionary<Tuple<IDistancable, IDistancable>, double>(matrix);
+            var tempMatrix = new Dictionary<Tuple<MapObject, MapObject>, double>(matrix);
 
-            var itemsLeft = new List<IDistancable>(items);
+            var itemsLeft = new List<MapObject>(items);
 
-            var edges = new List<Tuple<IDistancable, IDistancable>>();
+            var edges = new List<Tuple<MapObject, MapObject>>();
 
-            var mask = new Dictionary<Tuple<IDistancable, IDistancable>, bool>();
+            var mask = new Dictionary<Tuple<MapObject, MapObject>, bool>();
 
-            items.ForEach(first => items.ForEach(second => { mask[new Tuple<IDistancable, IDistancable>(first, second)] = false; }));
+            items.ForEach(first => items.ForEach(second => { mask[new Tuple<MapObject, MapObject>(first, second)] = false; }));
 
             var (praNodeFirst, praNodeSecond) = tempMatrix.Aggregate((first, second) => first.Value < second.Value ? first : second).Key; //alert
 
@@ -114,13 +114,13 @@ namespace algorithm
             {
                 (var first, var second) = tempMatrix.Aggregate((first, second) => first.Value < second.Value ? first : second).Key;
 
-                tempMatrix.Remove(new Tuple<IDistancable, IDistancable>(first, second));
-                mask[new Tuple<IDistancable, IDistancable>(first, second)] = true;
+                tempMatrix.Remove(new Tuple<MapObject, MapObject>(first, second));
+                mask[new Tuple<MapObject, MapObject>(first, second)] = true;
 
-                edges.Add(new Tuple<IDistancable, IDistancable>(first, second));
+                edges.Add(new Tuple<MapObject, MapObject>(first, second));
             }
 
-            var schedule = new List<IDistancable>();
+            var schedule = new List<MapObject>();
 
             schedule.Add(praNodeFirst);
 
@@ -143,7 +143,7 @@ namespace algorithm
                 }
             }
 
-            //var unnecessaryEdges = new HashSet<Tuple<IDistancable, IDistancable>>();
+            //var unnecessaryEdges = new HashSet<Tuple<MapObject, MapObject>>();
             //foreach (var edge1 in edges)
             //{
             //    foreach (var edge2 in edges)
@@ -164,12 +164,12 @@ namespace algorithm
             for (var i = 1; i < schedule.Count; i++)
             {
                 //Trace.Write((((Station) schedule[i]).id - ids.Min()).ToString() + " -> ");
-                score += matrix[new Tuple<IDistancable, IDistancable>(schedule[i - 1], schedule[i])];
+                score += matrix[new Tuple<MapObject, MapObject>(schedule[i - 1], schedule[i])];
             }
 
             Trace.WriteLine(score);
 
             return items; //alert
         }
-    }
+    }*/
 }

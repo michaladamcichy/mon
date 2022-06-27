@@ -79,7 +79,7 @@ namespace algorithm
                 {
                     if(!unit.HasAttachement() && !station.IsAttached() && station.Position.Equals(unit.Position)) //alert to powinno byc property
                     {
-                        MapObject.Attach(station, unit);
+                        unit.Attach(station);
                     }
                 }
             }

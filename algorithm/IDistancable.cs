@@ -6,9 +6,5 @@ using System.Threading.Tasks;
 
 namespace algorithm
 {
-    public interface IDistancable
-    {
-        public double GetDistance(IDistancable other);
-        public bool IsInRange(IRangable other);
-    }
+
 }

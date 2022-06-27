@@ -6,37 +6,90 @@ using System.Threading.Tasks;
 
 namespace algorithm
 {
-    public class Group : List<Station>, IDistancable
+    public class Group : MapObject
     {
-        public Group() : base() { }
+        public List<Station> Stations { get; set; } = new List<Station>();
 
-        public Group(List<Station> stations) : base(stations)
+        public override Position Position { get { return MapObject.Center(Stations); } set { } }  //alert empty set
+        public override double Range { get { return 0.0; } set { throw new Exception(); } } //alert brzydko oraz 0.0
+        public Group() { }
+
+        public Group(List<Station> stations) : base(new Position())
         {
-
+            Stations = new List<Station>(stations);
         }
         public void Add(Station station, Dictionary<Station, bool> connected) //alert czy connected wciąż potrzebne?? raczej nie
+            //alert schizofrenia raz jest add bez conected, raz z connected
         {
-            Add(station);
+            Stations.Add(station);
             connected[station] = true;
         }
 
         public void Remove(Station station, Dictionary<Station, bool> connected)
         {
-            Remove(station);
+            Stations.Remove(station);
             connected[station] = false;
         }
-        public List<MapObject> ToMapObjects()
+
+        public double GetDistance(MapObject other)
         {
-            return this.Cast<MapObject>().ToList();
-        } 
+            if (other is MapObject)
+            {
+                return Stations.Min(item => other.GetDistanceFrom(item));
+
+            }
+
+            if (other is Group)
+            {
+                var otherGroup = (Group)other;
+
+                return Stations.Min(first => otherGroup.Stations.Min(second => second.GetDistanceFrom(first)));
+            }
+
+            throw new Exception();
+        }
+
+        public bool IsInRange(MapObject other)
+        {
+            return Stations.Any(item => item.IsInRange(other));
+        }
+
+        public Station GetNearest(MapObject other)
+        {
+            if (Stations.Count == 0) return null; //alert podstępny null
+            
+            if(other is not Group)
+            {
+                return Stations.Aggregate((item1, item2) => item1.GetDistanceFrom(other) < item2.GetDistanceFrom(other) ? item1 : item2); //alert stabilność najmniejszych elementów
+            }
+
+            var min = Stations.First();
+            var minValue = Stations.First().GetDistanceFrom(((Group)other).Stations.First());
+            
+            foreach(var first in Stations)
+            {
+                foreach(var second in ((Group)other).Stations)
+                {
+                    if (first == second) continue;
+
+                    if(first.GetDistanceFrom(second) < minValue)
+                    {
+                        min = first;
+                        minValue = first.GetDistanceFrom(second);
+                    }
+                }
+            }
+
+            return min;
+        }
 
         public static List<Station> Flatten(List<Group> groups)
         {
             var list = new List<Station>();
-            
-            foreach(Group group in groups)
+
+            foreach (Group group in groups)
             {
-                foreach(var station in group)
+                foreach (var station in group.Stations)
                 {
                     list.Add(station);
                 }
@@ -44,61 +97,6 @@ namespace algorithm
             list.Sort((item1, item2) => item1.id - item2.id); //alert opakować to, alert straciłem kolejność, czemu?
 
             return list;
-        }
-
-        public double GetDistance(IDistancable other)
-        {
-            if (other is MapObject)
-            {
-                var mapObject = (MapObject)other;
-                var nearest = this.Min(item => MapObject.Distance(item, mapObject));
-            }
-
-            if (other is Group)
-            {
-                var otherGroup = (Group)other;
-
-                return this.Min(first => otherGroup.Min(second => second.GetDistance(first)));
-            }
-
-            throw new Exception();
-        }
-
-        static double Distance(IDistancable first, IDistancable second)
-        {
-            return first.GetDistance(second);
-        }
-
-        public bool IsInRange(IRangable other)
-        {
-            return this.Any(item => item.IsInRange(other));
-        }
-
-        public Station GetNearest(IDistancable other)
-        {
-            //return null; //alert
-            if(other is Group)
-            {
-                var min = this.First();
-                var minValue = Distance(this.First(), ((Group)other).First());
-                foreach(var first in this)
-                {
-                    foreach(var second in (Group)other)
-                    {
-                        if (first == second) continue;
-
-                        if(Distance(first, second) < minValue)
-                        {
-                            min = first;
-                            minValue = Distance(first, second);
-                        }
-                    }
-                }
-
-                return min;
-            }
-
-            return this.Aggregate((item1, item2) => item1.GetDistance(other) < item2.GetDistance(other) ? item1 : item2); //alert stabilność najmniejszych elementów
         }
     }
 }

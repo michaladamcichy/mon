@@ -73,7 +73,7 @@ namespace backend.Controllers
         public List<StationJSON> greedySalesmanAlgorithm(InstanceJSON instanceJSON)
         {
             var instance = new Instance(instanceJSON);
-            var ret = Algorithm.GreedySalesman(instance.Stations.Cast<IDistancable>().ToList()).Cast<Station>().Select(item => item.GetJSON()).ToList();
+            var ret = Algorithm.GreedySalesman(instance.Stations.Cast<MapObject>().ToList()).Cast<Station>().Select(item => item.GetJSON()).ToList();
             return ret;
         }
 

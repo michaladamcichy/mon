@@ -26,3 +26,12 @@ CHOLIBKA - czy jednokierunkowa komunikacja cokolwiek daje? oprócz tego,
     że w obrębie dużej stacji może być kilka małych?? 
 
 WARIANT Z BEZPOŚREDNIMI POŁĄCZENIAMI piony - sztab i sztab - dywizje dowodzenia!
+
+BYć może błąd nie wynika z niedokładności lat lng, lecz może powinienem dodatkowo sprawdzać, czy należą do okręgu
+
+UWAGA - użyć klasy C# geolocation przy liczeniu odległości
+
+A czy nie popełniasz takiego błędy, że bierzesz uśrednionen współrzedne zamiast faktycznego środka minimalnego
+    okręgu opisującego?
+
+Usunąłem tolerancję

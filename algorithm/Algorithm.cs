@@ -35,7 +35,7 @@ namespace algorithm
             return new SimpleArrange().Run(instance);
         }
 
-        public static List<IDistancable> GreedySalesman(List<IDistancable> items)
+        public static List<MapObject> GreedySalesman(List<MapObject> items)
         {
             return new GreedySalesman().Run(items);
         }
@@ -43,16 +43,16 @@ namespace algorithm
         //public static List<Station> SimpleArrangeAlgorithm(Instance instance)
         //{
         //    {
-        //        var stations = new Greedy().Run(instance.Stations.Cast<IDistancable>().ToList()).Cast<Station>().ToList();
-        //        var score = Salesman.Evaluate(stations.Cast<IDistancable>().ToList());
+        //        var stations = new Greedy().Run(instance.Stations.Cast<MapObject>().ToList()).Cast<Station>().ToList();
+        //        var score = Salesman.Evaluate(stations.Cast<MapObject>().ToList());
         //        //Trace.Write(stations.Count);
         //        Trace.WriteLine("Greedy: " + score.ToString());
         //        Trace.WriteLine("");
         //    }
         //    {
         //        Trace.WriteLine("Salesman: ");
-        //        var stations = new Salesman().Run(instance.Stations.Cast<IDistancable>().ToList()).Cast<Station>().ToList();
-        //        var score = Salesman.Evaluate(stations.Cast<IDistancable>().ToList());
+        //        var stations = new Salesman().Run(instance.Stations.Cast<MapObject>().ToList()).Cast<Station>().ToList();
+        //        var score = Salesman.Evaluate(stations.Cast<MapObject>().ToList());
         //        //Trace.Write(stations.Count);
 
         //        //Trace.WriteLine("");

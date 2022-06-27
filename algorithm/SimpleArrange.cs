@@ -8,7 +8,7 @@ namespace algorithm
 {
     public class SimpleArrange : IArrangeAlgorithm
     {
-        double? MinCoveringRange(Double[] ranges, List<MapObject> mapObjects)
+        double? MinCoveringRange(Double[] ranges, List<MapObject> mapObjects) //alert move to mapobject
         {
             double minCoveringRadius = MapObject.MinCoveringCircleRadius(mapObjects);
 
@@ -21,6 +21,11 @@ namespace algorithm
             }
 
             return null;
+        }
+
+        double? MinCoveringRange(Double[] ranges, List<Station> stations)
+        {
+            return MinCoveringRange(ranges, stations.Cast<MapObject>().ToList());
         }
 
         static void Add(List<Station> stations, Station station, Dictionary<Station, bool> connected)
@@ -51,16 +56,15 @@ namespace algorithm
             first.Range = commonRange;
             second.Range = commonRange;
 
-            var distanceToCover = first.GetDistance(second);
+            var distanceToCover = first.GetDistanceFrom(second);
 
             var stationsCount = (int) Math.Ceiling(distanceToCover / ranges.Max()); //alert! alert może być niepoprawne
-            var stepLength = ranges.Max();
-            var stepLat = (second.Position.lat - first.Position.lat) / stationsCount;
-            var stepLng = (second.Position.lng - first.Position.lng) / stationsCount;
+            var stepLat = (second.Position.Lat - first.Position.Lat) / stationsCount;
+            var stepLng = (second.Position.Lng - first.Position.Lng) / stationsCount;
 
             for (var i = 1; i <= stationsCount; i++)
             {
-                var station = new Station(new Position(first.Position.lat + stepLat * i, first.Position.lng + stepLng * i), ranges.Max());
+                var station = new Station(new Position(first.Position.Lat + stepLat * i, first.Position.Lng + stepLng * i), ranges.Max());
                 stations.Add(station);
             }
 
@@ -82,7 +86,7 @@ namespace algorithm
         }
 
         //alert zrobić wersję dla IRangable
-        List<Station> ArrangeBetween(IEnumerable<Station> ranges, IRangable first, IRangable second)
+        List<Station> ArrangeBetween(IEnumerable<Station> ranges, MapObject first, MapObject second)
         {
             var f = first is Group ? ((Group) first).GetNearest(second) : first;
             var s = second is Group ? ((Group)second).GetNearest(first) : second;
@@ -99,7 +103,7 @@ namespace algorithm
             //}
         }
 
-        List<Station> Join(double[] ranges, IDistancable first, IDistancable second)
+        List<Station> Join(double[] ranges, MapObject first, MapObject second)
         {
             var f = first is Group ? ((Group) first).GetNearest(second) : first;
             var s = second is Group? ((Group)second).GetNearest(first) : second;
@@ -143,7 +147,7 @@ namespace algorithm
 
         List<Station> JoinGroups(double[] ranges, List<Group> groups)
         {
-            //var scheduled = Algorithm.GreedySalesman(groups.Cast<IDistancable>().ToList());
+            //var scheduled = Algorithm.GreedySalesman(groups.Cast<MapObject>().ToList());
 
             //var stations = new List<Station>();
             //for(var i = 1; i < scheduled.Count; i++)
@@ -208,7 +212,7 @@ namespace algorithm
                 //może zacząć od najmniejszych i próbować zwiększać i patrzeć czy coś zyskuję
                 //albo od największych i próbować zmniejszać patrząc czy coś tracę
                 instance.MapObjects.Add(station);
-                MapObject.Attach(station, unit);
+                unit.Attach(station);
             }
 
             instance.Stations.ForEach(item => connected[item] = false);
@@ -221,7 +225,7 @@ namespace algorithm
                 var group = new Group();
                 group.Add(first, connected);
 
-                var nearestStations = first.GetNearestStations(instance.MapObjects);
+                var nearestStations = first.GetNearest(instance.Stations);
 
                 var removed = new List<Station>();
 
@@ -229,18 +233,18 @@ namespace algorithm
                 {
                     if (connected[second]) continue;
 
-                    var minCoveringRangeBeforeAdding = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
+                    var minCoveringRangeBeforeAdding = MinCoveringRange(instance.StationRanges, group.Stations);
                     group.Add(second, connected);
 
-                    var minCoveringRangeAfterAdding = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
+                    var minCoveringRangeAfterAdding = MinCoveringRange(instance.StationRanges, group.Stations);
 
-                    var center = MapObject.Center(group.ToMapObjects());
+                    var center = MapObject.Center(group.Stations);
                     //var furthestFromCenter = temp.Max(item => MapObject.Distance(item.Position, center));
-                    var furthestFromCenter = group.Aggregate((first, second) => MapObject.Distance(first.Position, center) > MapObject.Distance(second.Position, center) ? first : second);
+                    var furthestFromCenter = group.Stations.Aggregate((first, second) => MapObject.Distance(first.Position, center) > MapObject.Distance(second.Position, center) ? first : second);
 
                     group.Remove(furthestFromCenter, connected);
                     removed.Add(furthestFromCenter);
-                    var alternativeMinCoveringRange = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
+                    var alternativeMinCoveringRange = MinCoveringRange(instance.StationRanges, group.Stations);
 
                     //alert todo! być może opłaca się podejmować poniższą decyzję nie na podstawie minCoveringRange lecz minCoveringRadius??
                     //premiowanie skupienia nawet, jeśli chwilowo nie zmienia to sytuacji ze stacjami?
@@ -276,10 +280,9 @@ namespace algorithm
                 {
                     if (connected[removedStation]) continue; //alert chyba niepotrzebne
 
-                    var minCoveringRangeBeforeAdding = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
-                    group.Add(removedStation, connected);
+                    var minCoveringRangeBeforeAdding = MinCoveringRange(instance.StationRanges, group.Stations);
 
-                    var minCoveringRangeAfterAdding = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
+                    var minCoveringRangeAfterAdding = MinCoveringRange(instance.StationRanges, group.Stations);
 
                     if (minCoveringRangeAfterAdding == null)
                     {
@@ -289,7 +292,7 @@ namespace algorithm
                     }
                 }
 
-                var range = MinCoveringRange(instance.StationRanges, group.ToMapObjects());
+                var range = MinCoveringRange(instance.StationRanges, group.Stations);
                 if (range == null)
                 {
                     throw new Exception(); //alert
@@ -297,20 +300,20 @@ namespace algorithm
 
                 foreach (var stationRange in instance.StationRanges)
                 {
-                    if (group.Any(item => item.Range >= stationRange)) //alert
+                    if (group.Stations.Any(item => item.Range >= stationRange)) //alert
                     {
                         continue;
                     }
 
-                    if (Algorithm.IsConnected(group.ToList()))
+                    if (Algorithm.IsConnected(group.Stations))
                     {
                         break;
                     }
 
-                    group.ToList().ForEach(item => item.Range = stationRange);
+                    group.Stations.ForEach(item => item.Range = stationRange);
                 }
 
-                if (Algorithm.IsConnected(group.ToList()) && group.All(item => item.Range <= range))
+                if (Algorithm.IsConnected(group.Stations) && group.Stations.All(item => item.Range <= range))
                 {
                     groups.Add(group);
                     continue;
@@ -320,11 +323,11 @@ namespace algorithm
                 //lepije by  było, jakby miały mały zasięg i wstawić małą stację międzyu nie
                 //bo chodzi o to, że linijkka po ifie może zmniejszyć zasięg stacji przy jednostkach
 
-                group.ToList().ForEach(item => item.Range = range.Value);
+                group.Stations.ForEach(item => item.Range = range.Value);
 
                 //return temp.ToList();//alert
 
-                group.Add(new Station(MapObject.Center(group.ToMapObjects()), range.Value));
+                group.Stations.Add(new Station(MapObject.Center(group.Stations), range.Value));
                 groups.Add(group);
             }
 
@@ -333,7 +336,7 @@ namespace algorithm
                 if (connected[station] == false)
                 {
                     var group = new Group();
-                    group.Add(station);
+                    group.Stations.Add(station);
                     groups.Add(group);
                 }
             }

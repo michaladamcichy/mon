@@ -10,7 +10,7 @@ namespace algorithm
     {
         public bool Run(Instance instance)
         {
-            var units = instance.MapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList();
+            var units = instance.Units;
 
             if (units.Count == 1) return true;
 
