@@ -31,19 +31,19 @@ namespace algorithm
             connected[station] = false;
         }
 
-        public double GetDistance(MapObject other)
+        public override double GetDistanceFrom(MapObject other)
         {
-            if (other is MapObject)
-            {
-                return Stations.Min(item => other.GetDistanceFrom(item));
-
-            }
-
             if (other is Group)
             {
                 var otherGroup = (Group)other;
 
                 return Stations.Min(first => otherGroup.Stations.Min(second => second.GetDistanceFrom(first)));
+            }
+
+            if (other is MapObject)
+            {
+                return Stations.Min(item => other.GetDistanceFrom(item));
+
             }
 
             throw new Exception();

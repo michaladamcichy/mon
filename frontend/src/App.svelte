@@ -26,11 +26,7 @@
 				return;
 			}
 		}
-
 		stationRanges = ranges;
-		console.log(stations);
-		console.log(oldRanges[0]);
-		console.log(ranges[0]);
 		updateAllStations(stations.map(station => {
 			const index = oldRanges.indexOf(station.range);
 			if(index >= 0) {
@@ -41,6 +37,10 @@
 			return station;
 		}));
 		oldRanges = [...ranges];
+	};
+
+	const updateCounts = (counts) => {
+		stationCounts = counts;
 	};
 
 	let stations = [
@@ -146,6 +146,7 @@
 				stationRanges={stationRanges}
 				stationCounts={stationCounts}
 				updateRanges={updateRanges}
+				updateCounts={updateCounts}
 				updateStations={updateAllStations}
 				isConnected={isConnected}/>
 		</div>

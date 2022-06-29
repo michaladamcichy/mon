@@ -36,7 +36,7 @@ namespace algorithm
         {
             this.Position = position;
         }
-        public double GetDistanceFrom(MapObject other)
+        public virtual double GetDistanceFrom(MapObject other)
         {
             return Distance(this.Position, other.Position);
         }
@@ -51,6 +51,7 @@ namespace algorithm
         {
             return GetNearest(mapObjects.Cast<MapObject>().ToList()).Cast<Station>().ToList();
         }
+
 
         public void AddSender(MapObject sender)
         {
@@ -115,6 +116,26 @@ namespace algorithm
                     (1 - Math.Cos((second.Lng - first.Lng) * p)) / 2;
 
             return 12742 * Math.Asin(Math.Sqrt(a)); // 2 * R; R = 6371 
+        }
+
+        public static double? MinCoveringRange(Double[] ranges, List<MapObject> mapObjects) //alert move to mapobject
+        {
+            double minCoveringRadius = MinCoveringCircleRadius(mapObjects);
+
+            foreach (var range in ranges)
+            {
+                if (minCoveringRadius <= range)
+                {
+                    return range;
+                }
+            }
+
+            return null;
+        }
+
+        public static double? MinCoveringRange(Double[] ranges, List<Station> stations)
+        {
+            return MinCoveringRange(ranges, stations.Cast<MapObject>().ToList());
         }
     }
 

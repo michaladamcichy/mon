@@ -10,6 +10,7 @@ import Station from "./Station.svelte";
     export let stationRanges;
     export let stationCounts;
     export let updateRanges;
+    export let updateCounts;
     export let updateStations;
     export let isConnected;
 
@@ -43,7 +44,7 @@ import Station from "./Station.svelte";
 </script>
 
 <div class="row">
-    <BottomPaneSection title={"Station ranges (km)"}>
+    <BottomPaneSection title={"Station ranges (km) and counts"}>
         <div class="row">
             {#each stationRanges as range, index}
                 <input type="number"
@@ -54,7 +55,20 @@ import Station from "./Station.svelte";
                     class="col"
                     step={1}/>
             {/each}
+            <p class="col">(km)</p>
         </div>
+        <div class="row">
+            {#each stationCounts as count, index}
+                <input type="number"
+                    min={0}
+                    bind:value={count}
+                    on:change={() => {updateCounts(stationCounts);}}
+                    class="col"
+                    step={1}/>
+            {/each}
+            <p class="col"></p>
+        </div>
+        
     </BottomPaneSection>
     <BottomPaneSection title={'Algorithms'}>
         <div class="row">

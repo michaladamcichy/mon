@@ -38,6 +38,14 @@
     const toggleUnitsVisibility = () => {
         unitsHidden = !unitsHidden;
     };
+
+    const removeAllStations = () => {
+        updateAllStations([]);
+    };
+
+    const removeAllUnits = () => {
+        updateAllUnits([]);
+    };
     
 </script>
 
@@ -45,6 +53,10 @@
     <div class="row">
         <h4 class="col">Stations</h4>
         <button class="toggleVisibilityButton btn btn-primary" on:click={toggleStationsVisibility}>{stationsHidden ? "v" : "^"}</button>
+        {#if stations.length > 0}
+            <div class="col"></div>
+            <button class="col btn btn-danger" on:click={() => {removeAllStations()}}>X</button>
+        {/if}
         <div class="col"></div>
         <div class="col"></div>
         <div class="col"></div>
@@ -65,7 +77,11 @@
     <div class="row">
         <h4 class="col">Units</h4>
         <button class="toggleVisibilityButton btn btn-primary" on:click={toggleUnitsVisibility}>{unitsHidden ? 'v' : '^'}</button>
-        <div class="col"></div>
+        {#if units.length > 0}
+            <div class="col"></div>
+            <button class="col btn btn-danger" on:click={() => {removeAllUnits()}}>X</button>
+        {/if}
+            <div class="col"></div>
         <div class="col"></div>
         <div class="col"></div>
         <div class="col"></div>

@@ -35,3 +35,10 @@ A czy nie popełniasz takiego błędy, że bierzesz uśrednionen współrzedne z
     okręgu opisującego?
 
 Usunąłem tolerancję
+
+ArrangeBetween - uwaga - dobierać ostatnią stację mniejszą, jeśli można
+
+czyżby błąd z byciem poza zasięgiem się rozwiązał?
+todo dawanie mniejszych stacji gdzie tylko możemy
+łączenie stacji w obrębie grupy, o ile nie potrzeba dodatkowej stacji, powinno także przebiegać wg MST
+alert duża wtopa Group.GetDistance(Station) może zwracać co innego niż Station.GetDistanceFrom(Group)
