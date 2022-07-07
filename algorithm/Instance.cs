@@ -40,6 +40,10 @@ namespace algorithm
             var stations = instanceJSON.stations.Select(item => new Station(item)).ToList();
             var units = instanceJSON.units.Select(item => new Unit(item)).ToList();
             this.MapObjects = prepareMapObjects(stations, units);
+
+            int id = 0; //alert brzydko
+            this.Stations.ForEach(station => { station.id = ++id; });
+            Station._id = id;
         }
 
         public Instance(List<Station> stations, List<Unit> units)

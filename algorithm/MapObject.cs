@@ -72,9 +72,13 @@ namespace algorithm
         //
         public static double MinCoveringCircleRadius(List<MapObject> mapObjects) //alert not tested, not optimalised!!!
         {
-            double maxDistance = 0.0;
-            mapObjects.ForEach(first => { mapObjects.ForEach(second => { maxDistance = Math.Max(maxDistance, first.GetDistanceFrom(second));});});
-            return maxDistance / 2;
+            //alert!
+            var center = CenterOfGravity(mapObjects); //alert alert wielki alert
+            return mapObjects.Select(item => item.GetDistanceFrom(new MapObject(center))).ToList().Max(); //alert alert alert
+            return SmallestEnclosingCircleAdapter.GetRange(mapObjects);
+            //double maxDistance = 0.0;
+            //mapObjects.ForEach(first => { mapObjects.ForEach(second => { maxDistance = Math.Max(maxDistance, first.GetDistanceFrom(second));});});
+            //return maxDistance / 2;
         }
 
         public static double MinCoveringCircleRadius(List<Station> stations)
@@ -111,23 +115,25 @@ namespace algorithm
 
         public static Position MinCoveringCircleCenter(List<MapObject> mapObjects)
         {
-            if (mapObjects.Count == 0) return null; //alert podstępny null
-            if (mapObjects.Count == 1) return mapObjects[0].Position;
+            return CenterOfGravity(mapObjects); //alert alert wielki alert
+            return SmallestEnclosingCircleAdapter.GetCenter(mapObjects);
+            //if (mapObjects.Count == 0) return null; //alert podstępny null
+            //if (mapObjects.Count == 1) return mapObjects[0].Position;
 
-            var furthestPair = new Tuple<MapObject, MapObject>(mapObjects.First(), mapObjects.Last());
-            var maxDistance = 0.0;
-            mapObjects.ForEach(first => {
-                mapObjects.ForEach(second => {
-                    if (first == second) return;
-                    var distance = Math.Max(maxDistance, first.GetDistanceFrom(second));
-                    if (distance > maxDistance)
-                    {
-                        maxDistance = distance;
-                        furthestPair = new Tuple<MapObject, MapObject>(first, second);
-                    }
-            }); });
+            //var furthestPair = new Tuple<MapObject, MapObject>(mapObjects.First(), mapObjects.Last());
+            //var maxDistance = 0.0;
+            //mapObjects.ForEach(first => {
+            //    mapObjects.ForEach(second => {
+            //        if (first == second) return;
+            //        var distance = Math.Max(maxDistance, first.GetDistanceFrom(second));
+            //        if (distance > maxDistance)
+            //        {
+            //            maxDistance = distance;
+            //            furthestPair = new Tuple<MapObject, MapObject>(first, second);
+            //        }
+            //}); });
 
-            return CenterOfGravity(new List<MapObject>() { furthestPair.Item1, furthestPair.Item2 });
+            //return CenterOfGravity(new List<MapObject>() { furthestPair.Item1, furthestPair.Item2 });
         }
 
         public static Position MinCoveringCircleCenter(List<Station> stations)

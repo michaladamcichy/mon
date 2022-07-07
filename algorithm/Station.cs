@@ -22,9 +22,9 @@ namespace algorithm
     }
     public class Station : MapObject
     {
-        static int _id = 0;
+        public static int _id = 0;
         public int groupId { get; private set; }
-        public int id { get; } = ++_id;
+        public int id { get; set; } = ++_id; //alert
 
         public Station(double range) : base(new Position())
         {

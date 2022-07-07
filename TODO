@@ -46,3 +46,5 @@ alert duża wtopa Group.GetDistance(Station) może zwracać co innego niż Stati
 ALERT prosta optymalizacja - zaczynać algorytm najbliższego sąsiada od wierzchołka, który ma najmniejszą odległość
     do najbliższego sąsiada
 ALERT ciągle nie wiem czy moje wyrafinowane grupowanie rzeczywiście robi to, co myślę
+
+ALERT złagodzić sprawdzanie w IsConnected
