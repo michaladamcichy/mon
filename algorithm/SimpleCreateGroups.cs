@@ -9,18 +9,105 @@ namespace algorithm
     public class SimpleCreateGroups
     {
         Instance instance;
-        List<Station> solution = new List<Station>(); //alert jeszcze nie użyłem
-        HashSet<Station> connected = new HashSet<Station>();
 
         public SimpleCreateGroups(Instance instance)
         {
             this.instance = instance;
         }
 
+        public (Group, Cost) CreateGroup(Station first, Cost initialCost, List<Group> groups)
+        {
+            var group = new Group(new List<Station> { first });
+
+            if (!initialCost.CanGetAny()) return (group, initialCost);
+
+            var nearestStations = first.GetNearest(instance.Stations);
+            var removedStations = new List<Station>();
+
+            foreach (var station in nearestStations)
+            {
+                if (station == first || groups.Any(item => item.Contains(station))) continue; //alert nie powinienem przeglądać wszystkich stacji, tylko najbliższe
+                                                                               //tylko jakim warunkiem to sprawdzać?
+
+                var minCoveringRangeAfterAdding = initialCost.QueryMinCoveringRange(group.Stations);
+                if (minCoveringRangeAfterAdding == null) continue; //alert co ze stacjami nie należacymi do grupy a istniejącymi?
+                group.Add(station);
+                
+
+                //probujemy usunac i patrzymy czy poprawia sie skupienie
+                if(group.Stations.Count > 2)
+                {
+                    var furthestFromCenter = MapObject.GetFurthestFrom(group.Stations, MapObject.CenterOfGravity(group.Stations));
+                    if (furthestFromCenter == station) continue;
+                    var minCoveringCircleRadiusBeforeRemoving = MapObject.MinCoveringCircleRadius(group.Stations);
+                    group.Remove(furthestFromCenter);
+                    var minCoveringCircleRadiusAfterRemoving = MapObject.MinCoveringCircleRadius(group.Stations);
+
+                    if (minCoveringCircleRadiusAfterRemoving < minCoveringCircleRadiusBeforeRemoving)
+                    {
+                        removedStations.Add(furthestFromCenter);
+                        continue;
+                    }
+
+                    group.Add(furthestFromCenter);
+                }
+            }
+            
+            foreach (var removedStation in removedStations)
+            {
+                var minCoveringRangeAfterAdding = initialCost.QueryMinCoveringRange(group.Stations.Concat<Station>(new List<Station>() { removedStation }).ToList());
+
+                if (minCoveringRangeAfterAdding == null) continue;
+                group.Add(removedStation);
+            }
+                
+            var minCoveringRange = initialCost.QueryMinCoveringRange(group.Stations);
+
+            if (minCoveringRange == null || !initialCost.CanGet(minCoveringRange.Value, group.Stations.Count + 1))
+            {
+                return (new Group(new List<Station>() { first }), initialCost);
+            }
+            initialCost.Get(minCoveringRange.Value, group.Stations.Count + 1);
+            group.Stations.ForEach(item => initialCost.ChangeRange(item, minCoveringRange.Value));
+            group.Add(new Station(MapObject.MinCoveringCircleCenter(group.Stations), minCoveringRange.Value));
+
+            return (group, initialCost);
+        }
+
         public List<Group> Run()
+        {
+            Cost initialCost = new Cost(instance);
+            //if nie rozbudowujemy tylko zaczynamy od zera //alert!
+            instance.MapObjects.RemoveAll(item => item is Station); //alert!!
+            var groups = new List<Group>();
+
+            foreach (var unit in instance.Units)
+            {
+                var minRange = initialCost.GetMin();
+                if(minRange == null) return new List<Group>() { new Group(instance.Stations) } ;
+                var station = new Station(instance.StationRanges.Min());
+                instance.MapObjects.Add(station);
+                unit.Attach(station);
+            }
+
+            while(instance.Stations.Any(station => groups.All(group => !group.Contains(station)))) //alert może jakoś zgrabniej?
+            foreach(var station in instance.Stations)
+            {
+                if (groups.Any(group => group.Contains(station))) continue;
+                var (group, cost) = CreateGroup(station, initialCost, groups);
+                groups.Add(group);
+            }
+
+            return groups; //alert
+        }
+
+        /*public List<Group> RRun()
         {
             instance.MapObjects.RemoveAll(item => item is Station); //alert!!
 
+
+            //alert
+            //return new List<Group>();
             var connected = new Dictionary<Station, bool>(); //alert - jak zrobić, żeby były tylko stacje związane z jednostkami?
 
             foreach (var unit in instance.Units)
@@ -100,7 +187,7 @@ namespace algorithm
                     if (connected[removedStation]) continue; //alert chyba niepotrzebne
 
                     var minCoveringRangeBeforeAdding = MapObject.MinCoveringRange(instance.StationRanges, group.Stations);
-
+                    group.Stations.Add(removedStation);
                     var minCoveringRangeAfterAdding = MapObject.MinCoveringRange(instance.StationRanges, group.Stations);
 
                     if (minCoveringRangeAfterAdding == null)
@@ -163,6 +250,6 @@ namespace algorithm
             //i potem łączyć grupy jak największymi stacjami
 
             return groups;
-        }
+        }*/
     }
 }

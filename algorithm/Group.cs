@@ -10,7 +10,7 @@ namespace algorithm
     {
         public List<Station> Stations { get; set; } = new List<Station>();
 
-        public override Position Position { get { return MapObject.Center(Stations); } set { } }  //alert empty set
+        public override Position Position { get { return MapObject.MinCoveringCircleCenter(Stations); } set { } }  //alert empty set
         public override double Range { get { return 0.0; } set { throw new Exception(); } } //alert brzydko oraz 0.0
         public Group() { }
 
@@ -18,17 +18,20 @@ namespace algorithm
         {
             Stations = new List<Station>(stations);
         }
-        public void Add(Station station, Dictionary<Station, bool> connected) //alert czy connected wciąż potrzebne?? raczej nie
+        public void Add(Station station) //alert czy connected wciąż potrzebne?? raczej nie
             //alert schizofrenia raz jest add bez conected, raz z connected
         {
             Stations.Add(station);
-            connected[station] = true;
         }
 
-        public void Remove(Station station, Dictionary<Station, bool> connected)
+        public void Remove(Station station)
         {
             Stations.Remove(station);
-            connected[station] = false;
+        }
+
+        public bool Contains(Station station)
+        {
+            return Stations.Contains(station);
         }
 
         public override double GetDistanceFrom(MapObject other)
@@ -91,6 +94,7 @@ namespace algorithm
             {
                 foreach (var station in group.Stations)
                 {
+                    station.SetGroupId(groups.IndexOf(group));
                     list.Add(station);
                 }
             }

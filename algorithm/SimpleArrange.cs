@@ -12,9 +12,10 @@ namespace algorithm
         public List<Station> Run(Instance instance)
         {
             List<Group> grouped = (new SimpleCreateGroups(instance)).Run();
-            List<Station> joined = (new SimpleJoinGroups(instance)).Run(grouped);
+            //List<Station> joined = (new SimpleJoinGroups(instance)).Run(grouped); //alert
 
-            return joined;
+            //return joined; //alert
+            return Group.Flatten(grouped);
         }
 
 

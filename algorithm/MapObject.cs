@@ -42,7 +42,8 @@ namespace algorithm
         }
         public List<MapObject> GetNearest(List<MapObject> mapObjects)
         {
-            var toSort = mapObjects.FindAll(item => item != this);
+            var THIS = this; //alert alert!
+            var toSort = mapObjects.FindAll(item => item != THIS);
             toSort.Sort((item1, item2) => this.GetDistanceFrom(item1).CompareTo(this.GetDistanceFrom(item2)));
             return toSort;
         }
@@ -63,7 +64,7 @@ namespace algorithm
             Receivers.Add(receiver);
         }
 
-        public bool IsInRange(MapObject other)
+        public virtual bool IsInRange(MapObject other)
         {
             return GetDistanceFrom(other) < other.Range;
         }
@@ -73,15 +74,20 @@ namespace algorithm
         {
             double maxDistance = 0.0;
             mapObjects.ForEach(first => { mapObjects.ForEach(second => { maxDistance = Math.Max(maxDistance, first.GetDistanceFrom(second));});});
-            return maxDistance;
+            return maxDistance / 2;
         }
 
-        public static Position Center(List<Station> stations)
+        public static double MinCoveringCircleRadius(List<Station> stations)
         {
-            return Center(stations.Cast<MapObject>().ToList());
+            return MinCoveringCircleRadius(stations.Cast<MapObject>().ToList());
         }
 
-        public static Position Center(List<MapObject> mapObjects) //alert czy można uśredniać lat i lng??
+        public static Position CenterOfGravity(List<Station> stations)
+        {
+            return CenterOfGravity(stations.Cast<MapObject>().ToList());
+        }
+
+        public static Position CenterOfGravity(List<MapObject> mapObjects) //alert czy można uśredniać lat i lng??
             //TODO - lepszy algorytm ze stackoverflow
         {
             if (mapObjects.Count == 0)
@@ -101,6 +107,37 @@ namespace algorithm
             center.Lng /= mapObjects.Count;
 
             return center;
+        }
+
+        public static Position MinCoveringCircleCenter(List<MapObject> mapObjects)
+        {
+            if (mapObjects.Count == 0) return null; //alert podstępny null
+            if (mapObjects.Count == 1) return mapObjects[0].Position;
+
+            var furthestPair = new Tuple<MapObject, MapObject>(mapObjects.First(), mapObjects.Last());
+            var maxDistance = 0.0;
+            mapObjects.ForEach(first => {
+                mapObjects.ForEach(second => {
+                    if (first == second) return;
+                    var distance = Math.Max(maxDistance, first.GetDistanceFrom(second));
+                    if (distance > maxDistance)
+                    {
+                        maxDistance = distance;
+                        furthestPair = new Tuple<MapObject, MapObject>(first, second);
+                    }
+            }); });
+
+            return CenterOfGravity(new List<MapObject>() { furthestPair.Item1, furthestPair.Item2 });
+        }
+
+        public static Position MinCoveringCircleCenter(List<Station> stations)
+        {
+            return MinCoveringCircleCenter(stations.Cast<MapObject>().ToList());
+        }
+
+        public static Station GetFurthestFrom(List<Station> stations, Position point)
+        {
+            return stations.Aggregate((first, second) => MapObject.Distance(first.Position, point) > MapObject.Distance(second.Position, point) ? first : second);
         }
 
         public static double Distance(Position first, Position second)

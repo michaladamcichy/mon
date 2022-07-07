@@ -9,8 +9,10 @@ import Station from "./Station.svelte";
     export let units;
     export let stationRanges;
     export let stationCounts;
+    export let stationWeights;
     export let updateRanges;
     export let updateCounts;
+    export let updateWeights;
     export let updateStations;
     export let isConnected;
 
@@ -44,7 +46,7 @@ import Station from "./Station.svelte";
 </script>
 
 <div class="row">
-    <BottomPaneSection title={"Station ranges (km) and counts"}>
+    <BottomPaneSection title={"Stations' paramaters"}>
         <div class="row">
             {#each stationRanges as range, index}
                 <input type="number"
@@ -55,7 +57,7 @@ import Station from "./Station.svelte";
                     class="col"
                     step={1}/>
             {/each}
-            <p class="col">(km)</p>
+            <p class="col">ranges</p>
         </div>
         <div class="row">
             {#each stationCounts as count, index}
@@ -66,24 +68,25 @@ import Station from "./Station.svelte";
                     class="col"
                     step={1}/>
             {/each}
-            <p class="col"></p>
+            <p class="col">counts</p>
+        </div>
+        <div class="row">
+            {#each stationWeights as weight, index}
+                <input type="number"
+                    min={0.0}
+                    bind:value={weight}
+                    on:change={() => {updateCounts(stationCounts);}}
+                    class="col"
+                    step={0.1}/>
+            {/each}
+            <p class="col">costs</p>
         </div>
         
     </BottomPaneSection>
     <BottomPaneSection title={'Algorithms'}>
         <div class="row">
-            <button class="btn btn-primary" on:click={() => onAlgorithmClicked("naiveArrange")}>
-                Naive arrange algorithm
-            </button>
-        </div>
-        <div class="row">
             <button class="btn btn-primary" on:click={() => onAlgorithmClicked("simpleArrange")}>
                 Simple arrange algorithm
-            </button>
-        </div>
-        <div class="row">
-            <button class="btn btn-primary" on:click={() => onAlgorithmClicked("greedySalesman")}>
-                Gridy salesman algorithm
             </button>
         </div>
     </BottomPaneSection>

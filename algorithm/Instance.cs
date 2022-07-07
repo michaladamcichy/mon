@@ -85,6 +85,68 @@ namespace algorithm
             }
 
             return mapObjects;
-        } 
+        }
+
+        public bool CanAcquireStation(double range, int howMany = 1) //alert stations czy station??
+        {
+            var index = StationRanges.ToList().FindIndex(item => item == range);
+            if (index == -1) return false;
+            return StationCounts[index] >= howMany;
+        }
+
+        public Station? AquireStation(List<Station> stations)
+        {
+            double minCoveringRadius = MapObject.MinCoveringCircleRadius(stations);
+
+            for(int i =0; i < StationRanges.Count(); i++)
+            {
+                if(StationRanges[i] <= minCoveringRadius && StationCounts[i] > 0)
+                {
+                    StationCounts[i]--;
+                    return new Station(StationRanges[i]);
+                }
+            }
+
+            return null;
+        }
+
+        public Station? AquireMinStation() //alert walnąć jednolinijkowca
+        {
+            for (int i = 0; i < StationRanges.Count(); i++)
+            {
+                if (StationCounts[i] > 0)
+                {
+                    StationCounts[i]--;
+                    return new Station(StationRanges[i]);
+                }
+            }
+
+            return null;
+        }
+
+        public Station? AquireMaxStation()
+        {
+            for (int i = StationRanges.Count() - 1; i >= 0; i--)
+            {
+                if (StationCounts[i] > 0)
+                {
+                    StationCounts[i]--;
+                    return new Station(StationRanges[i]);
+                }
+            }
+
+            return null;
+        }
+
+        public void GiveBackStation(Station station)
+        {
+            for(int i=0; i < StationRanges.Count(); i++)
+            {
+                if(StationRanges[i] == station.Range)
+                {
+                    StationCounts[i]++;
+                }
+            }
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace algorithm
 
         public List<Station> Run(Instance instance)
         {
-            throw new NotImplementedException();
+                throw new NotImplementedException();
         }
     }
 

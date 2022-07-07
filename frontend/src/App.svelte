@@ -15,6 +15,7 @@
 
 	let stationRanges = [20, 30, 50];
 	let stationCounts = [1000,1000,1000];
+	let stationWeights = [1.0, 1.5, 2.5];
 	let isConnected = null;
 	let oldRanges = [...stationRanges];
 	let defaultRange = stationRanges[0];
@@ -39,8 +40,12 @@
 		oldRanges = [...ranges];
 	};
 
-	const updateCounts = (counts) => {
+	const updateCounts = counts => {
 		stationCounts = counts;
+	};
+
+	const updateWeights = weights => {
+		stationWeights = weights;
 	};
 
 	let stations = [
@@ -145,6 +150,7 @@
 				units={units}
 				stationRanges={stationRanges}
 				stationCounts={stationCounts}
+				stationWeights={stationWeights}
 				updateRanges={updateRanges}
 				updateCounts={updateCounts}
 				updateStations={updateAllStations}

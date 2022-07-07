@@ -39,7 +39,7 @@ namespace algorithm
             {
                 if (!second.IsInRange(first))
                 {
-                    stations.Add(new Station(MapObject.Center((new MapObject[] { first, second }).ToList()), ranges.Max())); //alert dorobić dostosowanie rozmiaru
+                    stations.Add(new Station(MapObject.CenterOfGravity((new MapObject[] { first, second }).ToList()), ranges.Max())); //alert dorobić dostosowanie rozmiaru
                     return stations;
                 }
             }
@@ -110,7 +110,7 @@ namespace algorithm
                 return Group.Flatten(groups);
             }
 
-            var connectedGroups = new HashSet<Group>();
+            var connectedGroups = new HashSet<Group>(); //alert memebre already exists
             var additionalStations = new List<Station>();
 
             connectedGroups.Add(groups.First());

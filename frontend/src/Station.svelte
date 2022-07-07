@@ -12,7 +12,6 @@ let lat;
 let lng;
 
 const latlngStep = 0.1;
-
 </script>
 
 <div id="main" class="container">
@@ -31,9 +30,13 @@ const latlngStep = 0.1;
             <button class={`col btn ${station.range == range ? 'btn-success' : 'btn-primary'}`} on:click={() => {station.range = range; update(station);}}>{range}</button>
         {/each}
         <label class="col">{'km'}</label>
+        {#if station.groupId >= 0 }
+        <label class="col">{`group${station.groupId + 1}`}</label>
+        {:else}
         <label class="col">{''}</label>
         <label class="col">{''}</label>
         <label class="col">{''}</label>
+        {/if}
     </div>
 </div>
 

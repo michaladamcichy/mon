@@ -36,6 +36,7 @@ api.algorithm = async (type, stationRanges, stationCounts, stations, units) => {
     }
 
     const calculatedStations = await result.json();
+    console.log('result');
     console.log(calculatedStations);
     return calculatedStations;
 }

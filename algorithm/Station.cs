@@ -10,11 +10,12 @@ namespace algorithm
     {
         public Position position { get; set; } = new Position();
         public double range { get; set; } = 0.0;
-
-        public StationJSON(Position position, double range)
+        public int groupId { get; set; } = -1;
+        public StationJSON(Position position, double range, int groupId = -1)
         {
             this.position = position;
             this.range = range;
+            this.groupId = groupId;
         }
 
         public StationJSON() { }
@@ -22,6 +23,7 @@ namespace algorithm
     public class Station : MapObject
     {
         static int _id = 0;
+        public int groupId { get; private set; }
         public int id { get; } = ++_id;
 
         public Station(double range) : base(new Position())
@@ -32,6 +34,10 @@ namespace algorithm
         {
             this.Range = range;
         }
+        public void SetGroupId(int id)
+        {
+            groupId = id;
+        }
 
         public Station(StationJSON stationJSON) : base(stationJSON.position)
         {
@@ -40,7 +46,7 @@ namespace algorithm
 
         public StationJSON GetJSON()
         {
-            return new StationJSON(Position, Range);
+            return new StationJSON(Position, Range, groupId);
         }
 
         public void AttachTo(Unit unit)

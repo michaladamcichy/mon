@@ -14,6 +14,7 @@ const priorities = [
     {priority: 3, icon: 'fa fa-truck'},
     {priority: 2, icon: 'fa fa-star'},
     {priority: 1, icon: 'fa fa-male'},
+    {priority: 0, icon: 'fa fa-bitbucket'},
     ];
 </script>
 
@@ -28,15 +29,16 @@ const priorities = [
     </div>
     <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
         <label class="col">{''}</label>
-        <label class="col">{'range:'}</label>
         {#each priorities as priority}
+            {#if priority.priority == 0}
+                <div class="col"></div>
+            {/if}
             <button
                 class={`col btn selectButton ${unit.priority == priority.priority ? 'btn-success' : 'btn-primary'}`}
                     on:click={() => {unit.priority = priority.priority; update(unit);}}>
                 <i class={priority.icon}></i>
             </button>
         {/each}
-        <label class="col">{'km'}</label>
         <label class="col">{''}</label>
         <label class="col">{''}</label>
         <label class="col">{''}</label>

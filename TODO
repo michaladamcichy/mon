@@ -42,3 +42,7 @@ czyżby błąd z byciem poza zasięgiem się rozwiązał?
 todo dawanie mniejszych stacji gdzie tylko możemy
 łączenie stacji w obrębie grupy, o ile nie potrzeba dodatkowej stacji, powinno także przebiegać wg MST
 alert duża wtopa Group.GetDistance(Station) może zwracać co innego niż Station.GetDistanceFrom(Group)
+
+ALERT prosta optymalizacja - zaczynać algorytm najbliższego sąsiada od wierzchołka, który ma najmniejszą odległość
+    do najbliższego sąsiada
+ALERT ciągle nie wiem czy moje wyrafinowane grupowanie rzeczywiście robi to, co myślę
