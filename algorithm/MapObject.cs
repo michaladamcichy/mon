@@ -18,6 +18,11 @@ namespace algorithm
             this.Lat = lat; this.Lng = lng;
         }
 
+        public Position(Position  position)
+        {
+            this.Lat = position.Lat; this.Lng = position.Lng;
+        }
+
         public override bool Equals(object obj)
         {
             return Lat == ((Position) obj).Lat && Lng == ((Position) obj).Lng;
@@ -67,6 +72,16 @@ namespace algorithm
         public virtual bool IsInRange(MapObject other)
         {
             return GetDistanceFrom(other) < other.Range;
+        }
+
+        public static bool AreInRange(MapObject o1, MapObject o2)
+        {
+            return o1.IsInRange(o2) && o2.IsInRange(o1);
+        }
+
+        public static bool AreInRange(Station s1, Station s2)
+        {
+            return AreInRange((MapObject)s1, (MapObject)s2);
         }
 
         //

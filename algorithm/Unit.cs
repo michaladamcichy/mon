@@ -34,6 +34,7 @@ namespace algorithm
         public void Attach(Station station)
         {
             Receivers.Clear();
+            station.Senders.Add(this); //alert alert!
             station.Position = Position;
             Receivers.Add(station);
         }

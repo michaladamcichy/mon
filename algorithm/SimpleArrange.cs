@@ -8,14 +8,17 @@ namespace algorithm
 {
     public class SimpleArrange : IArrangeAlgorithm
     {
-
         public List<Station> Run(Instance instance)
         {
-            List<Group> grouped = (new SimpleCreateGroups(instance)).Run();
-            //List<Station> joined = (new SimpleJoinGroups(instance)).Run(grouped); //alert
+            var initialCost = new Cost(instance);
+            var groups = (new SimpleCreateGroups(instance)).Run();
+            var coreStations = groups.Select(group => group.CoreStation).ToList();
 
-            //return joined; //alert
-            return Group.Flatten(grouped);
+            var (cost, additionalStations) = JoinNearestNeighbors.Run(initialCost, coreStations);
+
+            groups.Add(new Group(additionalStations));
+
+            return Group.Flatten(groups);
         }
 
 

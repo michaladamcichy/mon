@@ -48,3 +48,14 @@ ALERT prosta optymalizacja - zaczynać algorytm najbliższego sąsiada od wierzc
 ALERT ciągle nie wiem czy moje wyrafinowane grupowanie rzeczywiście robi to, co myślę
 
 ALERT złagodzić sprawdzanie w IsConnected
+
+ALERT dodałem Senders.Add() w Attach - ale czemu to działało wcześniej???
+
+ALERT WAŻNE - powinienem używać nowej zmiennej cost na początku metody, a nie używać referencji przekazanej jako param.
+
+
+ALERT jest jakiś błąd przy łączeniu - duże kółko w małym
+
+ALERT ciągle de facto nie rozwiązany problem pomniejszania
+CZYŻBY first i second jednak na końcu czasami można było pomniejszyć?
+ALERT porobuć wszędzie cost zamiast initialCost
