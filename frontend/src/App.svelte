@@ -168,7 +168,9 @@
 				updateUnit={updateUnit}
 				removeUnit={removeUnit}
 				updateAllUnits={updateAllUnits}
-				stationRanges={stationRanges}/>
+				stationRanges={stationRanges}
+				stationCounts={stationCounts}
+				/>
 	</div>
 </div>
 
@@ -180,23 +182,23 @@
 	#topRow {
 		 
 		padding: 0;
-		height: 74vh;
+		height: 70vh;
 		/* height: 98vh; */
 	}
 	#bottomRow {
-		height: 24vh;
+		height: 20vh;
 	}
 
 	#leftCol {
-		height: 98vh;
+		height: 90vh;
 	}
 
 	#rightCol {
-		height: 98vh;
+		height: 90vh;
 	}
 
 	#leftTop {
-		height: 74vh;
+		height: 70vh;
 	}
 
 	#leftBottom {

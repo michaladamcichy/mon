@@ -59,3 +59,16 @@ ALERT jest jakiś błąd przy łączeniu - duże kółko w małym
 ALERT ciągle de facto nie rozwiązany problem pomniejszania
 CZYŻBY first i second jednak na końcu czasami można było pomniejszyć?
 ALERT porobuć wszędzie cost zamiast initialCost
+
+ALERT jak rozwiązać stacje operatorów? 
+
+ALERT POWAŻNA WĄTPLIWOŚĆ:
+    Uwaga, a co ze stacjami operatorów? 
+    Wtedy musiałbym zrobić możliwość podania dowolnego zasięgu.
+    Ale wtedy może być problem z dokładnym odtworzeniem sieci komórkowej w Polsce
+
+ALERT docelowo liczby stacji będziemy określać wyłącznie w magazynach
+    jednak musi być przycisk - czy chcemy uwzględniać odległości
+
+ALERT GDZIE W ŁAŃCUCHU DOWODZENIA UMIEŚCIĆ MAGAZYNY?
+LIFTING WIZUALNY - m. in. konsekwentne rozmiary czcionek, itd.

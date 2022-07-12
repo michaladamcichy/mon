@@ -60,17 +60,6 @@ import Station from "./Station.svelte";
             <p class="col">ranges</p>
         </div>
         <div class="row">
-            {#each stationCounts as count, index}
-                <input type="number"
-                    min={0}
-                    bind:value={count}
-                    on:change={() => {updateCounts(stationCounts);}}
-                    class="col"
-                    step={1}/>
-            {/each}
-            <p class="col">counts</p>
-        </div>
-        <div class="row">
             {#each stationWeights as weight, index}
                 <input type="number"
                     min={0.0}
@@ -81,12 +70,28 @@ import Station from "./Station.svelte";
             {/each}
             <p class="col">costs</p>
         </div>
+        <div class="row">
+            {#each stationCounts as count, index}
+                <input type="number"
+                    min={0}
+                    bind:value={count}
+                    class="col"
+                    step={1}
+                    disabled/>
+            {/each}
+            <p class="col">counts</p>
+        </div>
         
     </BottomPaneSection>
     <BottomPaneSection title={'Algorithms'}>
         <div class="row">
             <button class="btn btn-primary" on:click={() => onAlgorithmClicked("simpleArrange")}>
                 Simple arrange algorithm
+            </button>
+        </div>
+        <div class="row">
+            <button class="btn btn-primary" on:click={() => onAlgorithmClicked("simpleHierarchicalTree")}>
+                Simple hierarchical tree
             </button>
         </div>
     </BottomPaneSection>
@@ -114,5 +119,10 @@ import Station from "./Station.svelte";
 <style>
     .status {
         margin-bottom: 15px;
+    }
+    input:disabled
+    {
+        color: black;
+        background-color: lightgray;
     }
 </style>

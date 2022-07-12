@@ -10,8 +10,10 @@
     export let updateUnit;
     export let removeUnit;
     export let stationRanges;
+    export let stationCounts;
     export let updateAllStations;
     export let updateAllUnits;
+
 
     let stationsHidden = false;
     let unitsHidden = false;
@@ -94,7 +96,7 @@
             </button>
         </div>
         {#each units as unit, index}
-            <Unit index={index} unit={unit} update={updateUnit} remove={removeUnit}/>
+            <Unit index={index} unit={unit} update={updateUnit} remove={removeUnit} ranges={stationRanges} counts={stationCounts}/>
         {/each}
     {/if}
     <hr>
