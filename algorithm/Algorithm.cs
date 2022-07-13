@@ -25,19 +25,14 @@ namespace algorithm
             return new ConnectionCheck().Run(stations);
         }
 
-        public static List<Station> NaiveArrange(Instance instance)
-        {
-            return new NaiveArrange().Run(instance);
-        }
-
         public static List<Station> SimpleArrange(Instance instance)
         {
             return new SimpleArrange().Run(instance);
         }
 
-        public static List<MapObject> GreedySalesman(List<MapObject> items)
+        public static List<Station> SimpleHierarchicalTree(Instance instance)
         {
-            return new GreedySalesman().Run(items);
+            return new SimpleHierarchicalTree().Run(instance);
         }
 
         //public static List<Station> SimpleArrangeAlgorithm(Instance instance)

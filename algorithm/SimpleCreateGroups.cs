@@ -76,10 +76,10 @@ namespace algorithm
             
 
 
-            foreach (var station in group.Stations)
+            /*foreach (var station in group.Stations)
             {
                 if (cost.CanChangeRange(station, ))
-            }
+            }*/
             group.Add(new Station(MapObject.MinCoveringCircleCenter(group.Stations), minCoveringRange.Value));
 
             return (group, cost);
@@ -97,7 +97,7 @@ namespace algorithm
             {
                 var minRange = initialCost.GetMin();
                 if(minRange == null) return new List<Group>() { new Group(instance.Stations) } ;
-                var station = new Station(instance.StationRanges.Min());
+                var station = new Station(minRange.Value);
                 instance.MapObjects.Add(station);
                 unit.Attach(station);
             }

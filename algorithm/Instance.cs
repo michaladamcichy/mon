@@ -26,6 +26,7 @@ namespace algorithm
     {
         public double[] StationRanges { get; set; } = new double[0];
         public int[] StationCounts { get; set; } = new int[0];
+        public List<int> Priorities { get { return getPriorities(); } }
 
         public List<MapObject> MapObjects { get; set; } = new List<MapObject>(); //alert! setter
 
@@ -151,6 +152,13 @@ namespace algorithm
                     StationCounts[i]++;
                 }
             }
+        }
+
+        List<int> getPriorities()
+        {
+            var priorities = Units.Select(unit => unit.Priority).ToHashSet().ToList();
+            priorities.Sort();
+            return priorities;
         }
     }
 }

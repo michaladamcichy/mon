@@ -60,5 +60,12 @@ namespace algorithm
         {
             return Senders.Any(item => item is Unit);
         }
+
+        public Unit GetUnit() //alert podstępny null
+        {
+            if (!IsAttached()) return null;
+            var item = Senders.Find(item => item is Unit);
+            return (Unit) item;
+        }
     }
 }
