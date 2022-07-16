@@ -20,6 +20,14 @@
 	let oldRanges = [...stationRanges];
 	let defaultRange = stationRanges[0];
 
+	const priorities = [
+    {priority: 4, icon: 'fa fa-exclamation'},
+    {priority: 3, icon: 'fa fa-truck'},
+    {priority: 2, icon: 'fa fa-star'},
+    {priority: 1, icon: 'fa fa-male'},
+    {priority: 0, icon: 'fa fa-bitbucket'},
+    ];
+
 	const updateRanges = (ranges) => {
 		for(let i =0; i < ranges.length - 1; i++) {
 			if(ranges[i] >= ranges[i+1]) {
@@ -40,8 +48,18 @@
 		oldRanges = [...ranges];
 	};
 
-	const updateCounts = counts => {
-		stationCounts = counts;
+	const updateCounts = () => {
+		let runningCounts = [0,0,0];
+		units.forEach(unit => {
+			if(unit.priority === 0)
+			{
+				unit.counts.forEach((count, index) => {
+					runningCounts[index] += count;
+				});
+			}
+		});
+
+		stationCounts = runningCounts;
 	};
 
 	const updateWeights = weights => {
@@ -72,7 +90,13 @@
 			isConnected = await api.isConnected(stationRanges, stationCounts, stations, units);
 			serverNotResponding = false;
 		})();
+	};
+
+	$: {
+		units; updateCounts();
 	}
+
+
 
 	const updateAllStations = _stations => {
 		stations = _stations;
@@ -152,7 +176,6 @@
 				stationCounts={stationCounts}
 				stationWeights={stationWeights}
 				updateRanges={updateRanges}
-				updateCounts={updateCounts}
 				updateStations={updateAllStations}
 				isConnected={isConnected}/>
 		</div>
@@ -170,6 +193,7 @@
 				updateAllUnits={updateAllUnits}
 				stationRanges={stationRanges}
 				stationCounts={stationCounts}
+				priorities={priorities}
 				/>
 	</div>
 </div>
