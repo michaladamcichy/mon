@@ -1,5 +1,4 @@
 <script>
-import { missing_component } from 'svelte/internal';
 import Instance from './Instance.svelte';
 
     import Station from './Station.svelte';
@@ -9,6 +8,9 @@ import Instance from './Instance.svelte';
     export let instances;
     export let addInstance;
     export let selectInstance;
+    export let removeInstance;
+    export let removeAllInstances;
+    export let selectedInstance;
     export let stations;
     export let updateStation;
     export let removeStation;
@@ -22,6 +24,7 @@ import Instance from './Instance.svelte';
     export let priorities;
 
 
+    let instancesHidden = false;
     let stationsHidden = false;
     let unitsHidden = false;
 
@@ -62,14 +65,14 @@ import Instance from './Instance.svelte';
 <div id="main" class="container">
     <div class="row">
         <h4 class="col">Instances</h4>
-        <!-- <button class="toggleVisibilityButton btn btn-primary" on:click={toggleStationsVisibility}>{stationsHidden ? "v" : "^"}</button> -->
+        <button class="toggleVisibilityButton btn btn-primary" on:click={() => {instancesHidden = !instancesHidden;}}>{instancesHidden ? "v" : "^"}</button>
         <div class="col"></div>
         <div class="col"></div>
         <div class="col"></div>
         <div class="col"></div>
     </div>
     <hr>
-    <!-- {#if !stationsHidden} -->
+    {#if !instancesHidden}
         <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
             <button class="addButton btn btn-primary" on:click={() => {addInstance()}}>
                 +
@@ -77,14 +80,14 @@ import Instance from './Instance.svelte';
             <div class="col"></div>
             <div class="col"></div>
             <div class="col"></div>
-            <button class="col btn btn-danger removeAllButton" on:click={() => {removeAllStations()}} disabled={stations.length == 0}>X</button>
+            <button class="col btn btn-danger removeAllButton" on:click={() => {removeAllInstances();}} disabled={instances.length == 0}>X</button>
         </div>
         <hr>
         <hr>
         {#each instances as instance, index}
-            <Instance index={index} instance={instance} select={selectInstance}/>
+            <Instance index={index} instance={instance} select={selectInstance} remove={removeInstance} selected={selectedInstance}/>
         {/each}
-    <!-- {/if} -->
+    {/if}
     <div class="row">
         <h4 class="col">Stations</h4>
         <button class="toggleVisibilityButton btn btn-primary" on:click={toggleStationsVisibility}>{stationsHidden ? "v" : "^"}</button>

@@ -66,7 +66,7 @@
 	const connectionCheck = async () => {
 			let serverNotResponding = true; //alert to chyba miała być globalna
 			setTimeout(() => {if(serverNotResponding) isConnected = null;}, 5000);
-			isConnected = await api.isConnected(ranges,
+			selectedInstance.isConnected = isConnected = await api.isConnected(ranges,
 				counts,
 				stations,
 				units);
@@ -95,6 +95,8 @@
 	selectInstance(instances[0]);
 
 	const addInstance = () => {
+		console.log('addInstance');
+		console.log(instances);
 		instances.push(
 			{
 			ranges: defaultRanges,
@@ -155,6 +157,7 @@
 
 	// let serverNotResponding = true;
 	$: {
+		units;
 		connectionCheck();
 	};
 
@@ -189,6 +192,29 @@
             console.log('error');
         }
 	}
+
+	const removeInstance = instance => {
+		console.log('removing');
+		const index = instances.indexOf(instance);
+        if(index >= 0) {
+			instances = instances.filter((item, _index) => _index != index);
+            instances = instances;
+
+			if(instances.length == 0)
+			{
+				addInstance();
+				selectInstance(instances[0]);
+			}
+        } else {
+            console.log('error');
+        }
+	}
+
+	const removeAllInstances = () => {
+		instances = [];
+		addInstance();
+		selectInstance(instances[0]);
+	};
 
 	const updateAllUnits = _units => {
 		units = _units;
@@ -259,6 +285,9 @@
 				instances={instances}
 				addInstance={addInstance}
 				selectInstance={selectInstance}
+				removeInstance={removeInstance}
+				removeAllInstances={removeAllInstances}
+				selectedInstance={selectedInstance}
 				stations={stations}
 				updateStation={updateStation}
 				removeStation={removeStation}

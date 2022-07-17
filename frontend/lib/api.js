@@ -19,7 +19,7 @@ api.isConnected = async (stationRanges, stationCounts, stations, units) => {
     
     const result = await fetch(`${api.url}/isConnected`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
 
-    if(!result.ok) return null;
+    if(!result.ok) return undefined;
      
     const parsed = await result.json();
     return parsed;

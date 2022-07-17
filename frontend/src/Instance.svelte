@@ -3,16 +3,18 @@
 export let instance;
 export let index;
 export let select;
+export let remove;
+export let selected;
 
 </script>
 
 <div id="main" class="container">
     <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
         <label class="col">{`${index + 1}.`}</label>
-        <button class="col btn btn-primary" on:click={() => select(instance)}>Instance</button>
+        <button class={`col btn ${instance == selected ? 'btn-success' : 'btn-primary'}`} on:click={() => select(instance)}>Instance</button>
         <div class="col"></div>
         <div class="col"></div>
-        <button id="removeButton" class="btn btn-danger" on:click={() => {}}>X</button>
+        <button id="removeButton" class="btn btn-danger" on:click={() => {remove(instance);}}>X</button>
     </div>
     <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
         
