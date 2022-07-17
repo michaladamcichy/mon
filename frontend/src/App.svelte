@@ -32,10 +32,10 @@
 				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0] },
 			],
 			units: [
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
 			],
 		}
 	];
@@ -109,6 +109,11 @@
 		});
 		instances = instances;
 	};
+
+	const duplicateInstance = instance => {
+		instances.push(JSON.parse(JSON.stringify(instance)));
+		instances = instances;
+	};
 	
 	const priorities = [
 		{priority: 4, icon: 'fa fa-exclamation'},
@@ -157,7 +162,7 @@
 
 	// let serverNotResponding = true;
 	$: {
-		units;
+		units; stations;
 		connectionCheck();
 	};
 
@@ -291,6 +296,7 @@
 				addInstance={addInstance}
 				selectInstance={selectInstance}
 				removeInstance={removeInstance}
+				duplicateInstance={duplicateInstance}
 				removeAllInstances={removeAllInstances}
 				selectedInstance={selectedInstance}
 				stations={stations}

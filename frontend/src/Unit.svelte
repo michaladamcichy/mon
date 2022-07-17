@@ -8,6 +8,7 @@ export let update;
 export let remove;
 export let ranges;
 export let priorities;
+export let addUnit;
 
 const latlngStep = 0.1;
 
@@ -15,7 +16,7 @@ const latlngStep = 0.1;
 
 <div class="container">
     <div id="controlsContainer" class="form-group row d-flex justify-content-center align-items-center">
-        <label class="col">{`${index + 1}.`}</label>
+        <label class="col">{`${index + 1}. ${unit.master != undefined ? `[${unit.master + 1}]` : ''}`}</label>
         <label class="col col-form-label">lat:</label>
         <input type="number" class="col latLngInput" bind:value={unit.position.lat} on:change={() => {update(unit);}} step={latlngStep}/>
         <label class="col col-form-label">lng:</label>
@@ -40,7 +41,7 @@ const latlngStep = 0.1;
     <div class="controlsContainer form-group row d-flex justify-content-center align-items-center littleSpaceAbove">
         <label class="col">{''}</label>
         {#each priorities as priority}
-            <button
+            <div
                 class={`col btn selectButton ${unit.priority == priority.priority ? 'btn-success' : 'btn-primary'}`}
                     on:click={() => {
                         unit.priority = priority.priority;
@@ -51,10 +52,14 @@ const latlngStep = 0.1;
                         update(unit);
                         }}>
                 <i class={priority.icon}></i>
-            </button>
+                    </div>
         {/each}
         <label class="col">{''}</label>
+        {#if unit.priority > 0}
+        <button class="btn btn-primary" on:click={() => {addUnit(unit.priority, index)}}>+</button>
+        {:else}
         <label class="col">{''}</label>
+        {/if}
         <label class="col">{''}</label>
     </div>  
     <div class="row">
@@ -76,7 +81,7 @@ const latlngStep = 0.1;
         /* font-size: 5px; */
         font-weight: bold;
     }
-    #removeButton {
+    button {
         width: 30px;
         height: 30px;
         font-size: 10px;

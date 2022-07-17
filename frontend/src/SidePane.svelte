@@ -9,6 +9,7 @@ import Instance from './Instance.svelte';
     export let addInstance;
     export let selectInstance;
     export let removeInstance;
+    export let duplicateInstance;
     export let removeAllInstances;
     export let selectedInstance;
     export let stations;
@@ -40,15 +41,18 @@ import Instance from './Instance.svelte';
         stationsHidden = !stationsHidden;
     };
 
-    const addUnit = priority => {
+    const addUnit = (priority, master) => {
         let newUnits = [...units,
             {
                 position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, 
                 priority: priority != undefined ? priority : 1, //alert
-                counts: priority == 0 ? [1000, 1000, 1000] : undefined //alert
+                counts: priority == 0 ? [1000, 1000, 1000] : undefined, //alert
+                master: priority > 0 ? master : undefined,
             }
         ];
         updateAllUnits(newUnits);
+        console.log('add unit');
+        console.log(newUnits);
     };
 
     const toggleUnitsVisibility = () => {
@@ -88,7 +92,7 @@ import Instance from './Instance.svelte';
         <hr>
         <hr>
         {#each instances as instance, index}
-            <Instance index={index} instance={instance} select={selectInstance} remove={removeInstance} selected={selectedInstance}/>
+            <Instance index={index} instance={instance} select={selectInstance} remove={removeInstance} selected={selectedInstance} duplicate={duplicateInstance}/>
         {/each}
     {/if}
     <div class="row">
@@ -150,7 +154,7 @@ import Instance from './Instance.svelte';
         <hr>
         {#each units as unit, index}
             <Unit index={index} unit={unit} update={updateUnit} remove={removeUnit}
-                ranges={stationRanges} priorities={priorities}/>
+                ranges={stationRanges} priorities={priorities} addUnit={addUnit}/>
         {/each}
     {/if}
     <hr>
