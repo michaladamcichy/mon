@@ -24,7 +24,7 @@ import Station from "./Station.svelte";
 
     const getStationsStats = (stations) => {
         const sizes = stations.map(item => item.range);
-        console.log(sizes);
+        console.log(stations);
         const uniqueSizes = new Set(sizes);
 
         let counts = [];

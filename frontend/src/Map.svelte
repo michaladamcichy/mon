@@ -64,6 +64,8 @@ import { onMount } from "svelte";
 
 
     const generateMarkers = (map, mapObjects, update) => {
+        console.log('HERE');
+        console.log(mapObjects);
         mapObjects.forEach((mapObject, index) => {
             const marker = new google.maps.Marker({
                 position: mapObject.position,

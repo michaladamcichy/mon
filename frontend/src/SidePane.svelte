@@ -1,8 +1,14 @@
 <script>
+import { missing_component } from 'svelte/internal';
+import Instance from './Instance.svelte';
+
     import Station from './Station.svelte';
     import Unit from './Unit.svelte';
 
     export let map;
+    export let instances;
+    export let addInstance;
+    export let selectInstance;
     export let stations;
     export let updateStation;
     export let removeStation;
@@ -14,6 +20,7 @@
     export let updateAllStations;
     export let updateAllUnits;
     export let priorities;
+
 
     let stationsHidden = false;
     let unitsHidden = false;
@@ -54,6 +61,31 @@
 
 <div id="main" class="container">
     <div class="row">
+        <h4 class="col">Instances</h4>
+        <!-- <button class="toggleVisibilityButton btn btn-primary" on:click={toggleStationsVisibility}>{stationsHidden ? "v" : "^"}</button> -->
+        <div class="col"></div>
+        <div class="col"></div>
+        <div class="col"></div>
+        <div class="col"></div>
+    </div>
+    <hr>
+    <!-- {#if !stationsHidden} -->
+        <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
+            <button class="addButton btn btn-primary" on:click={() => {addInstance()}}>
+                +
+            </button>
+            <div class="col"></div>
+            <div class="col"></div>
+            <div class="col"></div>
+            <button class="col btn btn-danger removeAllButton" on:click={() => {removeAllStations()}} disabled={stations.length == 0}>X</button>
+        </div>
+        <hr>
+        <hr>
+        {#each instances as instance, index}
+            <Instance index={index} instance={instance} select={selectInstance}/>
+        {/each}
+    <!-- {/if} -->
+    <div class="row">
         <h4 class="col">Stations</h4>
         <button class="toggleVisibilityButton btn btn-primary" on:click={toggleStationsVisibility}>{stationsHidden ? "v" : "^"}</button>
         <div class="col"></div>
@@ -64,11 +96,11 @@
     <hr>
     {#if !stationsHidden}
         <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
-            <button class="addButton btn btn-primary" on:click={() => {addStation();}}>
+            <button class="addButton btn btn-primary" on:click={() => {addStation(Math.min(stationRanges))}}>
                 +
             </button>
             {#each stationRanges as range}
-                <button class="col btn btn-primary" on:click={() => {addStation(range);}}>{range}</button>
+                <button class="col btn btn-primary" on:click={() => {addStation(range)}}>{range}</button>
             {/each}
             <div class="col">km</div>
             <div class="col"></div>

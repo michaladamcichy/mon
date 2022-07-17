@@ -13,29 +13,117 @@
 
 	let map;
 
-	let stationRanges = [20, 30, 50];
-	let stationCounts = [1000,1000,1000];
-	let stationWeights = [1.0, 1.5, 2.5];
-	let isConnected = null;
-	let oldRanges = [...stationRanges];
-	let defaultRange = stationRanges[0];
+	const defaultRanges = [20, 30, 50];
+	const defaultCounts = [0,0,0];
+	const defaultWeights = [1.0, 1.5, 2.5];
+	const defaultStations = [];
+	const defaultUnits = [];
+	let instances = [
+		{
+			ranges: defaultRanges,
+			counts: [0,0,0],
+			weights: [1.0, 1.5, 2.5],
+			isConnected: undefined,
+			oldRanges: defaultRanges,
+			stations: [
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0] },
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0] },
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0] },
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0] },
+			],
+			units: [
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
+			],
+		}
+	];
 
+	let selectedInstance;
+
+	let ranges;
+	let counts;
+	let weights;
+	let isConnected;
+	let oldRanges;
+	let stations;
+	let units;
+
+
+	const updateInstance = instance => {
+		instance.ranges = ranges;
+		instance.counts = counts;
+		instance.weights = weights;
+		instance.isConnected = isConnected;
+		instance.oldRanges = oldRanges; //alert czy to nie może być lokalna zmienna?
+		instance.stations = stations;
+		instance.units = units;
+
+		instances = instances;
+	};
+
+	const connectionCheck = async () => {
+			let serverNotResponding = true; //alert to chyba miała być globalna
+			setTimeout(() => {if(serverNotResponding) isConnected = null;}, 5000);
+			isConnected = await api.isConnected(ranges,
+				counts,
+				stations,
+				units);
+			serverNotResponding = false;
+		};
+		
+	const selectInstance = instance => {
+		if(selectedInstance)
+		updateInstance(selectedInstance);
+
+		ranges = instance.ranges;
+		counts = instance.counts;
+		weights = instance.weights;
+		isConnected = instance.isConnected;
+		oldRanges = instance.oldRanges; //alert czy to nie może być lokalna zmienna?
+		stations = instance.stations;
+		units = instance.units;
+
+		selectedInstance = instance;
+		
+		instances = instances;
+		connectionCheck();
+		console.log(instances);
+	};
+
+	selectInstance(instances[0]);
+
+	const addInstance = () => {
+		instances.push(
+			{
+			ranges: defaultRanges,
+			counts: defaultCounts,
+			weights: defaultWeights,
+			isConnected: undefined,
+			oldRanges: defaultRanges,
+			stations: defaultStations,
+			units: defaultUnits,
+		});
+		instances = instances;
+	};
+	
 	const priorities = [
-    {priority: 4, icon: 'fa fa-exclamation'},
-    {priority: 3, icon: 'fa fa-truck'},
-    {priority: 2, icon: 'fa fa-star'},
-    {priority: 1, icon: 'fa fa-male'},
-    {priority: 0, icon: 'fa fa-bitbucket'},
+		{priority: 4, icon: 'fa fa-exclamation'},
+		{priority: 3, icon: 'fa fa-truck'},
+		{priority: 2, icon: 'fa fa-star'},
+		{priority: 1, icon: 'fa fa-male'},
+		{priority: 0, icon: 'fa fa-bitbucket'},
     ];
 
 	const updateRanges = (ranges) => {
 		for(let i =0; i < ranges.length - 1; i++) {
 			if(ranges[i] >= ranges[i+1]) {
-				stationRanges = [...oldRanges];
+				ranges = [...oldRanges];
 				return;
 			}
 		}
-		stationRanges = ranges;
+		ranges = ranges;
 		updateAllStations(stations.map(station => {
 			const index = oldRanges.indexOf(station.range);
 			if(index >= 0) {
@@ -59,41 +147,20 @@
 			}
 		});
 
-		stationCounts = runningCounts;
+		counts = runningCounts;
 	};
-
-	const updateWeights = weights => {
-		stationWeights = weights;
-	};
-
-	let stations = [
-		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
-		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
-		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
-		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
-		];
-
-	let units = [
-		{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
-		{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
-		{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
-		{position: {lat: 51.2297, lng: 21.0122 }, priority: 1},
-	];
 
 	onMount(() => {
 	});
 
+	// let serverNotResponding = true;
 	$: {
-		(async () => {
-			let serverNotResponding = true;
-			setTimeout(() => {if(serverNotResponding) isConnected = null;}, 5000);
-			isConnected = await api.isConnected(stationRanges, stationCounts, stations, units);
-			serverNotResponding = false;
-		})();
+		connectionCheck();
 	};
 
 	$: {
-		units; updateCounts();
+		units;
+		updateCounts();
 	}
 
 
@@ -165,16 +232,22 @@
 	<div id="leftCol" class="col-8">
 		<div id="leftTop" class="row">
 			{#if ready}
-			<Map map={map} setMap={setMap} stations={stations} updateStation={updateStation} units={units} updateUnit={updateUnit}/>
+			<Map
+				map={map}
+				setMap={setMap}
+				stations={stations}
+				updateStation={updateStation}
+				units={units}
+				updateUnit={updateUnit}/>
 			{/if}
 		</div>
 		<div id="leftBottom" class="row">
 			<BottomPane
 				stations={stations}
 				units={units}
-				stationRanges={stationRanges}
-				stationCounts={stationCounts}
-				stationWeights={stationWeights}
+				stationRanges={ranges}
+				stationCounts={counts}
+				stationWeights={weights}
 				updateRanges={updateRanges}
 				updateStations={updateAllStations}
 				isConnected={isConnected}/>
@@ -183,6 +256,9 @@
 	<div id="rightCol" class="col-4">
 			<SidePane
 				map={map}
+				instances={instances}
+				addInstance={addInstance}
+				selectInstance={selectInstance}
 				stations={stations}
 				updateStation={updateStation}
 				removeStation={removeStation}
@@ -191,8 +267,8 @@
 				updateUnit={updateUnit}
 				removeUnit={removeUnit}
 				updateAllUnits={updateAllUnits}
-				stationRanges={stationRanges}
-				stationCounts={stationCounts}
+				stationRanges={ranges}
+				stationCounts={counts}
 				priorities={priorities}
 				/>
 	</div>
