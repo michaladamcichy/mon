@@ -29,8 +29,11 @@ import Instance from './Instance.svelte';
     let unitsHidden = false;
 
     const addStation = range => {
-        const newStation = [...stations, {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: range}];
-        updateAllStations(newStation);
+        console.log('add station');
+        console.log(stationRanges);
+        const newStation = {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: range};
+        console.log(newStation);
+        updateAllStations([...stations, newStation]);
     };
 
     const toggleStationsVisibility = () => {
@@ -99,7 +102,7 @@ import Instance from './Instance.svelte';
     <hr>
     {#if !stationsHidden}
         <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
-            <button class="addButton btn btn-primary" on:click={() => {addStation(Math.min(stationRanges))}}>
+            <button class="addButton btn btn-primary" on:click={() => {addStation(stationRanges[0])}}>
                 +
             </button>
             {#each stationRanges as range}
@@ -147,7 +150,7 @@ import Instance from './Instance.svelte';
         <hr>
         {#each units as unit, index}
             <Unit index={index} unit={unit} update={updateUnit} remove={removeUnit}
-                ranges={stationRanges} counts={stationCounts} priorities={priorities}/>
+                ranges={stationRanges} priorities={priorities}/>
         {/each}
     {/if}
     <hr>

@@ -99,9 +99,9 @@
 		console.log(instances);
 		instances.push(
 			{
-			ranges: defaultRanges,
+			ranges: [...defaultRanges],
 			counts: defaultCounts,
-			weights: defaultWeights,
+			weights: [...defaultWeights],
 			isConnected: undefined,
 			oldRanges: defaultRanges,
 			stations: defaultStations,
@@ -203,6 +203,11 @@
 			if(instances.length == 0)
 			{
 				addInstance();
+				selectInstance(instances[0]);
+			}
+
+			if(instance == selectedInstance)
+			{
 				selectInstance(instances[0]);
 			}
         } else {
