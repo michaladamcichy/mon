@@ -72,3 +72,13 @@ ALERT docelowo liczby stacji będziemy określać wyłącznie w magazynach
 
 ALERT GDZIE W ŁAŃCUCHU DOWODZENIA UMIEŚCIĆ MAGAZYNY?
 LIFTING WIZUALNY - m. in. konsekwentne rozmiary czcionek, itd.
+
+niepokojąca sytuacja z instancjami - 2 różne rozwiązania
+
+
+ALERT ALERT ALERT
+    Trzeba zrobić tak, żeby dodatkowa stacja dla jednostacjowych grup nie marnowała się, jeśli grupa i tak nie zostanie podłączona
+    Wiem jak to zrobić
+
+
+

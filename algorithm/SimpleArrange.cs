@@ -10,15 +10,19 @@ namespace algorithm
     {
         public List<Station> Run(Instance instance)
         {
-            var initialCost = new Cost(instance);
-            var groups = (new SimpleCreateGroups(instance)).Run();
-            var coreStations = groups.Select(group => group.CoreStation).ToList();
+            var cost = new Cost(instance);
 
-            var (cost, additionalStations) = JoinNearestNeighbors.Run(initialCost, coreStations);
+            var (groups, newCost) = (new SimpleCreateGroups(instance)).Run(cost);
+            cost = new Cost(newCost);
+            if (instance.Units.Any(unit => !unit.HasAttachement())) return Group.Flatten(groups); //alert data flow po kryjomu modyfikuje instnace.Stations
+            
+            var coreStations = groups.FindAll(group => group.CoreStation != null).Select(group => group.CoreStation).ToList();
 
-            groups.Add(new Group(additionalStations));
 
-            return Group.Flatten(groups);
+            var (additionalStations, otherNewCost) = JoinNearestNeighbors.Run(cost, coreStations);
+            cost = new Cost(otherNewCost);
+
+            return Group.Flatten(groups).Concat<Station>(additionalStations).ToList();
         }
 
 

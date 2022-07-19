@@ -15,11 +15,15 @@ namespace algorithm
         
         public Station CoreStation { get {
                 var core = Stations.FindAll(item => !item.IsAttached());
-                if (core.Count != 1) throw new Exception("Ambiguous core station");
+                if (core.Count != 1) return null; //alert podstępny null
                 return core.First();
             } }
         public Group() { }
-
+        
+        public Group(Group group)
+        {
+            Stations = new List<Station>(group.Stations);
+        }
         public Group(List<Station> stations) : base(new Position())
         {
             Stations = new List<Station>(stations);
@@ -90,6 +94,11 @@ namespace algorithm
             }
 
             return min;
+        }
+
+        public Station GetFurthestFromCenter()
+        {
+            return MapObject.GetFurthestFrom(Stations, MapObject.CenterOfGravity(Stations));
         }
 
         public static List<Station> Flatten(List<Group> groups)

@@ -60,6 +60,7 @@ namespace algorithm
 
 
             var lastUsedRange = 0.0;
+            var previousStation = first;
             while (distanceCovered + lastUsedRange * (1 - tolerance) < distanceToCover)
             //alert sytuacje nieobsłużone:
             //1) first i second ostatnie można pomniejszyć
@@ -75,14 +76,17 @@ namespace algorithm
                 if (_range == null) break;
                 var range = _range.Value;
 
-                currentPosition = new Position(currentPosition.Lat + direction.Lat * range * (1 - tolerance),
-                currentPosition.Lng + direction.Lng * range * (1 - tolerance));
-                distanceCovered += range * (1 - tolerance);
-                var station = new Station(new Position(currentPosition), range);
+                var step = Math.Min(previousStation.Range, range);
+
+                currentPosition = new Position(currentPosition.Lat + direction.Lat * step * (1 - tolerance),
+                    currentPosition.Lng + direction.Lng * step * (1 - tolerance));
+                distanceCovered += step * (1 - tolerance);
+                var station = new Station(new Position(currentPosition), step);
                 stations.Add(station);
                 if (MapObject.AreInRange(station, second)) break;
                 lastUsedRange = range;
-            }
+                previousStation = station;
+            }   
 
 
             /*if (stations.Count > 0 && !second.IsInRange(stations.Last()))

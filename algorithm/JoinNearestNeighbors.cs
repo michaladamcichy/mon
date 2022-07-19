@@ -8,9 +8,9 @@ namespace algorithm
 {
     public class JoinNearestNeighbors
     {
-        public static (Cost, List<Station>) Run(Cost initialCost, List<Station> coreStations)
+        public static (List<Station>, Cost) Run(Cost initialCost, List<Station> coreStations)
         {
-            if(coreStations.Count == 0 || !initialCost.CanGetAny()) return (initialCost, new List<Station>());
+            if(coreStations.Count == 0 || !initialCost.CanGetAny()) return (new List<Station>(), initialCost);
             Cost cost = new Cost(initialCost);
 
             var connected = new HashSet<Station>();
@@ -41,7 +41,7 @@ namespace algorithm
                 if (!cost.CanGetAny()) break;
             }
 
-            return (cost, additionalStations);
+            return (additionalStations, cost);
         }
     }
 }

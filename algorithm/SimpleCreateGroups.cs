@@ -15,12 +15,33 @@ namespace algorithm
             this.instance = instance;
         }
 
-        public (Group, Cost) CreateGroup(Station first, Cost initialCost, List<Group> groups)
+        (Group?, Cost) AdjustGroup(Group _group, Cost initialCost)
+        {
+            var group = new Group(_group);
+            if (group == _group) throw new Exception();
+            Cost cost = new Cost(initialCost);
+
+            while(group.Stations.Count > 1)
+            {
+                var minCoveringRange = cost.QueryMinCoveringRange(group.Stations);
+                if (minCoveringRange != null && cost.CanGet(minCoveringRange.Value, group.Stations.Count + 1))
+                {
+                    return (group, cost);
+                }
+
+                var furthestFromCenter = group.GetFurthestFromCenter();
+                group.Remove(furthestFromCenter);
+            }
+
+            return (null, cost);
+        }
+
+        (Group?, Cost) CreateGroup(Station first, Cost initialCost, List<Group> groups)
         {
             var cost = new Cost(initialCost);
             var group = new Group(new List<Station> { first });
             var removedStations = new List<Station>();
-            if (!cost.CanGetAny()) return (group, cost);
+            if (!cost.CanGetAny()) return (null, initialCost);
 
             var nearestStations = first.GetNearest(instance.Stations);
             
@@ -37,7 +58,7 @@ namespace algorithm
                 //probujemy usunac i patrzymy czy poprawia sie skupienie
                 if (group.Stations.Count > 2)
                 {
-                    var furthestFromCenter = MapObject.GetFurthestFrom(group.Stations, MapObject.CenterOfGravity(group.Stations)); //alert
+                    var furthestFromCenter = MapObject.GetFurthestFrom(group.Stations, MapObject.CenterOfGravity(group.Stations)); //alert zamienić na metodę Group
                     if (furthestFromCenter == station) continue; //alert to z jakiegoś powodu było potrzebne, aby zachować właściwość pływania
                     var minCoveringCircleRadiusBeforeRemoving = MapObject.MinCoveringCircleRadius(group.Stations);
                     group.Remove(furthestFromCenter);
@@ -62,32 +83,29 @@ namespace algorithm
             }
 
             var minCoveringRange = cost.QueryMinCoveringRange(group.Stations);
+            if (minCoveringRange == null) throw new Exception();
 
-            if (minCoveringRange == null || !cost.CanGet(minCoveringRange.Value, group.Stations.Count + 1))
+
+            var temporaryCost = new Cost(cost); //alert można fajniej
+            temporaryCost.Get(minCoveringRange.Value);
+            if (!temporaryCost.CanChangeRange(group.Stations, minCoveringRange.Value))
             {
-                return (new Group(new List<Station>() { first }), cost);
+                var (adjustedGroup, otherNewCost) = AdjustGroup(group, cost);
+                if(adjustedGroup != null) return (adjustedGroup, otherNewCost);
+
+                return (new Group(new List<Station>() { first, new Station(first.Position, cost.GetMin().Value) }), cost);
             }
 
-            //alert - powyższe można bardziej inteligentnie - np. spróbować zrobić grupę z mniejszymi rozmiarami stacji
-            //lub spróbować zrobić grupę z dużą stacją z tyloma stacjami ile się da
-
-            initialCost.Get(minCoveringRange.Value, group.Stations.Count + 1);
-            group.Stations.ForEach(item => initialCost.ChangeRange(item, minCoveringRange.Value));
-            
-
-
-            /*foreach (var station in group.Stations)
-            {
-                if (cost.CanChangeRange(station, ))
-            }*/
+            group.Stations.ForEach(item => cost.ChangeRange(item, minCoveringRange.Value));
+            cost.Get(minCoveringRange.Value);
             group.Add(new Station(MapObject.MinCoveringCircleCenter(group.Stations), minCoveringRange.Value));
 
             return (group, cost);
         }
 
-        public List<Group> Run()
+        public (List<Group>, Cost) Run(Cost initialCost)
         {
-            Cost initialCost = new Cost(instance);
+            Cost cost = new Cost(initialCost);
             //if nie rozbudowujemy tylko zaczynamy od zera //alert!
             instance.MapObjects.RemoveAll(item => item is Station); //alert!!
             Station._id = 0;//alert
@@ -95,8 +113,8 @@ namespace algorithm
 
             foreach (var unit in instance.Units)
             {
-                var minRange = initialCost.GetMin();
-                if(minRange == null) return new List<Group>() { new Group(instance.Stations) } ;
+                var minRange = cost.GetMin();
+                if(minRange == null) return (new List<Group>() { new Group(instance.Stations) }, cost) ;
                 var station = new Station(minRange.Value);
                 instance.MapObjects.Add(station);
                 unit.Attach(station);
@@ -107,12 +125,39 @@ namespace algorithm
                 foreach (var station in instance.Stations)
                 {
                     if (groups.Any(group => group.Contains(station))) continue;
-                    var (group, cost) = CreateGroup(station, initialCost, groups);
+
+                    Group lastGroup = null;
+                    Group group = null;
+                    Cost groupCost = null;
+                    foreach(var range in instance.StationRanges)
+                    {
+                        var (_group, newCost) = CreateGroup(station, cost, groups);
+                        
+                        if(_group != null)
+                        {
+                            if(lastGroup == null || _group.Stations.Count > lastGroup.Stations.Count)
+                            {
+                                group = _group;
+                                groupCost = newCost;
+                            }
+
+                            lastGroup = _group;
+                        }
+                    }
+
+                    if (group == null)
+                    {
+                        group = new Group(new List<Station>() { station }); //alert nie przemyślane 
+                    }
+                    else
+                    {
+                        cost = new Cost(groupCost);
+                    }
                     groups.Add(group);
                 }
             }
 
-            return groups; //alert
+            return (groups, cost); //alert
         }
     }
 }

@@ -11,7 +11,9 @@ namespace algorithm
         public Instance Instance { get; }
         public int[] Counts { get; private set; } = new int[] { 0, 0, 0 };
 
-        HashSet<double> forbiddenRanges = new HashSet<double>();
+        public double[] Ranges { get { return Instance.StationRanges; } }
+
+        public HashSet<double> ForbiddenRanges { get; private set; } = new HashSet<double>();
         //public List<Station> Stations { get; } = new List<Station>();
         public Cost(Instance instance)
         {
@@ -23,30 +25,32 @@ namespace algorithm
         {
             this.Instance = cost.Instance;
             Counts = (int[])(cost.Counts.Clone());
+            ForbiddenRanges = new HashSet<double>(ForbiddenRanges);
         }
 
         public void AddForbiddenRange(double range)
         {
-            forbiddenRanges.Add(range);
+            ForbiddenRanges.Add(range);
         }
 
         public void RemoveAllForbiddenRanges()
         {
-            forbiddenRanges.Clear();
+            ForbiddenRanges.Clear();
         }
 
         public bool CanGet(double range, int count = 1)
         {
             var index = Instance.StationRanges.ToList().IndexOf(range);
-            if (Counts[index] - count < 0 || forbiddenRanges.Contains(range)) return false;
+            if (Counts[index] - count < 0 || ForbiddenRanges.Contains(range)) return false;
             return true;
         }
 
-        public void Get(double range, int count = 1)
+        public bool Get(double range, int count = 1)
         {
             var index = Instance.StationRanges.ToList().IndexOf(range);
-            if (Counts[index] - count < 0 || forbiddenRanges.Contains(range)) throw new Exception("Station range not available");
+            if (Counts[index] - count < 0 || ForbiddenRanges.Contains(range)) return false;
             Counts[index] -= count;
+            return true;
         }
 
         public double? GetMax(int count = 1, double maxRange = double.MaxValue)
@@ -71,7 +75,7 @@ namespace algorithm
         {
             for (var i = Instance.StationCounts.Count() - 1; i >= 0; i--)
             {
-                if (Counts[i] - count < 0 || Instance.StationRanges[i] > maxRange || forbiddenRanges.Contains(maxRange)) continue;
+                if (Counts[i] - count < 0 || Instance.StationRanges[i] > maxRange || ForbiddenRanges.Contains(maxRange)) continue;
                 return Instance.StationRanges[i];
             }
             return null;
@@ -81,7 +85,7 @@ namespace algorithm
         {
             for (var i = 0; i < Instance.StationCounts.Count(); i++)
             {
-                if (Counts[i] - count < 0 || Instance.StationRanges[i] < minRange || forbiddenRanges.Contains(minRange)) continue;
+                if (Counts[i] - count < 0 || Instance.StationRanges[i] < minRange || ForbiddenRanges.Contains(minRange)) continue;
                 return Instance.StationRanges[i];
             }
             return null;
@@ -102,7 +106,7 @@ namespace algorithm
 
             for (var i = 0; i < Instance.StationCounts.Count(); i++)
             {
-                if (Instance.StationRanges[i] >= minCoveringCircleRadius && Counts[i] > 0 && !forbiddenRanges.Contains(Instance.StationRanges[i]))
+                if (Instance.StationRanges[i] >= minCoveringCircleRadius && Counts[i] > 0 && !ForbiddenRanges.Contains(Instance.StationRanges[i]))
                 {
                     return Instance.StationRanges[i];
                 }
@@ -112,9 +116,9 @@ namespace algorithm
 
         public bool CanGetAny()
         {
-            for(var i = 0; i < Instance.StationRanges.Count(); i++)
+            for (var i = 0; i < Instance.StationRanges.Count(); i++)
             {
-                if(Counts[i] > 0 && !forbiddenRanges.Contains(Instance.StationRanges[i]))
+                if (Counts[i] > 0 && !ForbiddenRanges.Contains(Instance.StationRanges[i]))
                 {
                     return true;
                 }
@@ -122,6 +126,39 @@ namespace algorithm
 
             return false;
         }
+
+        public bool CanGetAny(int count)
+        {
+            var cost = new Cost(this);
+
+            for(var i = 0; i < count; i++)
+            {
+                var range = cost.GetMin();
+                if (range == null) return false;
+            }
+            return true;
+        }
+
+        /*     public bool CanGetAny(int count = 1)
+             {
+                 int howManyLeft = count;
+
+                 while(howManyLeft > 0)
+                 {
+                     var lastHowManyLeft = howManyLeft;
+                     for (var i = 0; i < Instance.StationRanges.Count(); i++)
+                     {
+                         if (Counts[i] > 0 && !ForbiddenRanges.Contains(Instance.StationRanges[i]))
+                         {
+                             howManyLeft--;
+                             if (howManyLeft == 0) return true;
+                             break;
+                         }
+                     }
+                     if(lastHowManyLeft == howManyLeft) return false;
+                 }
+                 return false;
+             }*/
 
         public bool CanMakeBigger(Station station)
         {
@@ -133,21 +170,23 @@ namespace algorithm
             return QueryMakeSmaller(station) != null;
         }
 
-        public void MakeBigger(Station station) //alert niekonsekwentnie - zwracaj bool czy sie udało
+        public bool MakeBigger(Station station) //alert niekonsekwentnie - zwracaj bool czy sie udało
         {
             var range = QueryMakeBigger(station);
-            if (range == null) throw new Exception("Trying to make station bigger but lacks resources");
+            if (range == null) return false;
             GiveBack(station.Range);
             Counts[Instance.StationRanges.ToList().IndexOf(range.Value)]--;
             station.Range = range.Value;
+            return true;
         }
-        public void MakeSmaller(Station station)
+        public bool MakeSmaller(Station station)
         {
             var range = QueryMakeSmaller(station);
-            if (range == null) throw new Exception("Trying to make station smaller but lacks resources");
+            if (range == null) return false;
             GiveBack(station.Range);
             Counts[Instance.StationRanges.ToList().IndexOf(range.Value)]--;
             station.Range = range.Value;
+            return true;
         }
 
         public double? QueryMakeBigger(Station station)
@@ -183,14 +222,28 @@ namespace algorithm
             return true;
         }
 
-        public void ChangeRange(Station station, double newRange)
+        public bool CanChangeRange(List<Station> stations, double newRange)
         {
-            if(!CanChangeRange(station, newRange)) return;
+            Cost cost = new Cost(this);
+            foreach(var station in stations)
+            {
+                if (!cost.ChangeRange(station, newRange)) return false;
+            }
+
+            return true;
+        }
+
+        public bool ChangeRange(Station station, double newRange)
+        {
+            if(!CanChangeRange(station, newRange)) return false;
             GiveBack(station.Range);
             Get(newRange);
             station.Range = newRange;
+            return true;
         }
 
+        
+        
         void GiveBack(double range, int count = 1)
         {
             Counts[Instance.StationRanges.ToList().IndexOf(range)] += count;
