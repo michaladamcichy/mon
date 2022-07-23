@@ -36,8 +36,8 @@ import Station from "./Station.svelte";
     const getStationsStats = (stations) => {
         const sizes = stations.map(item => item.range);
         console.log(stations);
-        const uniqueSizes = new Set(sizes);
-
+        let uniqueSizes = [...(new Set(sizes))];
+        uniqueSizes.sort();
         let counts = [];
         uniqueSizes.forEach(size => {
             counts.push({range: size, count: sizes.filter(item => item == size).length});
