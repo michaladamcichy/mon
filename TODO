@@ -76,9 +76,39 @@ LIFTING WIZUALNY - m. in. konsekwentne rozmiary czcionek, itd.
 niepokojąca sytuacja z instancjami - 2 różne rozwiązania
 
 
+ALERT ALERT big test operuje zawsze na aktualnej instancji - więc przy przełączaniu będzie problem
+
+
 ALERT ALERT ALERT
     Trzeba zrobić tak, żeby dodatkowa stacja dla jednostacjowych grup nie marnowała się, jeśli grupa i tak nie zostanie podłączona
     Wiem jak to zrobić
 
+ALERT WAŻNA UWAGA PRZY PISANIU PRACY
+    środek ciężkości zamiast środka najmniejszego pokrywającego koła
 
+HMMMM jak dodam stacje stacjonarne o zasięgach różnych od 20, 30, 50
+    Czy wszystko będzie działało jak należy?
+    Potencjalne zagrożenie: pętle foreach(var range in ranges)
 
+---------------
+Naprawić błąd z dobieraniem niedostępnych stacji
+Przetestować solidnie menedżera kosztu
+Poprawić ArrangeBetween żeby dobierał stacje lepiej
+Dodać wybieranie najtańszych stacji na podstawie lokalizacji
+Szlifowanie powyższych po dodaniu tych kosztów
+Obsługa stacji nieruszalnych czyli de facto opcja: uwzględniaj/nie uwzględniaj stacje, które już są na mapie
+    ALE UWAGA: trzeba uwzględnić to, że one są połączone światłowodem!!!    
+    Z drugiej strony one i tak będą wczytywane z pliku
+    jednak będzie trzeba dodać parametr stacji - isStationary
+    również ustawianie go z interfejsu
+    jeżeli natrafię na taką stację, to należy ustawiać jako senders i receivers wszystkie inne stacjonarne stacje
+Zakodowanie w jsonie lokalizacji stacji stacjonarnych
+Zakodowanie w jsonie lokalizacji jednostek
+Algorytmy ze stackoverflow zastąpić siszarpowymi
+Algorytm dobudowywania do istniejącej infrastruktury
+Algorytm z drzewem hierarchicznym
+
+Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń
+
+ALERT - zakomentowałem AdjustGroup
+laert group2 - frontend rozjechany

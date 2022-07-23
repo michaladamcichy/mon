@@ -30,7 +30,8 @@ namespace algorithm
 
         public List<MapObject> MapObjects { get; set; } = new List<MapObject>(); //alert! setter
 
-        public List<Station> Stations { get { return MapObjects.FindAll(item => item is Station).Cast<Station>().ToList(); } }
+        public List<Station> Stations { get { return MapObjects.FindAll(item => item is Station).Cast<Station>().ToList(); }
+            set { MapObjects.AddRange(value); } }
 
         public List<Unit> Units { get { return MapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList(); } }
 
@@ -59,6 +60,12 @@ namespace algorithm
         }
 
         public Instance(List<Station> stations) : this(stations, new List<Unit>()) {}
+
+        public Instance(int[] counts)
+        {
+            StationRanges = new double[] { 20.0, 30.0, 50.0 };
+            this.StationCounts = counts;
+        }
 
         List<MapObject> prepareMapObjects(List<Station> stations, List<Unit> units)
         {
@@ -152,6 +159,17 @@ namespace algorithm
                     StationCounts[i]++;
                 }
             }
+        }
+
+        public Dictionary<Station, double> SaveRangesSnapshot()
+        {
+            var snapshot = new Dictionary<Station, double>();
+            Stations.ForEach(station => snapshot[station] = station.Range);
+            return snapshot;
+        }
+        public void RestoreRangesSnapshot(Dictionary<Station, double> snapshot)
+        {
+            snapshot.ToList().ForEach(keyValue => keyValue.Key.Range = keyValue.Value);
         }
 
         List<int> getPriorities()

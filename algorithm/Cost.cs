@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,27 +16,32 @@ namespace algorithm
 
         public HashSet<double> ForbiddenRanges { get; private set; } = new HashSet<double>();
         //public List<Station> Stations { get; } = new List<Station>();
+        bool logEnabled = true;
         public Cost(Instance instance)
         {
             this.Instance = instance;
             Counts = (int[]) Instance.StationCounts.Clone(); //alert czy to działa?
         }
 
-        public Cost(Cost cost)
+        public Cost(Cost cost, bool logEnabled = true)
         {
-            this.Instance = cost.Instance;
+            this.Instance = cost.Instance; //alert
             Counts = (int[])(cost.Counts.Clone());
-            ForbiddenRanges = new HashSet<double>(ForbiddenRanges);
+            ForbiddenRanges = new HashSet<double>(cost.ForbiddenRanges);
+            this.logEnabled = logEnabled;
+            Log("new Cost");
         }
 
         public void AddForbiddenRange(double range)
         {
             ForbiddenRanges.Add(range);
+            Log("add forbidden range");
         }
 
         public void RemoveAllForbiddenRanges()
         {
             ForbiddenRanges.Clear();
+            Log("remove all forbidden ranges");
         }
 
         public bool CanGet(double range, int count = 1)
@@ -48,26 +54,41 @@ namespace algorithm
         public bool Get(double range, int count = 1)
         {
             var index = Instance.StationRanges.ToList().IndexOf(range);
-            if (Counts[index] - count < 0 || ForbiddenRanges.Contains(range)) return false;
+            if (Counts[index] - count < 0 || ForbiddenRanges.Contains(range))
+            {
+                Log("Get " + range.ToString() + " x" + count.ToString() + " failed");
+                return false;
+            }
             Counts[index] -= count;
+            Log("Get " + range.ToString() + " x" + count.ToString());
             return true;
         }
 
         public double? GetMax(int count = 1, double maxRange = double.MaxValue)
         {
             var max = QueryMax(count, maxRange);
-            if(max == null) return null;
+            if (max == null)
+            {
+                Log("GetMax null!");
+                return null;
+            }
 
             Counts[Instance.StationRanges.ToList().IndexOf(max.Value)] -= count;
+            Log("Get max " + max.ToString());
             return max;
         }
 
         public double? GetMin(int count = 1, double minRange = 0.0)
         {
             var min = QueryMin(count, minRange);
-            if (min == null) return null;
+            if (min == null)
+            {
+                Log("GetMin null!");
+                return null;
+            }
 
             Counts[Instance.StationRanges.ToList().IndexOf(min.Value)] -= count;
+            Log("GetMin " + min.ToString());
             return min;
         }
 
@@ -75,7 +96,7 @@ namespace algorithm
         {
             for (var i = Instance.StationCounts.Count() - 1; i >= 0; i--)
             {
-                if (Counts[i] - count < 0 || Instance.StationRanges[i] > maxRange || ForbiddenRanges.Contains(maxRange)) continue;
+                if (Counts[i] - count < 0 || Instance.StationRanges[i] > maxRange || ForbiddenRanges.Contains(Instance.StationRanges[i])) continue;
                 return Instance.StationRanges[i];
             }
             return null;
@@ -85,7 +106,7 @@ namespace algorithm
         {
             for (var i = 0; i < Instance.StationCounts.Count(); i++)
             {
-                if (Counts[i] - count < 0 || Instance.StationRanges[i] < minRange || ForbiddenRanges.Contains(minRange)) continue;
+                if (Counts[i] - count < 0 || Instance.StationRanges[i] < minRange || ForbiddenRanges.Contains(Instance.StationRanges[i])) continue;
                 return Instance.StationRanges[i];
             }
             return null;
@@ -94,9 +115,14 @@ namespace algorithm
         public double? GetMinCoveringRange(List<Station> stations)
         {
             var minCoveringRange = QueryMinCoveringRange(stations);
-            if (minCoveringRange == null) return null;
+            if (minCoveringRange == null)
+            {
+                Log("GetMinCoveringRange null!");
+                return null;
+            }
 
             Counts[Instance.StationRanges.ToList().IndexOf(minCoveringRange.Value)]--;
+            Log("GetMinCoveringRange " + minCoveringRange.ToString());
             return minCoveringRange.Value;
         }
 
@@ -129,7 +155,7 @@ namespace algorithm
 
         public bool CanGetAny(int count)
         {
-            var cost = new Cost(this);
+            var cost = new Cost(this, false);
 
             for(var i = 0; i < count; i++)
             {
@@ -173,19 +199,30 @@ namespace algorithm
         public bool MakeBigger(Station station) //alert niekonsekwentnie - zwracaj bool czy sie udało
         {
             var range = QueryMakeBigger(station);
-            if (range == null) return false;
+            if (range == null)
+            {
+                Log("MakeBigger failed!");
+                return false;
+            }
             GiveBack(station.Range);
             Counts[Instance.StationRanges.ToList().IndexOf(range.Value)]--;
             station.Range = range.Value;
+            Log("MakeBigger ->" + range.Value.ToString());
             return true;
         }
         public bool MakeSmaller(Station station)
         {
             var range = QueryMakeSmaller(station);
-            if (range == null) return false;
+            if (range == null)
+            {
+                Log("MakeSmaller failed!");
+                return false;
+            }
+
             GiveBack(station.Range);
             Counts[Instance.StationRanges.ToList().IndexOf(range.Value)]--;
             station.Range = range.Value;
+            Log("MakeSmaller ->" + range.ToString());
             return true;
         }
 
@@ -224,10 +261,10 @@ namespace algorithm
 
         public bool CanChangeRange(List<Station> stations, double newRange)
         {
-            Cost cost = new Cost(this);
+            Cost cost = new Cost(this, false);
             foreach(var station in stations)
             {
-                if (!cost.ChangeRange(station, newRange)) return false;
+                if (!cost.ChangeRange(new Station(station), newRange)) return false;   
             }
 
             return true;
@@ -235,10 +272,15 @@ namespace algorithm
 
         public bool ChangeRange(Station station, double newRange)
         {
-            if(!CanChangeRange(station, newRange)) return false;
+            if (!CanChangeRange(station, newRange))
+            {
+                Log("ChangeRange failed!");
+                return false;
+            }
             GiveBack(station.Range);
             Get(newRange);
             station.Range = newRange;
+            Log("ChangeRange ->" + newRange.ToString());
             return true;
         }
 
@@ -247,6 +289,13 @@ namespace algorithm
         void GiveBack(double range, int count = 1)
         {
             Counts[Instance.StationRanges.ToList().IndexOf(range)] += count;
+            Log("GiveBack " + range.ToString() + " x" + count.ToString());
+        }
+
+        void Log(string operationName)
+        {
+            if(logEnabled)
+                Debug.WriteLine(operationName + "  | " + string.Join(",", Counts));
         }
     }
 }

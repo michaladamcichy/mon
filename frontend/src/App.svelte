@@ -63,13 +63,17 @@
 		instances = instances;
 	};
 
-	const connectionCheck = async () => {
-			let serverNotResponding = true; //alert to chyba miała być globalna
-			setTimeout(() => {if(serverNotResponding) isConnected = null;}, 5000);
-			selectedInstance.isConnected = isConnected = await api.isConnected(ranges,
+	const checkIsConnected = async () => {
+		return api.isConnected(ranges,
 				counts,
 				stations,
 				units);
+	};
+
+	const connectionCheck = async () => {
+			let serverNotResponding = true; //alert to chyba miała być globalna
+			setTimeout(() => {if(serverNotResponding) isConnected = null;}, 5000);
+			selectedInstance.isConnected = isConnected = await checkIsConnected();
 			serverNotResponding = false;
 		};
 		
@@ -286,6 +290,8 @@
 				stationWeights={weights}
 				updateRanges={updateRanges}
 				updateStations={updateAllStations}
+				updateUnits={updateAllUnits}
+				checkIsConnected={checkIsConnected}
 				isConnected={isConnected}/>
 		</div>
 	</div>
@@ -322,11 +328,11 @@
 	#topRow {
 		 
 		padding: 0;
-		height: 70vh;
+		height: 60vh;
 		/* height: 98vh; */
 	}
 	#bottomRow {
-		height: 20vh;
+		height: 30vh;
 	}
 
 	#leftCol {
@@ -338,7 +344,7 @@
 	}
 
 	#leftTop {
-		height: 70vh;
+		height: 60vh;
 	}
 
 	#leftBottom {

@@ -18,7 +18,6 @@ namespace algorithm
         (Group?, Cost) AdjustGroup(Group _group, Cost initialCost)
         {
             var group = new Group(_group);
-            if (group == _group) throw new Exception();
             Cost cost = new Cost(initialCost);
 
             while(group.Stations.Count > 1)
@@ -26,6 +25,7 @@ namespace algorithm
                 var minCoveringRange = cost.QueryMinCoveringRange(group.Stations);
                 if (minCoveringRange != null && cost.CanGet(minCoveringRange.Value, group.Stations.Count + 1))
                 {
+                    cost.Get(minCoveringRange.Value, group.Stations.Count);
                     return (group, cost);
                 }
 
@@ -90,10 +90,19 @@ namespace algorithm
             temporaryCost.Get(minCoveringRange.Value);
             if (!temporaryCost.CanChangeRange(group.Stations, minCoveringRange.Value))
             {
-                var (adjustedGroup, otherNewCost) = AdjustGroup(group, cost);
-                if(adjustedGroup != null) return (adjustedGroup, otherNewCost);
+                var (adjustedGroup, otherNewCost) = AdjustGroup(group, cost); //alert! critical alert!!!
+                //Group adjustedGroup = null;
+                //Cost otherNewCost = new Cost(cost);
 
-                return (new Group(new List<Station>() { first, new Station(first.Position, cost.GetMin().Value) }), cost);
+                if (adjustedGroup != null)
+                {
+                    var adjustedMinCoveringRange = otherNewCost.GetMinCoveringRange(adjustedGroup.Stations);
+                    adjustedGroup.Add(new Station(MapObject.MinCoveringCircleCenter(adjustedGroup.Stations), adjustedMinCoveringRange.Value));
+                    return (adjustedGroup, otherNewCost);
+                }
+
+                var range = cost.GetMin().Value;
+                return (new Group(new List<Station>() { first, new Station(first.Position, range)}), cost);
             }
 
             group.Stations.ForEach(item => cost.ChangeRange(item, minCoveringRange.Value));
@@ -103,7 +112,7 @@ namespace algorithm
             return (group, cost);
         }
 
-        public (List<Group>, Cost) Run(Cost initialCost)
+        public (List<Group>, Cost) Run(Cost initialCost)    
         {
             Cost cost = new Cost(initialCost);
             //if nie rozbudowujemy tylko zaczynamy od zera //alert!
@@ -127,10 +136,17 @@ namespace algorithm
                     if (groups.Any(group => group.Contains(station))) continue;
 
                     Group lastGroup = null;
+                    Dictionary<Station, double> groupSnapshot = null;
                     Group group = null;
                     Cost groupCost = null;
-                    foreach(var range in instance.StationRanges)
+                    var reversedRanges = new List<double>(instance.StationRanges.ToList());
+                    reversedRanges.Reverse();
+                    /*cost.AddForbiddenRange(30.0);
+                    cost.AddForbiddenRange(50.0);*/
+                    var rangesSnapshot = instance.SaveRangesSnapshot(); //alert!
+                    foreach (var range in reversedRanges)
                     {
+                        instance.RestoreRangesSnapshot(rangesSnapshot);
                         var (_group, newCost) = CreateGroup(station, cost, groups);
                         
                         if(_group != null)
@@ -139,18 +155,23 @@ namespace algorithm
                             {
                                 group = _group;
                                 groupCost = newCost;
+                                groupSnapshot = instance.SaveRangesSnapshot();
                             }
 
                             lastGroup = _group;
                         }
+                        cost.AddForbiddenRange(range);
                     }
-
+                    cost.RemoveAllForbiddenRanges();
+                    
                     if (group == null)
                     {
                         group = new Group(new List<Station>() { station }); //alert nie przemyślane 
                     }
                     else
                     {
+                        instance.RestoreRangesSnapshot(groupSnapshot);
+                        groupCost.RemoveAllForbiddenRanges();
                         cost = new Cost(groupCost);
                     }
                     groups.Add(group);

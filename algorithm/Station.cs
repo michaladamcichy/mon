@@ -34,6 +34,16 @@ namespace algorithm
         {
             this.Range = range;
         }
+
+        public Station(Station station) //alert nie przemyślane dobrze
+        {
+            this.Position = new Position(station.Position);
+            this.Range = station.Range;
+            this.id = station.id;
+            this.Receivers = new List<MapObject>(station.Receivers);
+            this.Senders = new List<MapObject>(station.Senders);
+            this.groupId = station.groupId;
+        }
         public void SetGroupId(int id)
         {
             groupId = id;

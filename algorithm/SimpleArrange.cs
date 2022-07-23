@@ -19,9 +19,9 @@ namespace algorithm
             var coreStations = groups.FindAll(group => group.CoreStation != null).Select(group => group.CoreStation).ToList();
 
 
-            var (additionalStations, otherNewCost) = JoinNearestNeighbors.Run(cost, coreStations);
-            cost = new Cost(otherNewCost);
-
+            //var (additionalStations, otherNewCost) = JoinNearestNeighbors.Run(cost, coreStations);
+            //cost = new Cost(otherNewCost);
+            var additionalStations = new List<Station>();
             return Group.Flatten(groups).Concat<Station>(additionalStations).ToList();
         }
 
