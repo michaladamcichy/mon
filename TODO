@@ -91,7 +91,6 @@ HMMMM jak dodam stacje stacjonarne o zasięgach różnych od 20, 30, 50
     Potencjalne zagrożenie: pętle foreach(var range in ranges)
 
 ---------------
-Naprawić błąd z dobieraniem niedostępnych stacji
 Przetestować solidnie menedżera kosztu
 Poprawić ArrangeBetween żeby dobierał stacje lepiej
 Dodać wybieranie najtańszych stacji na podstawie lokalizacji
@@ -112,3 +111,6 @@ Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem
 
 ALERT - zakomentowałem AdjustGroup
 laert group2 - frontend rozjechany
+
+Uświadomiłem sobie, że jak dostosowuję stację z grupy do stacji centralnej, to może być tak, że mogę nie mogę dodać dokładnie takiej stacji
+    ale mogę większą. Ale może to być marnotrawstwo. Ale to tez może zależeć od zdefiniowanych wag.
