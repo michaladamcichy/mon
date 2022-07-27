@@ -140,3 +140,7 @@ ALERT - być konsekwentnym z tolerancją
 ALERT - czy na pewno wszędzie uwzględniam to, że stacja może już mieć pożądany rozmiar, albo można zamienić rozmiary 2 stacji?
 
 ALERT DUPLIKACJA NIE DZIAŁA
+
+ALERT w arrange between obecnie chyba może zajść pomniejszenie first i second - a przecież to stacje centralne!
+
+ALERT czy kierunek podany w lat, lng można bezpiecznie normalizować???? ROBIĘ TO

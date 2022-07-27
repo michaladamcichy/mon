@@ -195,6 +195,18 @@ namespace algorithm
         {
             return MinCoveringRange(ranges, stations.Cast<MapObject>().ToList());
         }
+
+        public static MapObject GetNextFromTowards(Station first, Station second, double tolerance = 0.1)
+        {
+            var smaller = first;// new Station(first.Range < second.Range ? first : second); //alert
+            var bigger = second; // new Station(second.Range > first.Range ? second : first); //alert
+
+            var distanceToCover = smaller.GetDistanceFrom(bigger);
+            var direction = new Position((bigger.Position.Lat - smaller.Position.Lat) / distanceToCover, (bigger.Position.Lng - smaller.Position.Lng) / distanceToCover);
+
+            return new MapObject(new Position(smaller.Position.Lat + direction.Lat * smaller.Range * (1.0 - tolerance),
+                smaller.Position.Lng + direction.Lng * smaller.Range * (1.0 - tolerance / 2.0))); //alert! czy w simplearrange też tak robiłe? dokładnie tak?
+        }
     }
 
     public enum StationType

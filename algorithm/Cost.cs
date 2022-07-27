@@ -284,7 +284,29 @@ namespace algorithm
             return true;
         }
 
-        
+        public Station? QueryJoin(Station first, Station second, double tolerance = 0.1) //alert tolerance nie jest uwzlędniony symetrycznie - od strony bigger nie jest
+        {
+            if (MapObject.AreInRange(first, second)) return null;
+            if(!CanGetAny()) return null;
+
+            var smaller = new Station(first.Range < second.Range ? first : second);
+            var bigger = new Station(second.Range > first.Range ? second : first);
+
+            var potentialJoiningStation = MapObject.GetNextFromTowards(smaller, bigger);
+            if (!potentialJoiningStation.IsInRange(bigger)) return null;
+            var minRange = Math.Max(smaller.Range, potentialJoiningStation.GetDistanceFrom(bigger) * (1 + tolerance / 2.0)); //alert na pewno przez 2?
+
+            var range = QueryMin(1, minRange);
+            return range == null ? null : new Station(potentialJoiningStation.Position, range.Value);
+        }
+
+        public Station? Join(Station first, Station second, double tolerance = 0.1)
+        {
+            var station = QueryJoin(first, second, tolerance);
+            if(station == null) return null;
+            Get(station.Range);
+            return station;
+        }
         
         public void GiveBack(double range, int count = 1)
         {

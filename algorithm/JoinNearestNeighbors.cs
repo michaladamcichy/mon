@@ -35,7 +35,7 @@ namespace algorithm
                     }
                 }
                 connected.Add(nearest.Item2); //alert nieczytelne
-                var (newCost, moreAdditionalStations) = ArrangeBetween.Run(cost, nearest.Item1, nearest.Item2); 
+                var (newCost, moreAdditionalStations) = RecursiveArrangeBetween.Run(cost, nearest.Item1, nearest.Item2); 
                 cost = new Cost(newCost);
                 additionalStations.AddRange(moreAdditionalStations);
                 if (!cost.CanGetAny()) break;
