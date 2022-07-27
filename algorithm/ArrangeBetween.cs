@@ -42,22 +42,41 @@ namespace algorithm
 
             return cost;
         }
-        public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station second, double tolerance = 0.1) //alert ograniczenie zasobów zaimplementowane tylko częściowo
+
+        static Cost AdjustEnds(Station first, List<Station> middles, Station last, Cost initialCost, double tolerance)
+        {
+            Cost cost = new Cost(initialCost);
+            cost.GiveBack(first.Range);
+            cost.GiveBack(last.Range);
+
+            if (middles.Count == 0)
+            {
+                var commonRange = first.GetDistanceFrom(last) * (1.0 - tolerance / 2.0); //alert
+                first.Range = cost.GetMin(1, commonRange).Value;
+                last.Range = cost.GetMin(1, commonRange).Value;
+                
+                return cost;
+            }
+
+            first.Range = cost.GetMin(1, middles.First().Range).Value;
+            last.Range = cost.GetMin(1, middles.Last().Range).Value;
+
+            return cost;
+        }
+        public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station last, double tolerance= 0.1) //alert ograniczenie zasobów zaimplementowane tylko częściowo
         {
             Cost cost = new Cost(initialCost);
             var stations = new List<Station>();
 
-            if (MapObject.AreInRange(first, second)) return (cost, new List<Station>());
+            cost.ChangeRange(first, cost.QueryMax().Value);
+            cost.ChangeRange(last, cost.QueryMax().Value);
+            if (MapObject.AreInRange(first, last) || !cost.CanGetAny()) return (cost, new List<Station>());
 
-            var newCost = MakeBothStationsBigger(cost, first, second);
-            cost = new Cost(newCost);
-
-            var distanceToCover = first.GetDistanceFrom(second);
+            var distanceToCover = first.GetDistanceFrom(last);
             var distanceCovered = 0.0;
 
             var currentPosition = first.Position;
-            var direction = new Position((second.Position.Lat - first.Position.Lat)/distanceToCover, (second.Position.Lng - first.Position.Lng)/distanceToCover);
-
+            var direction = new Position((last.Position.Lat - first.Position.Lat)/distanceToCover, (last.Position.Lng - first.Position.Lng)/distanceToCover);
 
             var lastUsedRange = 0.0;
             var previousStation = first;
@@ -70,10 +89,10 @@ namespace algorithm
             //5) dla jakichś innych wag może się opłacać mieszanie - jakby małe były drogie
             //6) cholera bardzo trudny problem
             {
-                if (!cost.CanGetAny()) break; //alert dużo możliwości bezsensownego użycia
+                if (!cost.CanGetAny()) return (cost, stations); //alert dużo możliwości bezsensownego użycia
                 var _range = cost.GetMax(1, (distanceToCover - distanceCovered + lastUsedRange * (1 - tolerance))); //to chyba nie działa
                 if (_range == null) _range = cost.GetMax(); //alert functional
-                if (_range == null) break;
+                if (_range == null) return (cost, stations);
                 var range = _range.Value;
 
                 var step = Math.Min(previousStation.Range, range);
@@ -83,12 +102,13 @@ namespace algorithm
                 distanceCovered += step * (1 - tolerance);
                 var station = new Station(new Position(currentPosition), step);
                 stations.Add(station);
-                if (MapObject.AreInRange(station, second)) break;
+                if (MapObject.AreInRange(station, last)) break;
                 lastUsedRange = range;
                 previousStation = station;
-            }   
-
-
+            }
+            //alert chyba trzeba by wcześniej jeszcze pomniejszyć skrajne middlesy
+            Cost newCost = AdjustEnds(first, stations, last, cost, tolerance);
+            cost = new Cost(newCost);
             /*if (stations.Count > 0 && !second.IsInRange(stations.Last()))
             {
                 stations.Add(new Station(MapObject.Center((new MapObject[] { second, stations.Last() }).ToList()), ranges.Max())); //alert dostosować rozmiar

@@ -90,7 +90,7 @@ HMMMM jak dodam stacje stacjonarne o zasięgach różnych od 20, 30, 50
     Czy wszystko będzie działało jak należy?
     Potencjalne zagrożenie: pętle foreach(var range in ranges)
 
----------------
+---------------------------------------------
 Przetestować solidnie menedżera kosztu
 Poprawić ArrangeBetween żeby dobierał stacje lepiej
 Dodać wybieranie najtańszych stacji na podstawie lokalizacji
@@ -106,6 +106,12 @@ Zakodowanie w jsonie lokalizacji jednostek
 Algorytmy ze stackoverflow zastąpić siszarpowymi
 Algorytm dobudowywania do istniejącej infrastruktury
 Algorytm z drzewem hierarchicznym
+Prawdziwe MST
+Usuwanie nadmiarowych stacji z końców palców rozgwiazdy?
+    Tylko to sprawia dodatkowe problemy...
+---
+punkty Steinera?
+--------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń
 
@@ -114,3 +120,23 @@ laert group2 - frontend rozjechany
 
 Uświadomiłem sobie, że jak dostosowuję stację z grupy do stacji centralnej, to może być tak, że mogę nie mogę dodać dokładnie takiej stacji
     ale mogę większą. Ale może to być marnotrawstwo. Ale to tez może zależeć od zdefiniowanych wag.
+
+
+
+ALERT błąd - ustawiam liczby stacji na dokładnie takie, jakie potrzeba
+    i wtedy algorytm nie buduje całości
+    Wydaje mi się, że jak poprawię SimpleArrange to wtedy już będzie dobrze 
+
+
+ALERT - tam, gdzie zrobiłem usuwanie najdalszych - myślę, że powinienem aktualizować środek ciężkości   
+    Ale to jest szczegół
+
+
+ALERT mam cudzy kod w moim kodzie. PAmiętaj, żeby go wywalić!!!
+
+ALERT - być konsekwentnym z tolerancją
+
+
+ALERT - czy na pewno wszędzie uwzględniam to, że stacja może już mieć pożądany rozmiar, albo można zamienić rozmiary 2 stacji?
+
+ALERT DUPLIKACJA NIE DZIAŁA

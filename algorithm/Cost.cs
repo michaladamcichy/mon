@@ -286,7 +286,7 @@ namespace algorithm
 
         
         
-        void GiveBack(double range, int count = 1)
+        public void GiveBack(double range, int count = 1)
         {
             Counts[Instance.StationRanges.ToList().IndexOf(range)] += count;
             Log("GiveBack " + range.ToString() + " x" + count.ToString());

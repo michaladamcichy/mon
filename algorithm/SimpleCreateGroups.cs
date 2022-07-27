@@ -141,8 +141,7 @@ namespace algorithm
                     Cost groupCost = null;
                     var reversedRanges = new List<double>(instance.StationRanges.ToList());
                     reversedRanges.Reverse();
-                    /*cost.AddForbiddenRange(30.0);
-                    cost.AddForbiddenRange(50.0);*/
+
                     var rangesSnapshot = instance.SaveRangesSnapshot(); //alert!
                     foreach (var range in reversedRanges)
                     {

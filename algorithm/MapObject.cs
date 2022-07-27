@@ -90,7 +90,7 @@ namespace algorithm
             //alert!
             var center = CenterOfGravity(mapObjects); //alert alert wielki alert
             return mapObjects.Select(item => item.GetDistanceFrom(new MapObject(center))).ToList().Max(); //alert alert alert
-            return SmallestEnclosingCircleAdapter.GetRange(mapObjects);
+            //return SmallestEnclosingCircleAdapter.GetRange(mapObjects);
             //double maxDistance = 0.0;
             //mapObjects.ForEach(first => { mapObjects.ForEach(second => { maxDistance = Math.Max(maxDistance, first.GetDistanceFrom(second));});});
             //return maxDistance / 2;
