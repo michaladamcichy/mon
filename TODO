@@ -144,3 +144,7 @@ ALERT DUPLIKACJA NIE DZIAŁA
 ALERT w arrange between obecnie chyba może zajść pomniejszenie first i second - a przecież to stacje centralne!
 
 ALERT czy kierunek podany w lat, lng można bezpiecznie normalizować???? ROBIĘ TO
+
+ALERT - widzę takie niebezpieczeństwo, że używam GetMax(x, maxRange) lub GetMIn....
+    I używam tego bezrefleksyjnie, bo wcześniej miałem CanGetAny
+    Ale przecież ja tu mam zawężony zakres, bo nie jest bezpiecznie!!!

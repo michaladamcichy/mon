@@ -74,14 +74,14 @@ namespace algorithm
             return GetDistanceFrom(other) < other.Range;
         }
 
-        public static bool AreInRange(MapObject o1, MapObject o2)
-        {
-            return o1.IsInRange(o2) && o2.IsInRange(o1);
-        }
+        //public static bool AreInRange(MapObject o1, MapObject o2)
+        //{
+        //    return o1.IsInRange(o2) && o2.IsInRange(o1);
+        //}
 
         public static bool AreInRange(Station s1, Station s2)
         {
-            return AreInRange((MapObject)s1, (MapObject)s2);
+            return s1.IsInRange(s2) && s2.IsInRange(s1);
         }
 
         //
@@ -198,14 +198,16 @@ namespace algorithm
 
         public static MapObject GetNextFromTowards(Station first, Station second, double tolerance = 0.1)
         {
-            var smaller = first;// new Station(first.Range < second.Range ? first : second); //alert
-            var bigger = second; // new Station(second.Range > first.Range ? second : first); //alert
+            //alert smaller bigger nieaktualne!
+            var smaller = first; //first.Range < second.Range ? first : second; //alert
+            var bigger = second;//second.Range > first.Range ? second : first; //alert
 
             var distanceToCover = smaller.GetDistanceFrom(bigger);
             var direction = new Position((bigger.Position.Lat - smaller.Position.Lat) / distanceToCover, (bigger.Position.Lng - smaller.Position.Lng) / distanceToCover);
 
-            return new MapObject(new Position(smaller.Position.Lat + direction.Lat * smaller.Range * (1.0 - tolerance),
-                smaller.Position.Lng + direction.Lng * smaller.Range * (1.0 - tolerance / 2.0))); //alert! czy w simplearrange też tak robiłe? dokładnie tak?
+            var step = Math.Min(smaller.Range, bigger.Range);
+            return new MapObject(new Position(smaller.Position.Lat + direction.Lat * step * (1.0 - tolerance),
+                smaller.Position.Lng + direction.Lng * step * (1.0 - tolerance / 2.0))); //alert! czy w simplearrange też tak robiłe? dokładnie tak?
         }
     }
 

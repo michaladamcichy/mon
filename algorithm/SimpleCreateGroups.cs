@@ -145,7 +145,7 @@ namespace algorithm
                     var rangesSnapshot = instance.SaveRangesSnapshot(); //alert!
                     foreach (var range in reversedRanges)
                     {
-                        instance.RestoreRangesSnapshot(rangesSnapshot);
+                        Instance.RestoreRangesSnapshot(rangesSnapshot);
                         var (_group, newCost) = CreateGroup(station, cost, groups);
                         
                         if(_group != null)
@@ -169,7 +169,7 @@ namespace algorithm
                     }
                     else
                     {
-                        instance.RestoreRangesSnapshot(groupSnapshot);
+                        Instance.RestoreRangesSnapshot(groupSnapshot);
                         groupCost.RemoveAllForbiddenRanges();
                         cost = new Cost(groupCost);
                     }

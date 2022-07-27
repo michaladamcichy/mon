@@ -292,9 +292,20 @@ namespace algorithm
             var smaller = new Station(first.Range < second.Range ? first : second);
             var bigger = new Station(second.Range > first.Range ? second : first);
 
+            var middlePoint = MapObject.CenterOfGravity(new List<MapObject>() { smaller, bigger });
+            var middlePointRange = QueryMin(1, (smaller.GetDistanceFrom(bigger) / 2.0) * (1.0 + tolerance / 2.0)); //alert czy na pewno przez 2?
+            if(middlePointRange != null)
+            {
+                var middleStation = new Station(middlePoint, middlePointRange.Value);
+                if (MapObject.AreInRange(smaller, middleStation) && MapObject.AreInRange(middleStation, bigger))
+                {
+                    Get(middlePointRange.Value);
+                    return middleStation;
+                }
+            }
             var potentialJoiningStation = MapObject.GetNextFromTowards(smaller, bigger);
             if (!potentialJoiningStation.IsInRange(bigger)) return null;
-            var minRange = Math.Max(smaller.Range, potentialJoiningStation.GetDistanceFrom(bigger) * (1 + tolerance / 2.0)); //alert na pewno przez 2?
+            var minRange = Math.Max(smaller.Range, potentialJoiningStation.GetDistanceFrom(bigger) * (1.0 + tolerance / 2.0)); //alert na pewno przez 2?
 
             var range = QueryMin(1, minRange);
             return range == null ? null : new Station(potentialJoiningStation.Position, range.Value);

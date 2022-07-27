@@ -163,13 +163,17 @@ namespace algorithm
 
         public Dictionary<Station, double> SaveRangesSnapshot()
         {
-            var snapshot = new Dictionary<Station, double>();
-            Stations.ForEach(station => snapshot[station] = station.Range);
-            return snapshot;
+            return SaveRangesSnapshot(Stations);
         }
-        public void RestoreRangesSnapshot(Dictionary<Station, double> snapshot)
+        public static void RestoreRangesSnapshot(Dictionary<Station, double> snapshot)
         {
             snapshot.ToList().ForEach(keyValue => keyValue.Key.Range = keyValue.Value);
+        }
+        public static Dictionary<Station, double> SaveRangesSnapshot(List<Station> stations)
+        {
+            var snapshot = new Dictionary<Station, double>();
+            stations.ForEach(station => snapshot[station] = station.Range);
+            return snapshot;
         }
 
         List<int> getPriorities()
@@ -178,5 +182,8 @@ namespace algorithm
             priorities.Sort();
             return priorities;
         }
+
+
+
     }
 }
