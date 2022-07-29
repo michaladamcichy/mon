@@ -26,10 +26,10 @@
 			isConnected: undefined,
 			oldRanges: defaultRanges,
 			stations: [
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0] },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0] },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0] },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0] },
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
 			],
 			units: [
 				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},

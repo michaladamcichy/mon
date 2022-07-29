@@ -12,34 +12,16 @@ namespace algorithm
         {
             var units = instance.Units;
 
-            if (units.Count == 1) return true;
-
-            if (units.Count == 0)
-            {
-                foreach (var station in instance.MapObjects.FindAll(item => item is Station))
-                {
-                    var visited = new Dictionary<MapObject, bool>();
-                    instance.MapObjects.ForEach(mapObject => visited.Add(mapObject, false));
-                    DFS(station, visited);
-                    bool notAllConnected = visited.Any(item => item.Value == false);
-
-                    if (notAllConnected)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
+            if (units.Count <= 1) return true;
 
             if (units.Any(item => !item.HasAttachement())) return false;
 
-            foreach (var unit in instance.MapObjects.FindAll(item => item is Unit))
+            foreach (var attachedStation in instance.Stations.FindAll(station => station.IsAttached()))
             {
-                var visited = new Dictionary<MapObject, bool>();
-                instance.MapObjects.ForEach(mapObject => visited.Add(mapObject, false));
-                DFS(unit, visited);
-                bool notAllConnected = visited.Any(item => item.Value == false);
+                var visited = new Dictionary<Station, bool>();
+                instance.Stations.ForEach(station => visited[station] = false);
+                DFS(attachedStation, visited);
+                bool notAllConnected = visited.Any(item => ((Station)item.Key).IsAttached() && item.Value == false);
 
                 if (notAllConnected)
                 {
@@ -53,31 +35,12 @@ namespace algorithm
         public bool Run(List<Station> stations)
         {
             return Run(new Instance(stations));
-            //if (stations.Count == 0)
-            //{
-            //    return true;
-            //}
-
-            //foreach (var station in stations)
-            //{
-            //    var visited = new Dictionary<MapObject, bool>();
-            //    stations.ForEach(mapObject => visited.Add(mapObject, false));
-            //    DFS(station, visited);
-            //    bool allConnected = visited.All(item => item.Value == true);
-
-            //    if (!allConnected)
-            //    {
-            //        return false;
-            //    }
-            //}
-
-            //return true;
         }
-        public void DFS(MapObject start, Dictionary<MapObject, bool> visited)
+        public void DFS(Station start, Dictionary<Station, bool> visited)
         {
             visited[start] = true;
 
-            foreach (var mapObject in start.Receivers)
+            foreach (var mapObject in start.Receivers.FindAll(mapObject => mapObject is Station).Cast<Station>().ToList())
             {
                 if (visited[mapObject] == true) continue;
 

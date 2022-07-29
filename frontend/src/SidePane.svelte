@@ -32,7 +32,7 @@ import Instance from './Instance.svelte';
     const addStation = range => {
         console.log('add station');
         console.log(stationRanges);
-        const newStation = {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: range};
+        const newStation = {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: range, isStationary: false};
         console.log(newStation);
         updateAllStations([...stations, newStation]);
     };

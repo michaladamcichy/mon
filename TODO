@@ -91,8 +91,9 @@ HMMMM jak dodam stacje stacjonarne o zasięgach różnych od 20, 30, 50
     Potencjalne zagrożenie: pętle foreach(var range in ranges)
 
 ---------------------------------------------
-Przetestować solidnie menedżera kosztu
-Poprawić ArrangeBetween żeby dobierał stacje lepiej
+--Przetestować solidnie menedżera kosztu
+--Poprawić ArrangeBetween żeby dobierał stacje lepiej
+ALERT grzebałem w ConnectionCheck - bądź czujny
 Dodać wybieranie najtańszych stacji na podstawie lokalizacji
 Szlifowanie powyższych po dodaniu tych kosztów
 Obsługa stacji nieruszalnych czyli de facto opcja: uwzględniaj/nie uwzględniaj stacje, które już są na mapie
