@@ -30,10 +30,10 @@ const latlngStep = 0.1;
             <button class={`col btn ${station.range == range ? 'btn-success' : 'btn-primary'}`} on:click={() => {station.range = range; update(station);}}>{range}</button>
         {/each}
         <label class="col">{'km'}</label>
-        <button class={`col btn btn-${station.isStationary ? 'secondary' : 'primary'}`} on:click={() => {station.isStationary = !station.isStationary; update(station);}}>
+        <button class={`col btn btn-${station.isStationary ? 'secondary' : 'primary'}`} on:click={() => {station.groupId = -1; station.isStationary = !station.isStationary; update(station);}}>
             <i class={station.isStationary ? 'fa fa-star' : 'fa fa-truck'}></i>
         </button>
-        {#if station.groupId >= 0 }
+        {#if station.groupId >= 0 && !station.isStationary}
         <label class="col">{`g${station.groupId + 1}`}</label>
         {:else}
         <label class="col">{''}</label>

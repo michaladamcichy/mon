@@ -33,7 +33,8 @@ import Station from "./Station.svelte";
         oldStationRanges = [...stationRanges];
     });
 
-    const getStationsStats = (stations) => {
+    const getStationsStats = (_stations) => {
+        const stations = [..._stations].filter(station => !station.isStationary);
         const sizes = stations.map(item => item.range);
         console.log(stations);
         let uniqueSizes = [...(new Set(sizes))];
@@ -116,8 +117,11 @@ import Station from "./Station.svelte";
                     _units[0].priority = 0;
                     _units[0].counts = [...counts];
                 }
-
-                const _stations = await api.algorithm('simpleArrange', [...stationRanges], [...counts], [], _units);
+                
+                const stationaryStations = test.getRandomStationaryStationsRelated(
+                            Math.ceil(unitsCount / 10 + 2), seed + 1, _units[0].position.lat, _units[0].position.lng); 
+                console.log(stationaryStations);
+                const _stations = await api.algorithm('simpleArrange', [...stationRanges], [...counts], stationaryStations, _units);
                 if(!_stations) {
                     console.log('request failed');
                     return;
@@ -160,7 +164,8 @@ import Station from "./Station.svelte";
                 //     const isConnected = await checkIsConnected();
                 //     if(isConnected != true) clearInterval(i);
                 //}
-            
+                const ranges = [...stationRanges];
+                const _counts = [...counts];
                 bigTestTask = setTimeout(async () => {
                     const _unitsCount = unitsCount;
                     for(let i = 0; i < 1000000; i++)
@@ -174,16 +179,18 @@ import Station from "./Station.svelte";
                             _units[0].counts = [...counts];
                         }
 
-                        const _stations = await api.algorithm('simpleArrange', [...stationRanges], [...counts], [], _units);
+                        const stationaryStations = test.getRandomStationaryStationsRelated(
+                            Math.ceil(unitsCount / 10 + 2), i+1, _units[0].position.lat, _units[0].position.lng); 
+                        const _stations = await api.algorithm('simpleArrange', ranges, _counts, stationaryStations, _units);
                         if(!_stations) {
                             console.log('request failed');
                             return;
                         }
 
-                        const isConnected = await api.isConnected([...stationRanges], [...counts], _stations, _units);
+                        const isConnected = await api.isConnected(ranges, counts, _stations, _units);
                         
-                        // if(!isConnected || bigTestRunning == false)
-                        if(!test.validate(_stations, stationRanges, _units[0].counts) || bigTestRunning == false) //alert counts
+                        if(!isConnected || bigTestRunning == false)
+                        // if(!.testvalidate(_stations, stationRanges, _units[0].counts) || bigTestRunning == false) //alert counts
                         {
                             updateStations(_stations);
                             updateUnits(_units);

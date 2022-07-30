@@ -58,11 +58,12 @@ namespace algorithm
         public Station(StationJSON stationJSON) : base(stationJSON.position)
         {
             this.Range = stationJSON.range;
+            this.IsStationary = stationJSON.isStationary;
         }
 
         public StationJSON GetJSON()
         {
-            return new StationJSON(Position, Range, groupId);
+            return new StationJSON(Position, Range, groupId, IsStationary);
         }
 
         public void AttachTo(Unit unit)

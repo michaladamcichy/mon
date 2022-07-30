@@ -33,6 +33,8 @@ namespace algorithm
         public List<Station> Stations { get { return MapObjects.FindAll(item => item is Station).Cast<Station>().ToList(); }
             set { MapObjects.AddRange(value); } }
 
+        public List<Station> StationaryStations { get; private set; } = new List<Station>();
+        public List<Unit> UnitsConnectedToStationaryStations { get; private set; } = new List<Unit>();
         public List<Unit> Units { get { return MapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList(); } }
 
         public Instance(InstanceJSON instanceJSON)
@@ -71,7 +73,7 @@ namespace algorithm
         {
             var mapObjects = stations.Cast<MapObject>().Concat(units.Cast<MapObject>()).ToList();
 
-            foreach(var first in mapObjects)
+            foreach(var first in mapObjects) //alert nie uwzględniam tutaj stacjonarnych
             {
                 foreach(var second in stations)
                 {
@@ -89,9 +91,29 @@ namespace algorithm
             {
                 foreach(var unit in units)
                 {
-                    if(!unit.HasAttachement() && !station.IsAttached() && station.Position.Equals(unit.Position)) //alert to powinno byc property
+                    if(!unit.HasAttachement() && !station.IsAttached() && station.Position.Equals(unit.Position) && !station.IsStationary) //alert to powinno byc property
                     {
                         unit.Attach(station);
+                    }
+                }
+            }
+
+
+            StationaryStations = mapObjects.FindAll(item => item is Station).Cast<Station>().ToList().FindAll(item => item.IsStationary).ToList(); //alert brzydkie
+            mapObjects.RemoveAll(item => item is Station && ((Station)item).IsStationary); //alert brzydkie
+            var _units = mapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList();
+            UnitsConnectedToStationaryStations.AddRange(_units.FindAll(unit => StationaryStations.Any(station => unit.IsInRange(station))).ToList());
+            mapObjects.RemoveAll(item => item is Unit && UnitsConnectedToStationaryStations.Contains(item));
+
+            foreach(var stationaryStation in StationaryStations)
+            {
+                foreach(var otherStationaryStation in StationaryStations)
+                {
+                    if (stationaryStation == otherStationaryStation) continue;
+
+                    if(!stationaryStation.Receivers.Contains(otherStationaryStation))
+                    {
+                        stationaryStation.AddReceiver(otherStationaryStation);
                     }
                 }
             }

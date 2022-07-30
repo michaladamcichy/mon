@@ -11,18 +11,18 @@ namespace algorithm
         public List<Station> Run(Instance instance)
         {
             var cost = new Cost(instance);
-
+            instance.MapObjects.RemoveAll(item => item is Station);
             var (groups, newCost) = (new SimpleCreateGroups(instance)).Run(cost);
             cost = new Cost(newCost);
-            if (instance.Units.Any(unit => !unit.HasAttachement())) return Group.Flatten(groups); //alert data flow po kryjomu modyfikuje instnace.Stations
+            if (instance.Units.Any(unit => !unit.HasAttachement())) return Group.Flatten(groups).Concat<Station>(instance.StationaryStations).ToList(); //alert data flow po kryjomu modyfikuje instnace.Stations
             
             var coreStations = groups.FindAll(group => group.CoreStation != null).Select(group => group.CoreStation).ToList();
 
 
-            var (additionalStations, otherNewCost) = JoinNearestNeighbors.Run(cost, coreStations);
+            var (additionalStations, otherNewCost) = JoinNearestNeighbors.Run(cost, coreStations, instance.StationaryStations, instance.UnitsConnectedToStationaryStations);
             cost = new Cost(otherNewCost);
             //var additionalStations = new List<Station>();
-            return Group.Flatten(groups).Concat<Station>(additionalStations).ToList();
+            return Group.Flatten(groups).Concat<Station>(additionalStations).ToList().Concat<Station>(instance.StationaryStations).ToList();
         }
 
 

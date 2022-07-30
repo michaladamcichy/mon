@@ -149,3 +149,18 @@ ALERT czy kierunek podany w lat, lng można bezpiecznie normalizować???? ROBIĘ
 ALERT - widzę takie niebezpieczeństwo, że używam GetMax(x, maxRange) lub GetMIn....
     I używam tego bezrefleksyjnie, bo wcześniej miałem CanGetAny
     Ale przecież ja tu mam zawężony zakres, bo nie jest bezpiecznie!!!
+
+ALERT niebezpieczeństwo stacjonarna stacja może być przez
+ przypadek przypisana jako attachment
+
+ALERT
+    nie będę tego implementował, ale backbone mógłby 
+    teoretycznie iść obok stacji
+
+ALERT w PrepareMapObjects stacjonarne tez otrzymują
+    receivers i senders 
+    czy to może powodować jakieś kłopoty?
+
+
+    ALERT zapytać promotora - czy będąc w zasięgu stacjonarnej mogę nie mieć żadnej stacji?
+    ALERT - na razie zawsze mi podłącza do komórkowych - pytanie czy tak ma być

@@ -33,26 +33,30 @@ import { onMount } from "svelte";
             updateCircles(_map, stations);
     });
 
-    const stationMarkerIcon = {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: 'white',
-        fillOpacity: 1.0,
-        strokeColor: 'black',
-        strokeOpacity: 1.0,
-        strokeWeight: 5.0,
-        scale: 15,
-        fontWeight: 'bold',
+    const stationMarkerIcon = station => {
+        return {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: station.isStationary ? 'yellow' : 'white',
+            fillOpacity: 1.0,
+            strokeColor: station.isStationary ? 'white' : 'black',
+            strokeOpacity: 1.0,
+            strokeWeight: 5.0,
+            scale: 13,
+            fontWeight: 'bold',
+        };
     };
 
-    const unitMarkerIcon = {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: 'white',
-        fillOpacity: 1.0,
-        strokeColor: 'darkgreen',
-        strokeOpacity: 1.0,
-        strokeWeight: 5.0,
-        scale: 15,
-        fontWeight: 'bold',
+    const unitMarkerIcon = unit => {
+        return {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: 'white',
+            fillOpacity: 1.0,
+            strokeColor: 'darkgreen',
+            strokeOpacity: 1.0,
+            strokeWeight: 5.0,
+            scale: 15,
+            fontWeight: 'bold',
+        };
     };
 
     const getUnitIcon = (unit) => {
@@ -77,7 +81,7 @@ import { onMount } from "svelte";
                     color:'black'
                 },
                 draggable: true,
-                icon: mapObjects == stations ? stationMarkerIcon : mapObjects == units ? unitMarkerIcon : null,
+                icon: mapObjects == stations ? stationMarkerIcon(mapObject) : mapObjects == units ? unitMarkerIcon(mapObject) : null,
             });
             marker.addListener('dragend', e => {
                 mapObject.position.lat = marker.getPosition().lat();

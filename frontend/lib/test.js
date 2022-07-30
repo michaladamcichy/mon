@@ -84,6 +84,39 @@ test.getRandomUnitsRelated = (unitsCount, seed) => {
     return units;
 };
 
+test.getRandomStationaryStationsRelated = (stationsCount, seed, lat, lng) => {
+    let stations = [];
+
+    seed = seed ? seed : Math.floor(Math.random() * 10000000);
+
+    stations.push({
+        position:
+                {
+                    lat: lat + 0.1,
+                    lng: lng + 0.1,
+                },
+            range: 50.0,
+            isStationary: true
+    });
+
+    for(let i = 1; i < stationsCount; i++)
+    {
+        let direction = normalize(rand(seed++) * 2 - 1.0, rand(seed++) * 2 - 1.0);
+        let distance = rand(seed++) * 1;
+        stations.push({
+            position:
+                {
+                    lat: stations[i-1].position.lat + direction.lat * distance,
+                    lng: stations[i-1].position.lng + direction.lng * distance,
+                },
+            range: 50.0,
+            isStationary: true
+        });
+    }
+
+    return stations;
+};
+
 
 test.validate = (stations, ranges, counts) => {
     for(let i = 0; i < ranges.length; i++)

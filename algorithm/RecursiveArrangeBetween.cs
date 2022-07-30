@@ -58,6 +58,8 @@ namespace algorithm
         }
         public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station last, double tolerance = 0.1)
         {
+            if (first.IsStationary && last.IsStationary) return (initialCost, new List<Station>()); //alert
+
             var cost = new Cost(initialCost);
 
             Cost optimalCost = null;

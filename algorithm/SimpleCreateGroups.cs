@@ -116,7 +116,6 @@ namespace algorithm
         {
             Cost cost = new Cost(initialCost);
             //if nie rozbudowujemy tylko zaczynamy od zera //alert!
-            instance.MapObjects.RemoveAll(item => item is Station); //alert!!
             Station._id = 0;//alert
             var groups = new List<Group>();
 
