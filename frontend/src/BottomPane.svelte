@@ -127,20 +127,20 @@ import Station from "./Station.svelte";
                             Math.ceil(unitsCount / 10 + 2), seed + 1, _units[0].position.lat, _units[0].position.lng); 
                 console.log(stationaryStations);
                 const _stations = await api.algorithm('simpleArrange', [...stationRanges], [...counts], stationaryStations, _units);
+                //ALERT
+                // const _positions = test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), seed);
+                // const __units = _positions.map(position => {return {position: position, priority: 1}}); 
+                // const __stations = await api.algorithm('arrangeWithExisting', [...stationRanges], [...counts], _stations.concat(stationaryStations), _units.concat(__units));
                 
-                const _positions = test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), seed);
-                const __units = _positions.map(position => {return {position: position, priority: 1}}); 
-                const __stations = await api.algorithm('arrangeWithExisting', [...stationRanges], [...counts], _stations.concat(stationaryStations), _units.concat(__units));
-                
-                if(!__stations) {
+                if(!_stations) {
                     console.log('request failed');
                     return;
                 }
 
                 //const isConnected = await api.isConnected([...stationRanges], [...counts], _stations, _units);
             
-                updateStations(__stations);
-                updateUnits(__units);
+                updateStations(_stations);
+                updateUnits(_units);
             }}>
                 Random instance
             </button>
@@ -201,13 +201,13 @@ import Station from "./Station.svelte";
                         const _positions = test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), i);
                         const __units = _positions.map(position => {return {position: position, priority: 1}}); 
                         const __stations = await api.algorithm('arrangeWithExisting', ranges, _counts, _stations.concat(stationaryStations), _units.concat(__units));
-                        const isConnected = await api.isConnected(ranges, counts, __stations, _units);
+                        const isConnected = await api.isConnected(ranges, counts, __stations.concat(stationaryStations), __units.concat(_units));
                         
                         if(!isConnected || bigTestRunning == false)
                         // if(!.testvalidate(_stations, stationRanges, _units[0].counts) || bigTestRunning == false) //alert counts
                         {
-                            updateStations(_stations);
-                            updateUnits(_units);
+                            updateStations(__stations);
+                            updateUnits(_units.concat(__units));
                             bigTestRunning = false;
                             return;
                         }
