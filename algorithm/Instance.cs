@@ -89,6 +89,7 @@ namespace algorithm
 
             foreach(var station in stations)
             {
+                if (station.IsCore) continue;
                 foreach(var unit in units)
                 {
                     if(!unit.HasAttachement() && !station.IsAttached() && station.Position.Equals(unit.Position) && !station.IsStationary) //alert to powinno byc property
@@ -205,7 +206,13 @@ namespace algorithm
             return priorities;
         }
 
-
+        public void UpdateCounts() //alert brzydkie
+        {
+            for(var i = 0; i < StationCounts.Count(); i++)
+            {
+                StationCounts[i] -= Stations.FindAll(station => station.Range == StationRanges[i]).Count;
+            }
+        }
 
     }
 }

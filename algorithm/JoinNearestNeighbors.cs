@@ -8,7 +8,7 @@ namespace algorithm
 {
     public class JoinNearestNeighbors
     {
-        public static (List<Station>, Cost) RunX(Cost initialCost, List<Station> coreStations, List<Station> stationaryStations, List<Unit> unitsConnectedToStationaryStations)
+        /*public static (List<Station>, Cost) RunX(Cost initialCost, List<Station> coreStations, List<Station> stationaryStations, List<Unit> unitsConnectedToStationaryStations)
         {
             if (coreStations.Count == 0 || !initialCost.CanGetAny()) return (new List<Station>(), initialCost);
             Cost cost = new Cost(initialCost);
@@ -65,24 +65,25 @@ namespace algorithm
             }
 
             return (additionalStations, cost);
-        }
+        }*/
 
 
-        public static (List<Station>, Cost) Run(Cost initialCost, List<Station> coreStations, List<Station> stationaryStations, List<Unit> unitsConnectedToStationaryStations)
+        public static (List<Station>, Cost) Run(Cost initialCost, List<Station> coreStations, List<Station> stationaryStations,
+            List<Unit> unitsConnectedToStationaryStations, HashSet<Station> _connected = null)
         {
             var cost = new Cost(initialCost);
             if (coreStations.Count == 0 || !cost.CanGetAny()) return (new List<Station>(), cost);
 
-            var connected = new HashSet<Station>();
+            var connected = _connected == null ? new HashSet<Station>() : _connected;
             var stations = new List<Station>();
             var additionalStations = new List<Station>();
 
             stations.AddRange(coreStations);
             stations.AddRange(stationaryStations);
-            if(unitsConnectedToStationaryStations.Count > 0)
+            if(unitsConnectedToStationaryStations.Count > 0) //alert chyba jednak nie powinno tak być
                 stationaryStations.ForEach(stationaryStation => connected.Add(stationaryStation));
-            else 
-                connected.Add(coreStations.First());
+
+            if (connected.Count == 0) connected.Add(coreStations.First());
 
             while (coreStations.Any(station => !connected.Contains(station)))
             {

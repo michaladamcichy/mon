@@ -100,10 +100,17 @@ Algorytmy ze stackoverflow zastąpić siszarpowymi
 Algorytm dobudowywania do istniejącej infrastruktury
 Algorytm z drzewem hierarchicznym
 Prawdziwe MST
+ChangeRangeOrBigger! - może zrobić to globalnie
+    i zobaczyć, czy poprawiają się rozwiązania
+CHOLERA tworząc grupy daje wszystkim takie same stacje
+    A bliższe jednostki przecież mogłyby mieć mniejsze!
 Usuwanie nadmiarowych stacji z końców palców rozgwiazdy?
     Tylko to sprawia dodatkowe problemy...
 ---
 punkty Steinera?
+
+ALERT - jeśli stacja bazowa jest blisko, jest dołączana nawet,
+jeśli nie ma żadnych stationaryUnits
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

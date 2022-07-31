@@ -79,8 +79,6 @@ test.getRandomUnitsRelated = (unitsCount, seed) => {
         units.push({lat: units[i-1].lat + direction.lat * distance, lng: units[i-1].lng + direction.lng * distance});
     }
 
-    console.log(`Seed: ${seed}`);
-
     return units;
 };
 

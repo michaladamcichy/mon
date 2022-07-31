@@ -284,6 +284,18 @@ namespace algorithm
             return true;
         }
 
+        public bool ChangeRange(List<Station> stations, double newRange)
+        {
+            if (!CanChangeRange(stations, newRange)) return false;
+            
+            foreach(var station in stations)
+            {
+                ChangeRange(station, newRange);
+            }
+
+            return true;
+        }
+
         public Station? QueryJoin(Station first, Station second, double tolerance = 0.1) //alert tolerance nie jest uwzlędniony symetrycznie - od strony bigger nie jest
         {
             if (MapObject.AreInRange(first, second)) return null;
