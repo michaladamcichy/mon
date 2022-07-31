@@ -91,17 +91,9 @@ HMMMM jak dodam stacje stacjonarne o zasięgach różnych od 20, 30, 50
     Potencjalne zagrożenie: pętle foreach(var range in ranges)
 
 ---------------------------------------------
---Przetestować solidnie menedżera kosztu
---Poprawić ArrangeBetween żeby dobierał stacje lepiej
-ALERT grzebałem w ConnectionCheck - bądź czujny
+WYWALIĆ SAVE SNAPSHOT!!! ŹRÓDŁO PRAWDOPODOBNYCH STRASZNIE TRUDNYCH DO ZNALEZIENIA BŁĘDÓW
 Dodać wybieranie najtańszych stacji na podstawie lokalizacji
 Szlifowanie powyższych po dodaniu tych kosztów
-Obsługa stacji nieruszalnych czyli de facto opcja: uwzględniaj/nie uwzględniaj stacje, które już są na mapie
-    ALE UWAGA: trzeba uwzględnić to, że one są połączone światłowodem!!!    
-    Z drugiej strony one i tak będą wczytywane z pliku
-    jednak będzie trzeba dodać parametr stacji - isStationary
-    również ustawianie go z interfejsu
-    jeżeli natrafię na taką stację, to należy ustawiać jako senders i receivers wszystkie inne stacjonarne stacje
 Zakodowanie w jsonie lokalizacji stacji stacjonarnych
 Zakodowanie w jsonie lokalizacji jednostek
 Algorytmy ze stackoverflow zastąpić siszarpowymi

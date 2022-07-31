@@ -107,6 +107,11 @@ import Station from "./Station.svelte";
             </button>
         </div>
         <div class="row">
+            <button class="btn btn-primary" on:click={() => onAlgorithmClicked("arrangeWithExisting")}>
+                Arrange with existing
+            </button>
+        </div>
+        <div class="row">
             <button class="col btn btn-primary" on:click={async () => {
                 const _unitsCount = unitsCount;
                 const positions = test.getRandomUnitsRelated(_unitsCount, seed);
@@ -222,7 +227,10 @@ import Station from "./Station.svelte";
             {/if}
         </div>
         <div class="row">
-            <div class="col"><p><b>{units.length}</b> {' units, '} <b>{stations.length}</b> {' stations'}</p></div>
+            <div class="col">
+                <p><b>{units.length}</b> {' units, '}
+                    <b>{stations.filter(station => !station.isStationary).length}</b> {'stations (mobile)'}</p>
+            </div>
         </div>
         <div class="row">
         {#each getStationsStats(stations) as stat}

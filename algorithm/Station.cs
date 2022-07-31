@@ -13,12 +13,14 @@ namespace algorithm
         public int groupId { get; set; } = -1;
 
         public bool isStationary { get; set; } = false;
-        public StationJSON(Position position, double range, int groupId = -1, bool isStationary = false)
+        public bool isCore { get; set; } = false;
+        public StationJSON(Position position, double range, int groupId = -1, bool isStationary = false, bool isCore = false)
         {
             this.position = position;
             this.range = range;
             this.groupId = groupId;
             this.isStationary = isStationary;
+            this.isCore = isCore;
         }
 
         public StationJSON() { }
@@ -29,15 +31,16 @@ namespace algorithm
         public int groupId { get; private set; }
         public int id { get; set; } = ++_id; //alert
         public bool IsStationary { get; set; } = false;
-
+        public bool IsCore { get; set; } = false;
         public Station(double range) : base(new Position())
         {
             this.Range = range;
         }
-        public Station(Position position, double range, bool isStationary = false) : base(position)
+        public Station(Position position, double range, bool isStationary = false, bool isCore = false) : base(position)
         {
             this.Range = range;
             this.IsStationary = isStationary;
+            this.IsCore = isCore;
         }
 
         public Station(Station station) //alert nie przemyślane dobrze
@@ -49,6 +52,7 @@ namespace algorithm
             this.Senders = new List<MapObject>(station.Senders);
             this.groupId = station.groupId;
             this.IsStationary = station.IsStationary;
+            this.IsCore = station.IsCore;
         }
         public void SetGroupId(int id)
         {
@@ -59,11 +63,12 @@ namespace algorithm
         {
             this.Range = stationJSON.range;
             this.IsStationary = stationJSON.isStationary;
+            this.IsCore = stationJSON.isCore;
         }
 
         public StationJSON GetJSON()
         {
-            return new StationJSON(Position, Range, groupId, IsStationary);
+            return new StationJSON(Position, Range, groupId, IsStationary, IsCore ? IsCore : !IsAttached()); //alert station raczej nie może przestać być corem, więc powinno być ok, ale kto wie
         }
 
         public void AttachTo(Unit unit)
