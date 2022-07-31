@@ -97,18 +97,19 @@ import Station from "./Station.svelte";
     </BottomPaneSection>
     <BottomPaneSection title={'Algorithms'}>
         <div class="row">
-            <button class="btn btn-primary" on:click={() => onAlgorithmClicked("simpleArrange")}>
-                Simple arrange algorithm
+            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("simpleArrange")}>
+                Arrange
             </button>
-        </div>
-        <div class="row">
-            <button class="btn btn-primary" on:click={() => onAlgorithmClicked("simpleHierarchicalTree")}>
-                Simple hierarchical tree
-            </button>
-        </div>
-        <div class="row">
-            <button class="btn btn-primary" on:click={() => onAlgorithmClicked("arrangeWithExisting")}>
+            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("arrangeWithExisting")}>
                 Arrange with existing
+            </button>
+        </div>
+        <div class="row">
+            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("simpleHierarchicalTree")}>
+                Hierarchical tree
+            </button>
+            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("priorityArrange")}>
+                Priority Arrange
             </button>
         </div>
         <div class="row">

@@ -111,6 +111,10 @@ punkty Steinera?
 
 ALERT - jeśli stacja bazowa jest blisko, jest dołączana nawet,
 jeśli nie ma żadnych stationaryUnits
+
+ALERT - BARDZO WAŻNE - w PrepareMapObjects
+    należy dodawać MNIEJSZĄ stację do jednostki!!
+    bez tego może dochodzić do bardzo dziwnych błędów
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

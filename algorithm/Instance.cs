@@ -37,31 +37,30 @@ namespace algorithm
         public List<Unit> UnitsConnectedToStationaryStations { get; private set; } = new List<Unit>();
         public List<Unit> Units { get { return MapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList(); } }
 
-        public Instance(InstanceJSON instanceJSON)
+        public Instance(InstanceJSON instanceJSON, bool initialize = true)
         {
             this.StationRanges = instanceJSON.stationRanges;
             this.StationCounts = instanceJSON.stationCounts;
             var stations = instanceJSON.stations.Select(item => new Station(item)).ToList();
             var units = instanceJSON.units.Select(item => new Unit(item)).ToList();
-            this.MapObjects = prepareMapObjects(stations, units);
 
-            int id = 0; //alert brzydko
-            this.Stations.ForEach(station => { station.id = ++id; });
-            Station._id = id;
+            this.MapObjects = prepareMapObjects(stations, units);
+            UpdateCounts(); //alert
         }
 
-        public Instance(List<Station> stations, List<Unit> units)
+        public Instance(List<Station> stations, List<Unit> units, int[] counts = null, bool initialize = true)
         {
             var ranges = new List<double>();
             stations.ForEach(item => ranges.Add(item.Range));
 
-            this.StationRanges = ranges.ToArray();
-            this.StationCounts = new int[3] { 1000, 1000, 1000 }; // alert!
+            this.StationRanges = new double[] {20.0, 30.0, 50.0 }; //alert 
+            this.StationCounts = counts == null ? new int[] { 1000, 1000, 1000 } : counts;
 
             this.MapObjects = prepareMapObjects(stations, units);
+            UpdateCounts(); //alert
         }
 
-        public Instance(List<Station> stations) : this(stations, new List<Unit>()) {}
+        public Instance(List<Station> stations, int[] counts) : this(stations, new List<Unit>(), counts) {}
 
         public Instance(int[] counts)
         {
@@ -69,8 +68,10 @@ namespace algorithm
             this.StationCounts = counts;
         }
 
-        List<MapObject> prepareMapObjects(List<Station> stations, List<Unit> units)
+        public List<MapObject> prepareMapObjects(List<Station> stations, List<Unit> units) //alert
         {
+            //RemoveRelations(); //alert
+
             var mapObjects = stations.Cast<MapObject>().Concat(units.Cast<MapObject>()).ToList();
 
             foreach(var first in mapObjects) //alert nie uwzględniam tutaj stacjonarnych
@@ -99,7 +100,6 @@ namespace algorithm
                 }
             }
 
-
             StationaryStations = mapObjects.FindAll(item => item is Station).Cast<Station>().ToList().FindAll(item => item.IsStationary).ToList(); //alert brzydkie
             mapObjects.RemoveAll(item => item is Station && ((Station)item).IsStationary); //alert brzydkie
             var _units = mapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList();
@@ -118,6 +118,10 @@ namespace algorithm
                     }
                 }
             }
+
+            int id = 0; //alert brzydko
+            this.Stations.ForEach(station => { station.id = ++id; });
+            Station._id = id;
 
             return mapObjects;
         }
@@ -212,6 +216,11 @@ namespace algorithm
             {
                 StationCounts[i] -= Stations.FindAll(station => station.Range == StationRanges[i]).Count;
             }
+        }
+
+        public void RemoveRelations()
+        {
+            MapObjects.ForEach(o => { o.Senders.Clear(); o.Receivers.Clear(); });
         }
 
     }

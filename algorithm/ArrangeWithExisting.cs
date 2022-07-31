@@ -8,13 +8,13 @@ namespace algorithm
 {
     public class ArrangeWithExisting
     {
-        public (Cost, List<Group>, List<Group>) AssignToGroups(Cost initialCost, List<Station> lonelyStations, List<Station> coreStations)
+        public (Cost, List<Group>, List<Group>) AssignToGroups(Cost initialCost, List<Station> lonelyStations, List<Station> coreStations, int[] counts)
             //alert modifikuję te coreStation, trzeba je potem zwrócić
         {
             var cost = new Cost(initialCost);
             var (newCost, groups, lonelyLeft) = (new ExpandGroups()).Run(cost, lonelyStations, coreStations);
             cost = new Cost(newCost);
-            var (newGroups, otherNewCost) = (new SimpleCreateGroups(new Instance(lonelyLeft))).Run(cost); //alert czy to zadziała?
+            var (newGroups, otherNewCost) = (new SimpleCreateGroups(new Instance(lonelyLeft, counts))).Run(cost); //alert czy to zadziała?
             cost = new Cost(otherNewCost);
 
             return (cost, groups, newGroups);
@@ -22,7 +22,7 @@ namespace algorithm
 
         public List<Station> Run(Instance instance)
         {
-            instance.UpdateCounts();
+            /*instance.UpdateCounts();*/ //alert
             Cost cost = new Cost(instance);
 
             var lonelyUnits = instance.Units.FindAll(unit => unit.Receivers.Count == 0).ToList();
@@ -40,7 +40,7 @@ namespace algorithm
             }
 
             var coreStations = instance.Stations.FindAll(station => station.IsCore).ToList();
-            var (newCost, oldGroups, newGroups) = AssignToGroups(cost, lonelyStations, coreStations);
+            var (newCost, oldGroups, newGroups) = AssignToGroups(cost, lonelyStations, coreStations, instance.StationCounts);
 
             var newStations = Group.Flatten(oldGroups.Concat<Group>(newGroups).ToList());
             var allStations = new List<Station>(newStations);
