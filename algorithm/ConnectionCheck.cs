@@ -32,9 +32,9 @@ namespace algorithm
             return true;
         }
 
-        public bool Run(List<Station> stations, int[] counts)
+        public bool Run(List<Station> stations, double maxAffordableDistance, int[] counts)
         {
-            return Run(new Instance(stations, counts));
+            return Run(new Instance(stations, maxAffordableDistance, counts));
         }
         public void DFS(Station start, Dictionary<Station, bool> visited)
         {

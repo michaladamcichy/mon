@@ -13,13 +13,15 @@ namespace algorithm
 
         public List<StationJSON> stations { get; set; } = new List<StationJSON>();
         public List<UnitJSON> units { get; set;  } = new List<UnitJSON>();
+        public double maxAffordableDistance { get; set; } = 0.0;
 
-        public InstanceJSON(double[] stationRanges, int[] stationCounts, List<StationJSON> stations, List<UnitJSON> units)
+        public InstanceJSON(double[] stationRanges, int[] stationCounts, List<StationJSON> stations, List<UnitJSON> units, double maxAffordableDistance)
         {
             this.stationRanges = stationRanges;
             this.stationCounts = stationCounts;
             this.stations = stations;
             this.units = units;
+            this.maxAffordableDistance = maxAffordableDistance;
         }
     }
     public class Instance
@@ -36,11 +38,14 @@ namespace algorithm
         public List<Station> StationaryStations { get; private set; } = new List<Station>();
         public List<Unit> UnitsConnectedToStationaryStations { get; private set; } = new List<Unit>();
         public List<Unit> Units { get { return MapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList(); } }
+        public double MaxAffordableDistance { get; private set; } = 0.0;
 
         public Instance(InstanceJSON instanceJSON, bool initialize = true)
         {
             this.StationRanges = instanceJSON.stationRanges;
             this.StationCounts = instanceJSON.stationCounts;
+            this.MaxAffordableDistance = instanceJSON.maxAffordableDistance;
+
             var stations = instanceJSON.stations.Select(item => new Station(item)).ToList();
             var units = instanceJSON.units.Select(item => new Unit(item)).ToList();
 
@@ -48,19 +53,20 @@ namespace algorithm
             UpdateCounts(); //alert
         }
 
-        public Instance(List<Station> stations, List<Unit> units, int[] counts = null, bool initialize = true)
+        public Instance(List<Station> stations, List<Unit> units, double maxAfordableDistance, int[] counts = null, bool initialize = true)
         {
             var ranges = new List<double>();
             stations.ForEach(item => ranges.Add(item.Range));
 
             this.StationRanges = new double[] {20.0, 30.0, 50.0 }; //alert 
             this.StationCounts = counts == null ? new int[] { 1000, 1000, 1000 } : counts;
+            this.MaxAffordableDistance = maxAfordableDistance;
 
             this.MapObjects = prepareMapObjects(stations, units);
             UpdateCounts(); //alert
         }
 
-        public Instance(List<Station> stations, int[] counts) : this(stations, new List<Unit>(), counts) {}
+        public Instance(List<Station> stations, double maxAffordableDistance, int[] counts) : this(stations, new List<Unit>(), maxAffordableDistance, counts) {}
 
         public Instance(int[] counts)
         {
@@ -124,68 +130,6 @@ namespace algorithm
             Station._id = id;
 
             return mapObjects;
-        }
-
-        public bool CanAcquireStation(double range, int howMany = 1) //alert stations czy station??
-        {
-            var index = StationRanges.ToList().FindIndex(item => item == range);
-            if (index == -1) return false;
-            return StationCounts[index] >= howMany;
-        }
-
-        public Station? AquireStation(List<Station> stations)
-        {
-            double minCoveringRadius = MapObject.MinCoveringCircleRadius(stations);
-
-            for(int i =0; i < StationRanges.Count(); i++)
-            {
-                if(StationRanges[i] <= minCoveringRadius && StationCounts[i] > 0)
-                {
-                    StationCounts[i]--;
-                    return new Station(StationRanges[i]);
-                }
-            }
-
-            return null;
-        }
-
-        public Station? AquireMinStation() //alert walnąć jednolinijkowca
-        {
-            for (int i = 0; i < StationRanges.Count(); i++)
-            {
-                if (StationCounts[i] > 0)
-                {
-                    StationCounts[i]--;
-                    return new Station(StationRanges[i]);
-                }
-            }
-
-            return null;
-        }
-
-        public Station? AquireMaxStation()
-        {
-            for (int i = StationRanges.Count() - 1; i >= 0; i--)
-            {
-                if (StationCounts[i] > 0)
-                {
-                    StationCounts[i]--;
-                    return new Station(StationRanges[i]);
-                }
-            }
-
-            return null;
-        }
-
-        public void GiveBackStation(Station station)
-        {
-            for(int i=0; i < StationRanges.Count(); i++)
-            {
-                if(StationRanges[i] == station.Range)
-                {
-                    StationCounts[i]++;
-                }
-            }
         }
 
         public Dictionary<Station, double> SaveRangesSnapshot()

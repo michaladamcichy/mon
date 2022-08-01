@@ -115,6 +115,10 @@ jeśli nie ma żadnych stationaryUnits
 ALERT - BARDZO WAŻNE - w PrepareMapObjects
     należy dodawać MNIEJSZĄ stację do jednostki!!
     bez tego może dochodzić do bardzo dziwnych błędów
+RemoveRelations - sprawdzić czy brak tego nie prowadzi czasami w maliny (czy jest wszędzie, gdzie powinno?) 
+ALERT
+    IsConnected nie zawsze dostaje zaktualizowane
+        maxAffordableDistance
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

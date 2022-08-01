@@ -54,8 +54,28 @@ namespace backend.Controllers
         [Route("simpleArrangeAlgorithm")]
         public List<StationJSON> simpleArrangeAlgorithm(InstanceJSON instanceJSON)
         {
+            instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
             var instance = new Instance(instanceJSON);
             var ret = Algorithm.SimpleArrange(instance).Select(item => item.GetJSON()).ToList();
+            return ret;
+        }
+
+        [HttpPost]
+        [Route("priorityArrangeAlgorithm")]
+        public List<StationJSON> priorityArrangeAlgorithm(InstanceJSON instanceJSON)
+        {
+            instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.PriorityArrange(instance).Select(item => item.GetJSON()).ToList();
+            return ret;
+        }
+
+        [HttpPost]
+        [Route("arrangeWithExistingAlgorithm")]
+        public List<StationJSON> arrangeWithExisting(InstanceJSON instanceJSON)
+        {
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.ArrangeWithExisting(instance).Select(item => item.GetJSON()).ToList();
             return ret;
         }
 
@@ -63,6 +83,7 @@ namespace backend.Controllers
         [Route("simpleHierarchicalTreeAlgorithm")]
         public List<StationJSON> simpleHierarchicalTreeAlgorithm(InstanceJSON instanceJSON)
         {
+            instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
             var instance = new Instance(instanceJSON);
             var ret = Algorithm.SimpleHierarchicalTree(instance).Select(item => item.GetJSON()).ToList();
             return ret;

@@ -18,6 +18,12 @@
 	const defaultWeights = [1.0, 1.5, 2.5];
 	const defaultStations = [];
 	const defaultUnits = [];
+
+	let maxAffordableDistance = 0;
+	const updateMaxAffordableDistance = (value) => {
+		maxAffordableDistance = value;
+	};
+
 	let instances = [
 		{
 			ranges: defaultRanges,
@@ -71,7 +77,8 @@
 		return api.isConnected(ranges,
 				counts,
 				stations,
-				units);
+				units,
+				maxAffordableDistance);
 	};
 
 	const connectionCheck = async () => {
@@ -300,6 +307,8 @@
 				updateRanges={updateRanges}
 				updateStations={updateAllStations}
 				updateUnits={updateAllUnits}
+				maxAffordableDistance={maxAffordableDistance}
+				updateMaxAffordableDistance={updateMaxAffordableDistance}
 				checkIsConnected={checkIsConnected}
 				isConnected={isConnected}
 				bigTestRunning={bigTestRunning}

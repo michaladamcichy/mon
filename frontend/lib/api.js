@@ -14,8 +14,8 @@ api.test = async () => {
     console.log(res);
 };
 
-api.isConnected = async (stationRanges, stationCounts, stations, units) => {
-    const instance = {stationRanges, stationCounts, stations, units};
+api.isConnected = async (stationRanges, stationCounts, stations, units, maxAffordableDistance) => {
+    const instance = {stationRanges, stationCounts, stations, units, maxAffordableDistance};
     
     const result = await fetch(`${api.url}/isConnected`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
 
@@ -25,8 +25,8 @@ api.isConnected = async (stationRanges, stationCounts, stations, units) => {
     return parsed;
 };
 
-api.algorithm = async (type, stationRanges, stationCounts, stations, units) => {
-    const instance = {stationRanges, stationCounts, stations, units};
+api.algorithm = async (type, stationRanges, stationCounts, stations, units, maxAffordableDistance) => {
+    const instance = {stationRanges, stationCounts, stations, units, maxAffordableDistance};
     const result = await fetch(`${api.url}/${type}Algorithm`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
     //alert todo obsluga bledow
     if(!result.ok) {

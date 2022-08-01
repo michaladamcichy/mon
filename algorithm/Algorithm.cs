@@ -20,9 +20,9 @@ namespace algorithm
         {
             return new ConnectionCheck().Run(instance);
         }
-        public static bool IsConnected(List<Station> stations, int[] counts)
+        public static bool IsConnected(List<Station> stations, double maxAffordableDistance, int[] counts)
         {
-            return new ConnectionCheck().Run(stations, counts);
+            return new ConnectionCheck().Run(stations, maxAffordableDistance, counts);
         }
 
         public static List<Station> SimpleArrange(Instance instance)

@@ -8,12 +8,12 @@ namespace algorithm
 {
     public class ArrangeWithExisting
     {
-        public (Cost, List<Group>, List<Group>) AssignToGroups(Cost initialCost, List<Station> lonelyStations, List<Station> coreStations, int[] counts)
+        public (Cost, List<Group>, List<Group>) AssignToGroups(Cost initialCost, List<Station> lonelyStations, List<Station> coreStations, double maxAffordableDistance, int[] counts)
         {
             var cost = new Cost(initialCost);
             var (newCost, groups, lonelyLeft) = (new ExpandGroups()).Run(cost, lonelyStations, coreStations);
             cost = new Cost(newCost);
-            var (newGroups, otherNewCost) = (new SimpleCreateGroups(new Instance(lonelyLeft, counts))).Run(cost); //alert czy to zadziała?
+            var (newGroups, otherNewCost) = (new SimpleCreateGroups(new Instance(lonelyLeft, maxAffordableDistance, counts))).Run(cost); //alert czy to zadziała?
             cost = new Cost(otherNewCost);
 
             return (cost, groups, newGroups);
@@ -39,7 +39,7 @@ namespace algorithm
             }
 
             var coreStations = instance.Stations.FindAll(station => station.IsCore).ToList();
-            var (newCost, oldGroups, newGroups) = AssignToGroups(cost, lonelyStations, coreStations, instance.StationCounts);
+            var (newCost, oldGroups, newGroups) = AssignToGroups(cost, lonelyStations, coreStations, instance.MaxAffordableDistance, instance.StationCounts);
             cost = new Cost(newCost);
 
             var newStations = Group.Flatten(oldGroups.Concat<Group>(newGroups).ToList());
