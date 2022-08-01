@@ -30,10 +30,9 @@ namespace algorithm
                 removeRelations(units.Cast<MapObject>().ToList());*/
                 units.AddRange(initialInstance.Units.FindAll(unit => unit.Priority == priority).ToList());
 
-                var instance = new Instance(stations, units, initialInstance.StationCounts);
+                var instance = new Instance(stations.Concat<Station>(initialInstance.StationaryStations).ToList(),
+                    units.Concat<Unit>(initialInstance.UnitsConnectedToStationaryStations).ToList(), initialInstance.StationCounts); //alert
                 stations = new ArrangeWithExisting().Run(instance); //alert nie obsługuję nigdzie niedomyślnych rangów
-                
-
             }
 
             return stations;

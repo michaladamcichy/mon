@@ -49,8 +49,12 @@
 	let oldRanges;
 	let stations;
 	let units;
+	let bigTestRunning = false;
 
 
+	const updateBigTestRunning = (value) => {
+		bigTestRunning = value;
+	}
 	const updateInstance = instance => {
 		instance.ranges = ranges;
 		instance.counts = counts;
@@ -115,6 +119,11 @@
 	};
 
 	const duplicateInstance = instance => {
+		if(bigTestRunning) {
+			alert('Cannot do that while big test is running');
+			return;
+		}
+
 		instances.push(JSON.parse(JSON.stringify(instance)));
 		instances = instances;
 	};
@@ -292,7 +301,10 @@
 				updateStations={updateAllStations}
 				updateUnits={updateAllUnits}
 				checkIsConnected={checkIsConnected}
-				isConnected={isConnected}/>
+				isConnected={isConnected}
+				bigTestRunning={bigTestRunning}
+				updateBigTestRunning={updateBigTestRunning}
+				/>
 		</div>
 	</div>
 	<div id="rightCol" class="col-4">
@@ -316,6 +328,7 @@
 				stationRanges={ranges}
 				stationCounts={counts}
 				priorities={priorities}
+				bigTestRunning={bigTestRunning}
 				/>
 	</div>
 </div>

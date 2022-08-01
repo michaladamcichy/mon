@@ -64,7 +64,7 @@ namespace algorithm
 
         public Instance(int[] counts)
         {
-            StationRanges = new double[] { 20.0, 30.0, 50.0 };
+            StationRanges = new double[] { 20.0, 30.0, 50.0 }; //alert
             this.StationCounts = counts;
         }
 

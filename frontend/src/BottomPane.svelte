@@ -19,6 +19,8 @@ import Station from "./Station.svelte";
     export let updateUnits;
     export let checkIsConnected;
     export let isConnected;
+    export let bigTestRunning;
+    export let updateBigTestRunning;
 
     let oldStationRanges;
     let unitsCount = 50;
@@ -26,8 +28,9 @@ import Station from "./Station.svelte";
 
     let counts = [1000, 1000, 1000];
 
-    let bigTestRunning = false;
     let bigTestTask;
+
+    let selectAlgorithm = 'simpleArrange';
 
     onMount(() => {
         oldStationRanges = [...stationRanges];
@@ -58,7 +61,7 @@ import Station from "./Station.svelte";
 </script>
 
 <div class="row">
-    <BottomPaneSection title={"Stations' paramaters"}>
+    <BottomPaneSection title={"Stations' parameters"}>
         <div class="row">
             {#each stationRanges as range, index}
                 <input type="number"
@@ -67,21 +70,21 @@ import Station from "./Station.svelte";
                     bind:value={range}
                     on:change={() => {updateRanges(stationRanges);}}
                     class="col"
-                    step={1}/>
+                    step={1} disabled/>
             {/each}
             <p class="col">ranges</p>
         </div>
-        <div class="row">
+        <!-- <div class="row">
             {#each stationWeights as weight, index}
                 <input type="number"
                     min={0.0}
                     bind:value={weight}
                     on:change={() => {updateCounts(stationCounts);}}
                     class="col"
-                    step={0.1}/>
+                    step={0.1} disabled/>
             {/each}
             <p class="col">costs</p>
-        </div>
+        </div> -->
         <div class="row">
             {#each stationCounts as count, index}
                 <input type="number"
@@ -101,7 +104,7 @@ import Station from "./Station.svelte";
                 Arrange
             </button>
             <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("arrangeWithExisting")}>
-                Arrange with existing
+                With existing
             </button>
         </div>
         <div class="row">
@@ -109,15 +112,23 @@ import Station from "./Station.svelte";
                 Hierarchical tree
             </button>
             <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("priorityArrange")}>
-                Priority Arrange
+                Priority arrange
             </button>
         </div>
         <div class="row">
+            <select bind:value={selectAlgorithm}>
+                <option value="simpleArrange"> Arrange </option>
+                <option value="arrangeWithExisting"> With existing </option>
+                <option value="priorityArrange"> Priority arrange </option>
+            </select>
+        </div>
+        <div class="row">
             <button class="col btn btn-primary" on:click={async () => {
+                console.log(selectAlgorithm);
                 const _unitsCount = unitsCount;
                 const positions = test.getRandomUnitsRelated(_unitsCount, seed);
             
-                const _units = positions.map(position => {return {position: position, priority: 1}});
+                const _units = positions.map(position => {return {position: position, priority: (seed)%4 + 1}});
                 if(_units.length > 0)
                 {
                     _units[0].priority = 0;
@@ -127,7 +138,7 @@ import Station from "./Station.svelte";
                 const stationaryStations = test.getRandomStationaryStationsRelated(
                             Math.ceil(unitsCount / 10 + 2), seed + 1, _units[0].position.lat, _units[0].position.lng); 
                 console.log(stationaryStations);
-                const _stations = await api.algorithm('simpleArrange', [...stationRanges], [...counts], stationaryStations, _units);
+                const _stations = await api.algorithm(selectAlgorithm, [...stationRanges], [...stationCounts], stationaryStations, _units);
                 //ALERT
                 // const _positions = test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), seed);
                 // const __units = _positions.map(position => {return {position: position, priority: 1}}); 
@@ -153,10 +164,11 @@ import Station from "./Station.svelte";
                 if(bigTestRunning)
                 {
                     clearTimeout(bigTestTask);
-                    bigTestRunning = false;
+                    updateBigTestRunning(false);
                     return;
                 }
-                bigTestRunning = true;
+                updateBigTestRunning(true);
+                console.log(selectAlgorithm);
                 // const i = setInterval(f, 500);
 
                 // async function f() {
@@ -193,26 +205,28 @@ import Station from "./Station.svelte";
 
                         const stationaryStations = test.getRandomStationaryStationsRelated(
                             Math.ceil(unitsCount / 10 + 2), i+1, _units[0].position.lat, _units[0].position.lng); 
-                        const _stations = await api.algorithm('simpleArrange', ranges, _counts, stationaryStations, _units);
+                        const _stations = await api.algorithm(selectAlgorithm, ranges, _counts, stationaryStations, _units);
                         if(!_stations) {
                             console.log('request failed');
                             return;
                         }
 
                         const _positions = test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), i);
-                        const __units = _positions.map(position => {return {position: position, priority: 1}}); 
+                        let priority = 1;
+                        const __units = _positions.map(position => {return {position: position, priority: (priority++)%4 + 1}}); 
                         const __stations = await api.algorithm('arrangeWithExisting', ranges, _counts, _stations.concat(stationaryStations), _units.concat(__units));
                         const isConnected = await api.isConnected(ranges, counts, __stations.concat(stationaryStations), __units.concat(_units));
                         
-                        if(!isConnected || bigTestRunning == false)
-                        // if(!.testvalidate(_stations, stationRanges, _units[0].counts) || bigTestRunning == false) //alert counts
+                        if(!isConnected || !test.validate(_stations, stationRanges, _units[0].counts) || bigTestRunning == false)
                         {
                             updateStations(__stations);
                             updateUnits(_units.concat(__units));
-                            bigTestRunning = false;
+                            updateBigTestRunning(false);
                             return;
-                        }
+                        }    
                     }
+                    updateBigTestRunning(false);
+                    return;
                 }, 0);
 
             }}>
