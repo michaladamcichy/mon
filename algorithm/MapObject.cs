@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,121 +9,55 @@ namespace algorithm
 {
     public class Position
     {
-        public double lat { get; set; } = 0.0;
-        public double lng { get; set; } = 0.0;
+        public double Lat { get; set; } = 0.0;
+        public double Lng { get; set; } = 0.0;
 
         public Position() { }
         public Position(double lat, double lng)
         {
-            this.lat = lat; this.lng = lng;
+            this.Lat = lat; this.Lng = lng;
+        }
+
+        public Position(Position  position)
+        {
+            this.Lat = position.Lat; this.Lng = position.Lng;
         }
 
         public override bool Equals(object obj)
         {
-            return lat == ((Position) obj).lat && lng == ((Position) obj).lng;
+            return Lat == ((Position) obj).Lat && Lng == ((Position) obj).Lng;
         }
     }
-    public class MapObject //: ICloneable
+    public class MapObject
     {
-        public Position Position { get; set; } = new Position();
+        public virtual Position Position { get; set; } = new Position();
+        public virtual double Range { get; set; } = 0;
 
         public List<MapObject> Senders { get; set; } = new List<MapObject>();
         public List<MapObject> Receivers { get; set; } = new List<MapObject>();
 
-        public MapObject() { }
+        public MapObject() {}
         public MapObject(Position position)
         {
             this.Position = position;
         }
-
-        public override bool Equals(Object other)
+        public virtual double GetDistanceFrom(MapObject other)
         {
-            return Position == ((MapObject) other).Position;
+            return Distance(this.Position, other.Position);
         }
-        public object Clone()
+        public List<MapObject> GetNearest(List<MapObject> mapObjects)
         {
-            return new MapObject(Position); //alert dla dziedziczących też by raczej trzeba przeciążyć
-        }
-
-        public List<MapObject> GetNearestMapObjects(List<MapObject> mapObjects)
-        {
-            var toSort = mapObjects.FindAll(item => item != this);
-            toSort.Sort((item1, item2) => Distance(this, item1).CompareTo(Distance(this, item2)));
+            var THIS = this; //alert alert!
+            var toSort = mapObjects.FindAll(item => item != THIS);
+            toSort.Sort((item1, item2) => this.GetDistanceFrom(item1).CompareTo(this.GetDistanceFrom(item2)));
             return toSort;
         }
 
-        public List<Station> GetNearestStations(List<MapObject> mapObjects)
+        public List<Station> GetNearest(List<Station> mapObjects)
         {
-            var stations = mapObjects.FindAll(item => item != this && item is Station).Cast<Station>().ToList();
-            mapObjects.Sort((item1, item2) => Distance(this, item1).CompareTo(Distance(this, item2)));
-            return stations;
-        }
-        public List<Unit> GetNearestUnits(List<MapObject> mapObjects)
-        {
-            var units = mapObjects.FindAll(item => item != this && item is Unit).Cast<Unit>().ToList();
-            mapObjects.Sort((item1, item2) => Distance(this, item1).CompareTo(Distance(this, item2)));
-            return units;
+            return GetNearest(mapObjects.Cast<MapObject>().ToList()).Cast<Station>().ToList();
         }
 
-        public static double Distance(MapObject first, MapObject second)
-        {
-            return Distance(first.Position, second.Position);
-        }
-        public static double Distance(Position first, Position second)
-        {
-            //alert do weryfikacji - zarówno algorytm jak i przekopiowany kod!!!
-            ////wzięte żywcem z js, trzeba zweryfikować
-            //https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
-            //
-            double p = 0.017453292519943295;    // Math.PI / 
-            double a = 0.5 - Math.Cos((second.lat - first.lat) * p) / 2 +
-                    Math.Cos(first.lat * p) * Math.Cos(second.lat * p) *
-                    (1 - Math.Cos((second.lng - first.lng) * p)) / 2;
-
-            return 12742 * Math.Asin(Math.Sqrt(a)); // 2 * R; R = 6371 
-        }
-
-        public static double MinCoveringCircleRadius(List<MapObject> mapObjects) //alert not tested
-        {
-            double maxDistance = 0f;
-
-            foreach (var first in mapObjects)
-            {
-                foreach (var second in mapObjects)
-                {
-                    maxDistance = Math.Max(maxDistance, Distance(first, second));
-                }
-            }
-
-            return maxDistance / 2.0;
-        }
-
-        public static Position Center(List<MapObject> mapObjects) //alert czy można uśredniać lat i lng??
-        {
-            if(mapObjects.Count == 0)
-            {
-                return new Position();
-            }
-
-            var center = new Position();
-
-            foreach(var mapObject in mapObjects) 
-            {
-                center.lat += mapObject.Position.lat;
-                center.lng += mapObject.Position.lng;
-            }
-
-            center.lat /= mapObjects.Count;
-            center.lng /= mapObjects.Count;
-
-            return center;
-        }
-
-        public static void Attach(Station station, Unit unit)
-        {
-            station.AttachTo(unit);
-            unit.Attach(station);
-        }
 
         public void AddSender(MapObject sender)
         {
@@ -134,94 +69,145 @@ namespace algorithm
             Receivers.Add(receiver);
         }
 
-
-    }
-
-    public class StationJSON
-    {
-        public Position position { get; set; } = new Position();
-        public double range { get; set; } = 0.0;
-
-        public StationJSON(Position position, double range)
+        public virtual bool IsInRange(MapObject other)
         {
-            this.position = position;
-            this.range = range;
+            return GetDistanceFrom(other) < other.Range;
         }
 
-        public StationJSON() { }
-    }
-    public class Station : MapObject
-    {
-        static int _id = 0;
-        public int id { get; } = ++_id;
-        public double Range { get; set; }
-        
-        
+        //public static bool AreInRange(MapObject o1, MapObject o2)
+        //{
+        //    return o1.IsInRange(o2) && o2.IsInRange(o1);
+        //}
 
-        public Station(double range)
+        public static bool AreInRange(Station s1, Station s2)
         {
-            this.Range = range;
-        }
-        public Station(Position position, double range) : base(position)
-        {
-            this.Range = range;
+            return s1.IsInRange(s2) && s2.IsInRange(s1);
         }
 
-        public Station(StationJSON stationJSON) : base(stationJSON.position)
+        //
+        public static double MinCoveringCircleRadius(List<MapObject> mapObjects) //alert not tested, not optimalised!!!
         {
-            this.Range = stationJSON.range;
+            //alert!
+            var center = CenterOfGravity(mapObjects); //alert alert wielki alert
+            return mapObjects.Select(item => item.GetDistanceFrom(new MapObject(center))).ToList().Max(); //alert alert alert
+            //return SmallestEnclosingCircleAdapter.GetRange(mapObjects);
+            //double maxDistance = 0.0;
+            //mapObjects.ForEach(first => { mapObjects.ForEach(second => { maxDistance = Math.Max(maxDistance, first.GetDistanceFrom(second));});});
+            //return maxDistance / 2;
         }
 
-        public StationJSON GetJSON()
+        public static double MinCoveringCircleRadius(List<Station> stations)
         {
-            return new StationJSON(Position, Range);
+            return MinCoveringCircleRadius(stations.Cast<MapObject>().ToList());
         }
 
-        public void AttachTo(Unit unit)
+        public static Position CenterOfGravity(List<Station> stations)
         {
-            Position = unit.Position;
-            Senders.RemoveAll(item => item is Unit);
-            Senders.Add(unit);
+            return CenterOfGravity(stations.Cast<MapObject>().ToList());
         }
 
-        public bool IsAttached()
+        public static Position CenterOfGravity(List<MapObject> mapObjects) //alert czy można uśredniać lat i lng??
+            //TODO - lepszy algorytm ze stackoverflow
         {
-            return Senders.Any(item => item is Unit);
-        }
-    }
+            if (mapObjects.Count == 0)
+            {
+                return new Position();
+            }
 
-    public class UnitJSON //alert todo dać dziedziczenie może będzie działać
-    {
-        public Position position {  get; set; } = new Position();
+            var center = new Position();
 
-        public UnitJSON()
-        {
+            foreach (var mapObject in mapObjects)
+            {
+                center.Lat += mapObject.Position.Lat;
+                center.Lng += mapObject.Position.Lng;
+            }
 
-        }
+            center.Lat /= mapObjects.Count;
+            center.Lng /= mapObjects.Count;
 
-        public UnitJSON(Position position)
-        {
-            this.position = position;
-        }
-    }
-
-    public class Unit : MapObject
-    {
-        public Unit(UnitJSON unitJSON) : base(unitJSON.position)
-        {
-
-        }
-        public Unit() { }
-
-        public void Attach(Station station)
-        {
-            Receivers.Clear();
-            Receivers.Add(station);
+            return center;
         }
 
-        public bool HasAttachement()
+        public static Position MinCoveringCircleCenter(List<MapObject> mapObjects)
         {
-            return Receivers.Count > 0;
+            return CenterOfGravity(mapObjects); //alert alert wielki alert
+            return SmallestEnclosingCircleAdapter.GetCenter(mapObjects);
+            //if (mapObjects.Count == 0) return null; //alert podstępny null
+            //if (mapObjects.Count == 1) return mapObjects[0].Position;
+
+            //var furthestPair = new Tuple<MapObject, MapObject>(mapObjects.First(), mapObjects.Last());
+            //var maxDistance = 0.0;
+            //mapObjects.ForEach(first => {
+            //    mapObjects.ForEach(second => {
+            //        if (first == second) return;
+            //        var distance = Math.Max(maxDistance, first.GetDistanceFrom(second));
+            //        if (distance > maxDistance)
+            //        {
+            //            maxDistance = distance;
+            //            furthestPair = new Tuple<MapObject, MapObject>(first, second);
+            //        }
+            //}); });
+
+            //return CenterOfGravity(new List<MapObject>() { furthestPair.Item1, furthestPair.Item2 });
+        }
+
+        public static Position MinCoveringCircleCenter(List<Station> stations)
+        {
+            return MinCoveringCircleCenter(stations.Cast<MapObject>().ToList());
+        }
+
+        public static Station GetFurthestFrom(List<Station> stations, Position point)
+        {
+            return stations.Aggregate((first, second) => MapObject.Distance(first.Position, point) > MapObject.Distance(second.Position, point) ? first : second);
+        }
+
+        public static double Distance(Position first, Position second)
+        {
+            //TODO C# geolocation GetDistanceFrom
+            //alert do weryfikacji - zarówno algorytm jak i przekopiowany kod!!!
+            ////wzięte żywcem z js, trzeba zweryfikować
+            //https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+
+            double p = 0.017453292519943295;    // Math.PI / 
+            double a = 0.5 - Math.Cos((second.Lat - first.Lat) * p) / 2 +
+                    Math.Cos(first.Lat * p) * Math.Cos(second.Lat * p) *
+                    (1 - Math.Cos((second.Lng - first.Lng) * p)) / 2;
+
+            return 12742 * Math.Asin(Math.Sqrt(a)); // 2 * R; R = 6371 
+        }
+
+        public static double? MinCoveringRange(Double[] ranges, List<MapObject> mapObjects) //alert move to mapobject
+        {
+            double minCoveringRadius = MinCoveringCircleRadius(mapObjects);
+
+            foreach (var range in ranges)
+            {
+                if (minCoveringRadius <= range)
+                {
+                    return range;
+                }
+            }
+
+            return null;
+        }
+
+        public static double? MinCoveringRange(Double[] ranges, List<Station> stations)
+        {
+            return MinCoveringRange(ranges, stations.Cast<MapObject>().ToList());
+        }
+
+        public static MapObject GetNextFromTowards(Station first, Station second, double tolerance = 0.1)
+        {
+            //alert smaller bigger nieaktualne!
+            var smaller = first; //first.Range < second.Range ? first : second; //alert
+            var bigger = second;//second.Range > first.Range ? second : first; //alert
+
+            var distanceToCover = smaller.GetDistanceFrom(bigger);
+            var direction = new Position((bigger.Position.Lat - smaller.Position.Lat) / distanceToCover, (bigger.Position.Lng - smaller.Position.Lng) / distanceToCover);
+
+            var step = Math.Min(smaller.Range, bigger.Range);
+            return new MapObject(new Position(smaller.Position.Lat + direction.Lat * step * (1.0 - tolerance),
+                smaller.Position.Lng + direction.Lng * step * (1.0 - tolerance / 2.0))); //alert! czy w simplearrange też tak robiłe? dokładnie tak?
         }
     }
 

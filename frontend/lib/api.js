@@ -1,6 +1,6 @@
 export const api = {};
 
-api.url = `http://localhost:5688/api/algorithm`;
+api.url = `https://localhost:443/api/algorithm`;
 // api.headers = {mode: 'cors'};
 api.headers = {'Content-Type' : 'application/json'};
 // api.headers = {'Content-Type' : 'application/json', Accept : 'application/json'};
@@ -19,16 +19,15 @@ api.isConnected = async (stationRanges, stationCounts, stations, units) => {
     
     const result = await fetch(`${api.url}/isConnected`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
 
-    if(!result.ok) return null;
+    if(!result.ok) return undefined;
      
     const parsed = await result.json();
     return parsed;
 };
 
-api.simpleArrangeAlgorithm = async (stationRanges, stationCounts, stations, units) => {
+api.algorithm = async (type, stationRanges, stationCounts, stations, units) => {
     const instance = {stationRanges, stationCounts, stations, units};
-    console.log(instance);
-    const result = await fetch(`${api.url}/simpleArrangeAlgorithm`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
+    const result = await fetch(`${api.url}/${type}Algorithm`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
     //alert todo obsluga bledow
     if(!result.ok) {
         console.log('request failed');
@@ -36,7 +35,6 @@ api.simpleArrangeAlgorithm = async (stationRanges, stationCounts, stations, unit
     }
 
     const calculatedStations = await result.json();
-    console.log(calculatedStations);
     return calculatedStations;
 }
 

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,24 +26,27 @@ namespace backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpsRedirection(opts => {
+                opts.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
+                opts.HttpsPort = 443;
+            });
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
-                                  policy =>
-                                  {
-                                      policy.WithOrigins("http://localhost:5688",
-                                                          "http://localhost:8080",
-                                                          "http://127.0.0.1:8080",
-                                                          "http://127.0.0.1:5688")
-                                        .AllowAnyHeader()
-                                        .AllowAnyMethod();
-                                  });
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                    });
             });
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "backend", Version = "v1" });
             });
+
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,11 +58,13 @@ namespace backend
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "backend v1"));
             }
+            app.UseHttpsRedirection();
 
             app.UseRouting();
             app.UseCors();
 
             app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {

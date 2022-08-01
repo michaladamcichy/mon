@@ -9,13 +9,7 @@ namespace algorithm
     {
         static void Main(string[] args)
         {
-            List<int> list = (new int[] { 1, 2, 3 }).ToList();
-
-            foreach(var i in list)
-            {
-                Console.WriteLine(i);
-                list.Add(i);
-            }
+            CostTest.Run();
         }
     }
 }

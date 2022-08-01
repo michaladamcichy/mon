@@ -13,24 +13,137 @@
 
 	let map;
 
-	let stationRanges = [20, 30, 50];
-	let stationCounts = [1000,1000,1000];
-	let isConnected = null;
-	let oldRanges = [...stationRanges];
-	let defaultRange = stationRanges[0];
+	const defaultRanges = [20, 30, 50];
+	const defaultCounts = [0,0,0];
+	const defaultWeights = [1.0, 1.5, 2.5];
+	const defaultStations = [];
+	const defaultUnits = [];
+	let instances = [
+		{
+			ranges: defaultRanges,
+			counts: [0,0,0],
+			weights: [1.0, 1.5, 2.5],
+			isConnected: undefined,
+			oldRanges: defaultRanges,
+			stations: [
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
+				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
+			],
+			units: [
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
+				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
+			],
+		}
+	];
+
+	let selectedInstance;
+
+	let ranges;
+	let counts;
+	let weights;
+	let isConnected;
+	let oldRanges;
+	let stations;
+	let units;
+	let bigTestRunning = false;
+
+
+	const updateBigTestRunning = (value) => {
+		bigTestRunning = value;
+	}
+	const updateInstance = instance => {
+		instance.ranges = ranges;
+		instance.counts = counts;
+		instance.weights = weights;
+		instance.isConnected = isConnected;
+		instance.oldRanges = oldRanges; //alert czy to nie może być lokalna zmienna?
+		instance.stations = stations;
+		instance.units = units;
+
+		instances = instances;
+	};
+
+	const checkIsConnected = async () => {
+		return api.isConnected(ranges,
+				counts,
+				stations,
+				units);
+	};
+
+	const connectionCheck = async () => {
+			let serverNotResponding = true; //alert to chyba miała być globalna
+			setTimeout(() => {if(serverNotResponding) isConnected = null;}, 5000);
+			selectedInstance.isConnected = isConnected = await checkIsConnected();
+			serverNotResponding = false;
+		};
+		
+	const selectInstance = instance => {
+		if(selectedInstance)
+		updateInstance(selectedInstance);
+
+		ranges = instance.ranges;
+		counts = instance.counts;
+		weights = instance.weights;
+		isConnected = instance.isConnected;
+		oldRanges = instance.oldRanges; //alert czy to nie może być lokalna zmienna?
+		stations = instance.stations;
+		units = instance.units;
+
+		selectedInstance = instance;
+		
+		instances = instances;
+		connectionCheck();
+		console.log(instances);
+	};
+
+	selectInstance(instances[0]);
+
+	const addInstance = () => {
+		console.log('addInstance');
+		console.log(instances);
+		instances.push(
+			{
+			ranges: [...defaultRanges],
+			counts: defaultCounts,
+			weights: [...defaultWeights],
+			isConnected: undefined,
+			oldRanges: defaultRanges,
+			stations: defaultStations,
+			units: defaultUnits,
+		});
+		instances = instances;
+	};
+
+	const duplicateInstance = instance => {
+		if(bigTestRunning) {
+			alert('Cannot do that while big test is running');
+			return;
+		}
+
+		instances.push(JSON.parse(JSON.stringify(instance)));
+		instances = instances;
+	};
+	
+	const priorities = [
+		{priority: 4, icon: 'fa fa-exclamation'},
+		{priority: 3, icon: 'fa fa-truck'},
+		{priority: 2, icon: 'fa fa-star'},
+		{priority: 1, icon: 'fa fa-male'},
+		{priority: 0, icon: 'fa fa-bitbucket'},
+    ];
 
 	const updateRanges = (ranges) => {
 		for(let i =0; i < ranges.length - 1; i++) {
 			if(ranges[i] >= ranges[i+1]) {
-				stationRanges = [...oldRanges];
+				ranges = [...oldRanges];
 				return;
 			}
 		}
-
-		stationRanges = ranges;
-		console.log(stations);
-		console.log(oldRanges[0]);
-		console.log(ranges[0]);
+		ranges = ranges;
 		updateAllStations(stations.map(station => {
 			const index = oldRanges.indexOf(station.range);
 			if(index >= 0) {
@@ -43,31 +156,35 @@
 		oldRanges = [...ranges];
 	};
 
-	let stations = [
-		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
-		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
-		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
-		{position: {lat: 52.2297, lng: 21.0122}, range: stationRanges[0] },
-		];
+	const updateCounts = () => {
+		let runningCounts = [0,0,0];
+		units.forEach(unit => {
+			if(unit.priority === 0)
+			{
+				unit.counts.forEach((count, index) => {
+					runningCounts[index] += count;
+				});
+			}
+		});
 
-	let units = [
-		{position: {lat: 51.2297, lng: 21.0122 }},
-		{position: {lat: 51.2297, lng: 21.0122 }},
-		{position: {lat: 51.2297, lng: 21.0122 }},
-		{position: {lat: 51.2297, lng: 21.0122 }},
-	];
+		counts = runningCounts;
+	};
 
 	onMount(() => {
 	});
 
+	// let serverNotResponding = true;
 	$: {
-		(async () => {
-			let serverNotResponding = true;
-			setTimeout(() => {if(serverNotResponding) isConnected = null;}, 5000);
-			isConnected = await api.isConnected(stationRanges, stationCounts, stations, units);
-			serverNotResponding = false;
-		})();
+		units; stations;
+		connectionCheck();
+	};
+
+	$: {
+		units;
+		updateCounts();
 	}
+
+
 
 	const updateAllStations = _stations => {
 		stations = _stations;
@@ -93,6 +210,34 @@
             console.log('error');
         }
 	}
+
+	const removeInstance = instance => {
+		console.log('removing');
+		const index = instances.indexOf(instance);
+        if(index >= 0) {
+			instances = instances.filter((item, _index) => _index != index);
+            instances = instances;
+
+			if(instances.length == 0)
+			{
+				addInstance();
+				selectInstance(instances[0]);
+			}
+
+			if(instance == selectedInstance)
+			{
+				selectInstance(instances[0]);
+			}
+        } else {
+            console.log('error');
+        }
+	}
+
+	const removeAllInstances = () => {
+		instances = [];
+		addInstance();
+		selectInstance(instances[0]);
+	};
 
 	const updateAllUnits = _units => {
 		units = _units;
@@ -136,23 +281,42 @@
 	<div id="leftCol" class="col-8">
 		<div id="leftTop" class="row">
 			{#if ready}
-			<Map map={map} setMap={setMap} stations={stations} updateStation={updateStation} units={units} updateUnit={updateUnit}/>
+			<Map
+				map={map}
+				setMap={setMap}
+				stations={stations}
+				updateStation={updateStation}
+				units={units}
+				updateUnit={updateUnit}/>
 			{/if}
 		</div>
 		<div id="leftBottom" class="row">
 			<BottomPane
 				stations={stations}
 				units={units}
-				stationRanges={stationRanges}
-				stationCounts={stationCounts}
+				stationRanges={ranges}
+				stationCounts={counts}
+				stationWeights={weights}
 				updateRanges={updateRanges}
 				updateStations={updateAllStations}
-				isConnected={isConnected}/>
+				updateUnits={updateAllUnits}
+				checkIsConnected={checkIsConnected}
+				isConnected={isConnected}
+				bigTestRunning={bigTestRunning}
+				updateBigTestRunning={updateBigTestRunning}
+				/>
 		</div>
 	</div>
 	<div id="rightCol" class="col-4">
 			<SidePane
 				map={map}
+				instances={instances}
+				addInstance={addInstance}
+				selectInstance={selectInstance}
+				removeInstance={removeInstance}
+				duplicateInstance={duplicateInstance}
+				removeAllInstances={removeAllInstances}
+				selectedInstance={selectedInstance}
 				stations={stations}
 				updateStation={updateStation}
 				removeStation={removeStation}
@@ -161,7 +325,11 @@
 				updateUnit={updateUnit}
 				removeUnit={removeUnit}
 				updateAllUnits={updateAllUnits}
-				stationRanges={stationRanges}/>
+				stationRanges={ranges}
+				stationCounts={counts}
+				priorities={priorities}
+				bigTestRunning={bigTestRunning}
+				/>
 	</div>
 </div>
 
@@ -173,23 +341,23 @@
 	#topRow {
 		 
 		padding: 0;
-		height: 74vh;
+		height: 60vh;
 		/* height: 98vh; */
 	}
 	#bottomRow {
-		height: 24vh;
+		height: 30vh;
 	}
 
 	#leftCol {
-		height: 98vh;
+		height: 90vh;
 	}
 
 	#rightCol {
-		height: 98vh;
+		height: 90vh;
 	}
 
 	#leftTop {
-		height: 74vh;
+		height: 60vh;
 	}
 
 	#leftBottom {
