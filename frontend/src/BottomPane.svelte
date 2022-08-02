@@ -32,7 +32,8 @@ import Station from "./Station.svelte";
     let bigTestTask;
 
     let selectAlgorithm = 'simpleArrange';
-
+    let lastOperation = {name: null, time: null};
+    
     onMount(() => {
         oldStationRanges = [...stationRanges];
     });
@@ -52,12 +53,13 @@ import Station from "./Station.svelte";
     };
 
     const onAlgorithmClicked = async (type) => {
-        const calculatedStations = await api.algorithm(type, stationRanges, stations, units, maxAffordableDistance);
-        if(!calculatedStations) {
+        const res = await api.algorithm(type, stationRanges, stationCounts, stations, units);
+        if(!res) {
             console.log('request failed');
             return;
         }
-        updateStations(calculatedStations);
+        lastOperation = {name: type, time: res.milliseconds};
+        updateStations(res.stations);
     };
 </script>
 
@@ -148,13 +150,20 @@ import Station from "./Station.svelte";
                 const stationaryStations = test.getRandomStationaryStationsRelated(
                             Math.ceil(unitsCount / 10 + 2), seed + 1, _units[0].position.lat, _units[0].position.lng); 
                 console.log(stationaryStations);
-                const _stations = await api.algorithm(selectAlgorithm, [...stationRanges], stationaryStations, _units, maxAffordableDistance);
+                const res = await api.algorithm(selectAlgorithm, [...stationRanges], [...stationCounts], stationaryStations, _units);
+                //ALERT
+                // const _positions = test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), seed);
+                // const __units = _positions.map(position => {return {position: position, priority: 1}}); 
+                // const __stations = await api.algorithm('arrangeWithExisting', [...stationRanges], [...counts], _stations.concat(stationaryStations), _units.concat(__units));
                 
-                if(!_stations) {
+                if(!res) {
                     console.log('request failed');
                     return;
                 }
-            
+                const _stations = res.stations;
+                //const isConnected = await api.isConnected([...stationRanges], [...counts], _stations, _units);
+                lastOperation = {name: selectAlgorithm, time: res.milliseconds};
+
                 updateStations(_stations);
                 updateUnits(_units);
             }}>
@@ -209,17 +218,18 @@ import Station from "./Station.svelte";
 
                         const stationaryStations = test.getRandomStationaryStationsRelated(
                             Math.ceil(unitsCount / 10 + 2), i+1, _units[0].position.lat, _units[0].position.lng); 
-                        const _stations = await api.algorithm(selectAlgorithm, ranges, stationaryStations, _units, maxAffordableDistance);
-                        if(!_stations) {
+                        const res = await api.algorithm(selectAlgorithm, ranges, _counts, stationaryStations, _units);
+                        if(!res) {
                             console.log('request failed');
                             return;
                         }
-
+                        const _stations = res.stations;
                         const _positions = test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), i);
                         let priority = 1;
                         const __units = _positions.map(position => {return {position: position, priority: (priority++)%4 + 1}}); 
-                        const __stations = await api.algorithm('arrangeWithExisting', ranges, _stations.concat(stationaryStations), _units.concat(__units), maxAffordableDistance);
-                        const isConnected = await api.isConnected(ranges, __stations.concat(stationaryStations), __units.concat(_units), maxAffordableDistance);
+                        const __res = await api.algorithm('arrangeWithExisting', ranges, _counts, _stations.concat(stationaryStations), _units.concat(__units));
+                        const __stations = __res.stations;
+                        const isConnected = await api.isConnected(ranges, counts, __stations.concat(stationaryStations), __units.concat(_units));
                         
                         if(!isConnected || !test.validate(_stations, stationRanges, _units[0].counts) || bigTestRunning == false)
                         {
@@ -265,6 +275,14 @@ import Station from "./Station.svelte";
             <div class="col"><p><b>{stat.count}</b> {`x ${stat.range}km `}</p></div>
         {/each}
         </div>
+        {#if lastOperation.name}
+        <div class="row">
+            <p class="col">{`Last operation: `} <b>{`${lastOperation.name}`} </b></p>
+        </div>
+        <div class="row">
+            <p class="col">{`Completed within: `} <b>{`${lastOperation.time / 1000} s`} </b></p>
+        </div>
+        {/if}
     </BottomPaneSection>
 </div>
 

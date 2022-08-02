@@ -34,8 +34,10 @@ api.algorithm = async (type, stationRanges, stations, units, maxAffordableDistan
         return;
     }
 
-    const calculatedStations = await result.json();
-    return calculatedStations;
+    console.log('result');
+    const res = await result.json();
+    console.log(res);
+    return res;
 }
 
 api.testPost = async (stationRanges, stations, units) => {
