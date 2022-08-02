@@ -28,7 +28,7 @@ namespace backend.Controllers
             //return new string[] { "value1", "value2" };
             //return new ArrayList { "a", "b", "c" };
             System.Diagnostics.Debug.WriteLine("HELLO");
-           
+
             var a = new A();
             return a;
         }
@@ -37,25 +37,45 @@ namespace backend.Controllers
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            
+
             return "value";
         }
 
         // POST api/<ValuesController>
         [HttpPost]
         [Route("isConnected")]
-        public bool Post(InstanceJSON instanceJSON) {
+        public bool Post(InstanceJSON instanceJSON)
+        {
             var instance = new Instance(instanceJSON);
             return Algorithm.IsConnected(instance); //alert
-            return false;
         }
 
         [HttpPost]
         [Route("simpleArrangeAlgorithm")]
         public List<StationJSON> simpleArrangeAlgorithm(InstanceJSON instanceJSON)
         {
+            instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
             var instance = new Instance(instanceJSON);
             var ret = Algorithm.SimpleArrange(instance).Select(item => item.GetJSON()).ToList();
+            return ret;
+        }
+
+        [HttpPost]
+        [Route("priorityArrangeAlgorithm")]
+        public List<StationJSON> priorityArrangeAlgorithm(InstanceJSON instanceJSON)
+        {
+            instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.PriorityArrange(instance).Select(item => item.GetJSON()).ToList();
+            return ret;
+        }
+
+        [HttpPost]
+        [Route("arrangeWithExistingAlgorithm")]
+        public List<StationJSON> arrangeWithExisting(InstanceJSON instanceJSON)
+        {
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.ArrangeWithExisting(instance).Select(item => item.GetJSON()).ToList();
             return ret;
         }
 
@@ -63,6 +83,7 @@ namespace backend.Controllers
         [Route("simpleHierarchicalTreeAlgorithm")]
         public List<StationJSON> simpleHierarchicalTreeAlgorithm(InstanceJSON instanceJSON)
         {
+            instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
             var instance = new Instance(instanceJSON);
             var ret = Algorithm.SimpleHierarchicalTree(instance).Select(item => item.GetJSON()).ToList();
             return ret;
