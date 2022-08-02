@@ -105,7 +105,6 @@ namespace algorithm
             }
             return taken;
         }
-
         public bool CanGet(Unit warehouse, double range, int count = 1)
         {
             return HowMuchCanGet(warehouse, range) >= count;
@@ -140,7 +139,6 @@ namespace algorithm
             Get(range, howMuch);
             return howMuch;
         }
-
         public int GetMost(double range, int count, MapObject mapObject)
         {
             var taken = 0;
@@ -152,7 +150,6 @@ namespace algorithm
             }
             return taken;
         }
-
         public int GetMost(double range, MapObject mapObject)
         {
             var taken = 0;
@@ -164,14 +161,12 @@ namespace algorithm
             }
             return taken;
         }
-
         public bool Get(Unit warehouse, double range, int count = 1)
         {
             if (HowMuchCanGet(warehouse, range) < count) return false;
             __(warehouse).Counts[__Index(range)] -= count;
             return true;
         }
-
         public bool Get(double range, int count = 1)
         {
             if (!CanGet(range, count)) return false;
@@ -183,7 +178,6 @@ namespace algorithm
             }
             return taken == count;
         }
-
         public bool Get(double range, int count, MapObject mapObject)
         {
             if(!CanGet(range, count, mapObject)) return false;
@@ -198,7 +192,6 @@ namespace algorithm
             Debug.Assert(taken == count);
             return true;
         }
-
         public double? GetMax(int count = 1, double maxRange = double.MaxValue)
         {
             foreach(var range in Ranges.Reverse().Where(range => range <= maxRange && !ForbiddenRanges.Contains(range))) //alert gdzieindziej nie uwzględniałem
@@ -207,7 +200,6 @@ namespace algorithm
             }
             return null;
         }
-
         public double? GetMax(int count = 1, MapObject mapObject = null, double maxRange = double.MaxValue)
         {
             if (mapObject == null) return GetMax(count, maxRange);
@@ -225,7 +217,6 @@ namespace algorithm
             }
             return null;
         }
-
         public double? GetMin(int count = 1, MapObject mapObject = null, double minRange = 0.0)
         {
             if (mapObject == null) return GetMin(count, minRange);
@@ -243,7 +234,6 @@ namespace algorithm
             }
             return null;
         }
-
         public double? QueryMax(int count = 1, MapObject mapObject = null, double maxRange = double.MaxValue)
         {
             if (mapObject == null) return QueryMax(count, maxRange);
@@ -253,7 +243,6 @@ namespace algorithm
             }
             return null;
         }
-
         public double? QueryMin(int count = 1, double minRange = 0.0)
         {
             foreach (var range in Ranges.Where(range => range >= minRange && !ForbiddenRanges.Contains(range))) //alert gdzieindziej nie uwzględniałem
@@ -262,7 +251,6 @@ namespace algorithm
             }
             return null;
         }
-
         public double? QueryMin(int count = 1, MapObject mapObject = null, double minRange = 0.0)
         {
             if (mapObject == null) return QueryMin(count, minRange);
@@ -272,21 +260,6 @@ namespace algorithm
             }
             return null;
         }
-
-        /*public double? GetMinCoveringRange(List<Station> stations)
-        {
-            var minCoveringRange = QueryMinCoveringRange(stations);
-            if (minCoveringRange == null)
-            {
-                Log("GetMinCoveringRange null!");
-                return null;
-            }
-
-            Counts[Instance.StationRanges.ToList().IndexOf(minCoveringRange.Value)]--;
-            Log("GetMinCoveringRange " + minCoveringRange.ToString());
-            return minCoveringRange.Value;
-        }*/
-
         public double? GetMinCoveringRange(List<Station> stations)
         {
             var minCoveringRange = QueryMinCoveringRange(stations);
@@ -306,51 +279,11 @@ namespace algorithm
             var minCoveringCircleRadius = MapObject.MinCoveringCircleRadius(stations);
             return QueryMin(1, minCoveringCircleRadius);
         }
-
         public double? QueryMinCoveringRange(List<Station> stations, MapObject mapObject)
         {
             var minCoveringCircleRadius = MapObject.MinCoveringCircleRadius(stations);
             return QueryMin(1, mapObject, minCoveringCircleRadius);
         }
-
-/*        public double? QueryMinCoveringRange(List<Station> stations)
-        {
-            var minCoveringCircleRadius = MapObject.MinCoveringCircleRadius(stations);
-
-            for (var i = 0; i < Counts.Count(); i++)
-            {
-                if (Instance.StationRanges[i] >= minCoveringCircleRadius && Counts[i] > 0 && !ForbiddenRanges.Contains(Instance.StationRanges[i]))
-                {
-                    return Instance.StationRanges[i];
-                }
-            }
-            return null;
-        }*/
-
-/*        public bool CanGetAny()
-        {
-            for (var i = 0; i < Instance.StationRanges.Count(); i++)
-            {
-                if (Counts[i] > 0 && !ForbiddenRanges.Contains(Instance.StationRanges[i]))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-*/
-/*        public bool CanGetAny(int count)
-        {
-            var cost = new Cost(this, false);
-
-            for(var i = 0; i < count; i++)
-            {
-                var range = cost.GetMin();
-                if (range == null) return false;
-            }
-            return true;
-        }*/
         public bool CanGetAny(int count = 1) //alert pamietaj, żeby zrobić wszędzie forbiddenDistance
         {
             return Ranges.Any(range => CanGet(range, count));
@@ -360,9 +293,10 @@ namespace algorithm
         {
             return Ranges.Any(range => CanGet(range, count, mapObject));
         }
-
+/*
         public bool CanMakeBigger(Station station, double minRange = 0.0)
         {
+
         }
         public bool CanMakeBigger(Station station, MapObject mapObject, double minRange = 0.0)
         {
@@ -387,7 +321,7 @@ namespace algorithm
         public double? MakeBigger(Station station, MapObject mapObject, double minRange = 0.0)
         {
 
-        }
+        }*/
 /*
         public bool MakeBigger(Station station) //alert niekonsekwentnie - zwracaj bool czy sie udało
         {
@@ -489,14 +423,68 @@ namespace algorithm
             return true;
         }
 */
+        public bool CanChangeRange(Unit warehouse, Station station, double newRange)
+        {
+            if (station.Range == newRange) return true;
+            return CanGet(warehouse, newRange);
+        }
+        public bool CanChangeRange(Station station, double newRange)
+        {
+            if (station.Range == newRange) return true;
+            return CanGet(newRange);
+        }
+
+        public bool CanChangeRange(Station station, double newRange, MapObject mapObject)
+        {
+            if(station.Range == newRange) return true;
+            return CanGet(newRange, 1, mapObject);
+        }
+
+        public bool CanChangeRange(List<Station> _stations, double newRange)
+        {
+            var stations = _stations.Select(station => new Station(station)).ToList();
+            Cost cost = new Cost(this);
+            foreach (var station in stations)
+            {
+                if (!ChangeRange(station, newRange)) return false;
+            }
+
+            return true;
+        }
+
+        public bool CanChangeRange(List<Station> _stations, double newRange, MapObject mapObject)
+        {
+            var stations = _stations.Select(station => new Station(station)).ToList();
+            Cost cost = new Cost(this);
+            foreach (var station in stations)
+            {
+                if (!ChangeRange(station, newRange, mapObject)) return false;
+            }
+
+            return true;
+        }
+        //
+        public bool ChangeRange(Unit warehouse, Station station, double newRange)
+        {
+            if (station.Range == newRange) return true;
+            if (!Get(warehouse, newRange)) return false;
+            GiveBack(warehouse, station.Range);
+            return true;
+        }
         public bool ChangeRange(Station station, double newRange)
         {
-
+            if (station.Range == newRange) return true;
+            return CanGet(newRange);
         }
-        public bool ChangeRange(List<Station> station, List<double> ranges)
+
+        public bool ChangeRange(Station station, double newRange, MapObject mapObject)
         {
-
+            if (station.Range == newRange) return true;
+            if (!Get(newRange, 1, mapObject)) return false;
+            GiveBack(warehouse, station.Range);
+            return true;
         }
+        
         /*
         public Station? QueryJoin(Station first, Station second, double tolerance = 0.1) //alert tolerance nie jest uwzlędniony symetrycznie - od strony bigger nie jest
         {
