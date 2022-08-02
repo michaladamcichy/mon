@@ -1,6 +1,6 @@
 export const api = {};
 
-api.url = `https://150.254.30.225/:443/api/algorithm`;
+api.url = `https://150.254.30.225:443/api/algorithm`;
 // api.headers = {mode: 'cors'};
 api.headers = {'Content-Type' : 'application/json'};
 // api.headers = {'Content-Type' : 'application/json', Accept : 'application/json'};
