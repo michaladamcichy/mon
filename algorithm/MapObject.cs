@@ -57,6 +57,10 @@ namespace algorithm
         {
             return GetNearest(mapObjects.Cast<MapObject>().ToList()).Cast<Station>().ToList();
         }
+        public List<Unit> GetNearest(List<Unit> mapObjects)
+        {
+            return GetNearest(mapObjects.Cast<MapObject>().ToList()).Cast<Unit>().ToList();
+        }
 
 
         public void AddSender(MapObject sender)

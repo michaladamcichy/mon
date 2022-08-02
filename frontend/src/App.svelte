@@ -75,7 +75,6 @@
 
 	const checkIsConnected = async () => {
 		return api.isConnected(ranges,
-				counts,
 				stations,
 				units,
 				maxAffordableDistance);

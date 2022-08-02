@@ -8,7 +8,7 @@ namespace algorithm
 {
     public class ConnectionCheck
     {
-        public bool Run(Instance instance)
+        public bool Run(Instance instance) //alert wcześniej usuwałem tu jednostki
         {
             var units = instance.Units;
 
@@ -32,10 +32,10 @@ namespace algorithm
             return true;
         }
 
-        public bool Run(List<Station> stations, double maxAffordableDistance, int[] counts)
+        /*public bool Run(List<Station> stations, double maxAffordableDistance, int[] counts)
         {
             return Run(new Instance(stations, maxAffordableDistance, counts));
-        }
+        }*/
         public void DFS(Station start, Dictionary<Station, bool> visited)
         {
             visited[start] = true;

@@ -119,6 +119,8 @@ RemoveRelations - sprawdzić czy brak tego nie prowadzi czasami w maliny (czy je
 ALERT
     IsConnected nie zawsze dostaje zaktualizowane
         maxAffordableDistance
+CRITICAL ALERT - w connection check wcześniej usuwałem jednostki - sprawdzić, czy nie przywrócić usuwania!
+    CHYBA JEDNAK TEGO NIE UŻYWAŁEM
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

@@ -31,7 +31,7 @@ namespace algorithm
                 units.AddRange(initialInstance.Units.FindAll(unit => unit.Priority == priority).ToList());
 
                 var instance = new Instance(stations.Concat<Station>(initialInstance.StationaryStations).ToList(),
-                    units.Concat<Unit>(initialInstance.UnitsConnectedToStationaryStations).ToList(), initialInstance.MaxAffordableDistance, initialInstance.StationCounts); //alert
+                    units.Concat<Unit>(initialInstance.UnitsConnectedToStationaryStations).ToList(), initialInstance.MaxAffordableDistance); //alert
                 stations = new ArrangeWithExisting().Run(instance); //alert nie obsługuję nigdzie niedomyślnych rangów
             }
 

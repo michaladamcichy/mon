@@ -27,7 +27,6 @@ namespace algorithm
     public class Instance
     {
         public double[] StationRanges { get; set; } = new double[0];
-        public int[] StationCounts { get; set; } = new int[0];
         public List<int> Priorities { get { return getPriorities(); } }
 
         public List<MapObject> MapObjects { get; set; } = new List<MapObject>(); //alert! setter
@@ -38,40 +37,36 @@ namespace algorithm
         public List<Station> StationaryStations { get; private set; } = new List<Station>();
         public List<Unit> UnitsConnectedToStationaryStations { get; private set; } = new List<Unit>();
         public List<Unit> Units { get { return MapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList(); } }
+        public List<Unit> Warehouses { get; private set; } = new List<Unit>();
         public double MaxAffordableDistance { get; private set; } = 0.0;
 
-        public Instance(InstanceJSON instanceJSON, bool initialize = true)
+        public Instance(InstanceJSON instanceJSON)
         {
             this.StationRanges = instanceJSON.stationRanges;
-            this.StationCounts = instanceJSON.stationCounts;
-            this.MaxAffordableDistance = instanceJSON.maxAffordableDistance;
+            this.MaxAffordableDistance = instanceJSON.maxAffordableDistance == 0 ? double.MaxValue : instanceJSON.maxAffordableDistance;
 
             var stations = instanceJSON.stations.Select(item => new Station(item)).ToList();
             var units = instanceJSON.units.Select(item => new Unit(item)).ToList();
 
             this.MapObjects = prepareMapObjects(stations, units);
-            UpdateCounts(); //alert
         }
 
-        public Instance(List<Station> stations, List<Unit> units, double maxAfordableDistance, int[] counts = null, bool initialize = true)
+        public Instance(List<Station> stations, List<Unit> units, double maxAffordableDistance)
         {
             var ranges = new List<double>();
             stations.ForEach(item => ranges.Add(item.Range));
 
             this.StationRanges = new double[] {20.0, 30.0, 50.0 }; //alert 
-            this.StationCounts = counts == null ? new int[] { 1000, 1000, 1000 } : counts;
-            this.MaxAffordableDistance = maxAfordableDistance;
+            this.MaxAffordableDistance = maxAffordableDistance;
 
             this.MapObjects = prepareMapObjects(stations, units);
-            UpdateCounts(); //alert
         }
 
-        public Instance(List<Station> stations, double maxAffordableDistance, int[] counts) : this(stations, new List<Unit>(), maxAffordableDistance, counts) {}
+        public Instance(List<Station> stations, double maxAffordableDistance) : this(stations, new List<Unit>(), maxAffordableDistance) {}
 
-        public Instance(int[] counts)
+        public Instance()
         {
             StationRanges = new double[] { 20.0, 30.0, 50.0 }; //alert
-            this.StationCounts = counts;
         }
 
         public List<MapObject> prepareMapObjects(List<Station> stations, List<Unit> units) //alert
@@ -125,9 +120,11 @@ namespace algorithm
                 }
             }
 
-            int id = 0; //alert brzydko
-            this.Stations.ForEach(station => { station.id = ++id; });
-            Station._id = id;
+            //int id = 0; //alert brzydko
+            //this.Stations.ForEach(station => { station.id = ++id; }); //alert to nie działa!
+            //Station._id = id;
+
+            Warehouses.AddRange(mapObjects.FindAll(item => item is Unit && ((Unit)item).Priority == 0).Cast<Unit>().ToList());
 
             return mapObjects;
         }
@@ -152,14 +149,6 @@ namespace algorithm
             var priorities = Units.Select(unit => unit.Priority).ToHashSet().ToList();
             priorities.Sort();
             return priorities;
-        }
-
-        public void UpdateCounts() //alert brzydkie
-        {
-            for(var i = 0; i < StationCounts.Count(); i++)
-            {
-                StationCounts[i] -= Stations.FindAll(station => station.Range == StationRanges[i]).Count;
-            }
         }
 
         public void RemoveRelations()

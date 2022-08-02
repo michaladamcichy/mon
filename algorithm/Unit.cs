@@ -35,6 +35,15 @@ namespace algorithm
             this.Counts = unitJSON.counts;
         }
 
+        public Unit(Unit unit)
+        {
+            this.Position = new Position(unit.Position);
+            this.Senders = new List<MapObject>(unit.Senders);
+            this.Receivers = new List<MapObject>(unit.Receivers);
+            this.Priority = unit.Priority;
+            this.Counts = (int[]) unit.Counts.Clone();
+        }
+
         public void Attach(Station station)
         {
             Receivers.Clear();

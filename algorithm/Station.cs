@@ -32,6 +32,7 @@ namespace algorithm
         public int id { get; set; } = ++_id; //alert
         public bool IsStationary { get; set; } = false;
         public bool IsCore { get; set; } = false;
+        Unit Warehouse { get; set; } = null;
         public Station(double range) : base(new Position())
         {
             this.Range = range;
@@ -88,6 +89,25 @@ namespace algorithm
             if (!IsAttached()) return null;
             var item = Senders.Find(item => item is Unit);
             return (Unit) item;
+        }
+
+        public void SetRange(double range) //alert rozważyć usunięcie tego dla bezpieczeństwa
+        {
+            Range = range;
+        }
+        public void SetRange(Tuple<double, Unit> range)
+        {
+            Range = range.Item1;
+            SetWarehouse(range.Item2);
+        }
+        public void SetWarehouse(Unit warehouse)
+        {
+            Warehouse = warehouse;
+        }
+
+        public Unit GetWarehouse()
+        {
+            return Warehouse;
         }
     }
 }

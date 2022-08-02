@@ -13,7 +13,7 @@ namespace algorithm
         {
             //public void AddForbiddenRange(double range)
             //public void RemoveAllForbiddenRanges()
-            {
+            /*{
                 Instance instance = new Instance(new int[] { 1000, 1000, 1000 });
                 Cost cost = new Cost(instance);
                 var r = cost.GetMax();
@@ -99,6 +99,6 @@ namespace algorithm
             //public bool CanChangeRange(List<Station> stations, double newRange)
             //public bool ChangeRange(Station station, double newRange)
             //void GiveBack(double range, int count = 1)
-        }
+        */}
     }
 }
