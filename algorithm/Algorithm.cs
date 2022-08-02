@@ -20,39 +20,43 @@ namespace algorithm
         {
             return new ConnectionCheck().Run(instance);
         }
-        public static bool IsConnected(List<Station> stations)
+        public static bool IsConnected(List<Station> stations, int[] counts)
         {
-            return new ConnectionCheck().Run(stations);
-        }
-
-        public static List<Station> NaiveArrange(Instance instance)
-        {
-            return new NaiveArrange().Run(instance);
+            return new ConnectionCheck().Run(stations, counts);
         }
 
         public static List<Station> SimpleArrange(Instance instance)
         {
             return new SimpleArrange().Run(instance);
         }
-
-        public static List<IDistancable> GreedySalesman(List<IDistancable> items)
+        
+        public static List<Station> PriorityArrange(Instance instance)
         {
-            return new GreedySalesman().Run(items);
+            return new PriorityArrange().Run(instance);
+        }
+        public static List<Station> ArrangeWithExisting(Instance instance)
+        {
+            return new ArrangeWithExisting().Run(instance);
+        }
+
+        public static List<Station> SimpleHierarchicalTree(Instance instance)
+        {
+            return new SimpleHierarchicalTree().Run(instance);
         }
 
         //public static List<Station> SimpleArrangeAlgorithm(Instance instance)
         //{
         //    {
-        //        var stations = new Greedy().Run(instance.Stations.Cast<IDistancable>().ToList()).Cast<Station>().ToList();
-        //        var score = Salesman.Evaluate(stations.Cast<IDistancable>().ToList());
+        //        var stations = new Greedy().Run(instance.Stations.Cast<MapObject>().ToList()).Cast<Station>().ToList();
+        //        var score = Salesman.Evaluate(stations.Cast<MapObject>().ToList());
         //        //Trace.Write(stations.Count);
         //        Trace.WriteLine("Greedy: " + score.ToString());
         //        Trace.WriteLine("");
         //    }
         //    {
         //        Trace.WriteLine("Salesman: ");
-        //        var stations = new Salesman().Run(instance.Stations.Cast<IDistancable>().ToList()).Cast<Station>().ToList();
-        //        var score = Salesman.Evaluate(stations.Cast<IDistancable>().ToList());
+        //        var stations = new Salesman().Run(instance.Stations.Cast<MapObject>().ToList()).Cast<Station>().ToList();
+        //        var score = Salesman.Evaluate(stations.Cast<MapObject>().ToList());
         //        //Trace.Write(stations.Count);
 
         //        //Trace.WriteLine("");

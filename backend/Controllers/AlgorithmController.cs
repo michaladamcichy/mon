@@ -51,15 +51,6 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Route("naiveArrangeAlgorithm")]
-        public List<StationJSON> naiveArrangeAlgorithm(InstanceJSON instanceJSON)
-        {
-            var instance = new Instance(instanceJSON);
-            var ret = Algorithm.NaiveArrange(instance).Select(item => item.GetJSON()).ToList();
-            return ret;
-        }
-
-        [HttpPost]
         [Route("simpleArrangeAlgorithm")]
         public List<StationJSON> simpleArrangeAlgorithm(InstanceJSON instanceJSON)
         {
@@ -69,11 +60,11 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Route("greedySalesmanAlgorithm")]
-        public List<StationJSON> greedySalesmanAlgorithm(InstanceJSON instanceJSON)
+        [Route("simpleHierarchicalTreeAlgorithm")]
+        public List<StationJSON> simpleHierarchicalTreeAlgorithm(InstanceJSON instanceJSON)
         {
             var instance = new Instance(instanceJSON);
-            var ret = Algorithm.GreedySalesman(instance.Stations.Cast<IDistancable>().ToList()).Cast<Station>().Select(item => item.GetJSON()).ToList();
+            var ret = Algorithm.SimpleHierarchicalTree(instance).Select(item => item.GetJSON()).ToList();
             return ret;
         }
 
