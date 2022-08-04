@@ -3,7 +3,7 @@ import Instance from './Instance.svelte';
 
     import Station from './Station.svelte';
     import Unit from './Unit.svelte';
-
+    
     export let map;
     export let instances;
     export let addInstance;
@@ -12,6 +12,7 @@ import Instance from './Instance.svelte';
     export let duplicateInstance;
     export let removeAllInstances;
     export let selectedInstance;
+    export let loadInstance;
     export let stations;
     export let updateStation;
     export let removeStation;
@@ -92,7 +93,8 @@ import Instance from './Instance.svelte';
         <hr>
         <hr>
         {#each instances as instance, index}
-            <Instance index={index} instance={instance} select={selectInstance} remove={removeInstance} selected={selectedInstance} duplicate={duplicateInstance}/>
+            <Instance index={index} instance={instance} select={selectInstance} remove={removeInstance} selected={selectedInstance} duplicate={duplicateInstance}
+                load={loadInstance}/>
         {/each}
     {/if}
     <div class="row">

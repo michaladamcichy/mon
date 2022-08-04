@@ -1,0 +1,37 @@
+Wejście:
+    units - zbiór jednostek
+        (lat, lng, priority) - zwykła jednostka,
+        (lat, lng, priority, counts: (count1, count2, count3)) - jednostka będąca magazynem
+    stationaryStations - zbiór stacji stacjonarnych
+        (lat, lng, range), range > 0
+
+Wyjście:
+    result - zbiór stacji mobilnych
+        (lat, lng, range)
+
+NAIVE ALGORITHM
+1. Ze zbioru units odrzuć każdą jednostke u, dla której istnieje taka stacja stacjonarna s_s, że u jest w zasięgu s_s
+    (te jednostki mają już zapewniony dostęp do sieci komunikacyjnej)
+2. Zainicjalizuj zbiór result := {}
+2. Dla każdej jednostki u ze zbioru units dodaj do zbioru result stację mobilną s_m o najmniejszym możliwym zasięgu
+    i pozycji równej pozycji jednostki u.
+(będą to stacje prywatne)
+3. Dla każdej stacji s1 z rozwiązania dodaj do zbioru result stację s2 o najmniejszym możliwym zasięgu w tym samym miejscu.
+    (będą to stacje pośredniczące, ta redundancja jest potrzebna ponieważ infrastruktura pośrednicząca nie może być
+    zależna od stacji prywatnych)
+4. Zainicjalizuj zbiór connected := {};
+5. Weź dowolną stację pośredniczącą s_p ze zbioru result.
+    5.1. Dodaj stację sp do zbioru connected
+    5.2. Znajdź najbliższą stację (pośredniczącą lub stacjonarną) s_nearest ze zbioru result, która nie należy do connected.
+    5.3. Wykonaj procedurę Join dla stacji s_p i s_nearest.
+    5.4. sp := s_nearest,
+    5.5. Powtarzaj kroki 5.1 - 5.5 dopóki istnieją stacje pośredniczące nie należące do connected.
+6. Zakończ
+
+PROCEDURA JOIN(stacja s1, stacja s2)
+1. Jeśli stacje są w swoim zasięgu - zakończ.
+2. Jeśli można wymienić stacje s1 i s2 na stacje o takich zasięgach, że stacje będą w swoim zasięgu - wymień i zakończ.
+(stacji stacjonarnych nie można wymieniać)
+3. Póki stacje s1 i s2 nie zostaną połączone pośrednio, dodawaj do zbioru result stacje o największym możliwym zasięgu 
+i twórz z nich łańcuch, aby połączyć s1 i s2.
+4. Zakończ

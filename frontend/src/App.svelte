@@ -20,6 +20,7 @@
 	const defaultUnits = [];
 	let instances = [
 		{
+			name: 'instance',
 			ranges: defaultRanges,
 			counts: [0,0,0],
 			weights: [1.0, 1.5, 2.5],
@@ -67,6 +68,18 @@
 		instances = instances;
 	};
 
+	const loadInstance = instance => {
+		ranges = instance.ranges;
+		counts = instance.counts;
+		weights = instance.weights;
+		isConnected = instance.isConnected;
+		oldRanges = instance.oldRanges;
+		stations = instance.stations;
+		units = instance.units;
+
+		instances = instances;
+	};
+
 	const checkIsConnected = async () => {
 		return api.isConnected(ranges,
 				counts,
@@ -107,6 +120,7 @@
 		console.log(instances);
 		instances.push(
 			{
+			name: 'instance',
 			ranges: [...defaultRanges],
 			counts: defaultCounts,
 			weights: [...defaultWeights],
@@ -175,15 +189,19 @@
 
 	// let serverNotResponding = true;
 	$: {
-		units; stations;
-		connectionCheck();
+		units; stations; ranges;
+		updateInstance(selectedInstance);
 	};
+
+	$: {
+		units; stations; ranges;
+		connectionCheck();
+	}
 
 	$: {
 		units;
 		updateCounts();
-	}
-
+	};
 
 
 	const updateAllStations = _stations => {
@@ -262,11 +280,11 @@
         } else {
             console.log('error');
         }
-	}
+	};
 
 	const setMap = _map => {
 		map = _map;
-	}
+	};
 </script>
 
 <svelte:head>
@@ -313,6 +331,7 @@
 				instances={instances}
 				addInstance={addInstance}
 				selectInstance={selectInstance}
+				loadInstance={loadInstance}
 				removeInstance={removeInstance}
 				duplicateInstance={duplicateInstance}
 				removeAllInstances={removeAllInstances}
