@@ -186,4 +186,9 @@ import Instance from './Instance.svelte';
         max-width: 40px !important;
         min-width: 40px !important;
     }
+
+    #x:nth-child(even) {
+        background-color: lightblue;
+    }
+    
 </style>

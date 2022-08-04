@@ -26,17 +26,9 @@
 			weights: [1.0, 1.5, 2.5],
 			isConnected: undefined,
 			oldRanges: defaultRanges,
-			stations: [
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
+			stations: [	
 			],
 			units: [
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
 			],
 		}
 	];
@@ -295,8 +287,7 @@
 </svelte:head>
 
 <div class="row">
-
-	<div id="leftCol" class="col-8">
+	<div id="leftCol" class="col-7">
 		<div id="leftTop" class="row">
 			{#if ready}
 			<Map
@@ -325,7 +316,7 @@
 				/>
 		</div>
 	</div>
-	<div id="rightCol" class="col-4">
+	<div id="rightCol" class="col-5">
 			<SidePane
 				map={map}
 				instances={instances}

@@ -53,12 +53,11 @@ const loadWP = () => {
             bind:this={input}
             placeholder='type instance name...'
             />
-        <div class="col"></div>
         <button class="col btn btn-primary" on:click={() => {fileInput.click();}}>Load</button>
         <button class="col btn btn-primary" on:click={() => {saveFile(instance.name, JSON.stringify(instance));}}>Save</button>
         <button class="col btn btn-primary" on:click={() => {loadGSM();}}>GSM</button>
         <button class="col btn btn-primary" on:click={() => {loadWP();}}>WP</button>
-        <button class="col btn btn-primary" on:click={() => {duplicate(instance);}}>Duplicate</button>
+        <button class="col btn btn-primary" on:click={() => {duplicate(instance);}}>Dupl.</button>
         <div class="col"></div>
         <button class="col btn btn-danger" on:click={() => {remove(instance);}}>X</button>
         <input style="display:none" type="file" accept="*" on:change={(e)=>onFileSelected(e)} bind:this={fileInput} >
@@ -85,6 +84,7 @@ const loadWP = () => {
     }
     .row {
         margin-bottom: 5px;
+        border-radius: 5px;
     }
     .selectedRow {
         background-color: lightgray;

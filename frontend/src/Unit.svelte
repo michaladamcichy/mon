@@ -14,7 +14,7 @@ const latlngStep = 0.1;
 
 </script>
 
-<div class="container">
+<div class="unit container">
     <div id="controlsContainer" class="form-group row d-flex justify-content-center align-items-center">
         <label class="col">{`${index + 1}. ${unit.master != undefined ? `[${unit.master + 1}]` : ''}`}</label>
         <label class="col col-form-label">lat:</label>
@@ -97,5 +97,10 @@ const latlngStep = 0.1;
 
     .littleSpaceAbove {
         margin-top: 5px;
+    }
+
+    .unit {
+        padding-top: 5px;
+        margin-bottom: 5px;
     }
 </style>
