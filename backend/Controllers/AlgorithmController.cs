@@ -77,14 +77,13 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Route("simpleHierarchicalTreeAlgorithm")]
-        public Result simpleHierarchicalTreeAlgorithm(InstanceJSON instanceJSON)
+        [Route("simpleOptimizeAlgorithm")]
+        public Result simpleOptimizeAlgorithm(InstanceJSON instanceJSON)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
             var instance = new Instance(instanceJSON);
-            var ret = Algorithm.SimpleHierarchicalTree(instance).Select(item => item.GetJSON()).ToList();
+            var ret = Algorithm.SimpleOptimize(instance).Select(item => item.GetJSON()).ToList();
             stopwatch.Stop();
             return new Result(ret, stopwatch.ElapsedMilliseconds);
         }

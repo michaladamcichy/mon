@@ -24,6 +24,9 @@ namespace algorithm
             /*instance.UpdateCounts();*/ //alert
             Cost cost = new Cost(instance);
 
+            var preNewCost = new SimplePrune().Run(cost, instance);
+            cost = new Cost(preNewCost);
+
             var lonelyUnits = instance.Units.FindAll(unit => unit.Receivers.Count == 0).ToList();
 
             var additionalStations = new List<Station>();
@@ -38,7 +41,7 @@ namespace algorithm
                 unit.Attach(station);
             }
 
-            var coreStations = instance.Stations.FindAll(station => station.IsCore).ToList();
+            var coreStations = instance.Stations.FindAll(station => station.IsCore).ToList(); //alert a dlaczego nie zrobiłem is not attached?
             var (newCost, oldGroups, newGroups) = AssignToGroups(cost, lonelyStations, coreStations, instance.StationCounts);
             cost = new Cost(newCost);
 

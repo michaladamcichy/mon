@@ -31,7 +31,11 @@ namespace algorithm
         public int groupId { get; private set; }
         public int id { get; set; } = ++_id; //alert
         public bool IsStationary { get; set; } = false;
-        public bool IsCore { get; set; } = false;
+        public bool IsCore { get { return !IsAttached(); } }
+
+        public bool IsPrivate { get { return IsAttached(); } }
+
+        public Unit Unit { get; private set; } = null;
         public Station(double range) : base(new Position())
         {
             this.Range = range;
@@ -40,7 +44,6 @@ namespace algorithm
         {
             this.Range = range;
             this.IsStationary = isStationary;
-            this.IsCore = isCore;
         }
 
         public Station(Station station) //alert nie przemyślane dobrze
@@ -52,7 +55,6 @@ namespace algorithm
             this.Senders = new List<MapObject>(station.Senders);
             this.groupId = station.groupId;
             this.IsStationary = station.IsStationary;
-            this.IsCore = station.IsCore;
         }
         public void SetGroupId(int id)
         {
@@ -63,7 +65,6 @@ namespace algorithm
         {
             this.Range = stationJSON.range;
             this.IsStationary = stationJSON.isStationary;
-            this.IsCore = stationJSON.isCore;
         }
 
         public StationJSON GetJSON()
@@ -73,21 +74,23 @@ namespace algorithm
 
         public void AttachTo(Unit unit)
         {
-            Position = unit.Position;
-            Senders.RemoveAll(item => item is Unit);
-            Senders.Add(unit);
+            Position = unit.Position; //alert pętla ! :)
+            Unit = unit;
         }
 
         public bool IsAttached()
         {
-            return Senders.Any(item => item is Unit);
+            return Unit != null;
         }
 
         public Unit GetUnit() //alert podstępny null
         {
-            if (!IsAttached()) return null;
-            var item = Senders.Find(item => item is Unit);
-            return (Unit) item;
+            return Unit; //alert
+        }
+
+        public void Detach()
+        {
+            Unit = null; //alert słabe są te metody
         }
     }
 }

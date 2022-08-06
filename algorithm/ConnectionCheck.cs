@@ -14,14 +14,13 @@ namespace algorithm
 
             if (units.Any(item => !item.HasAttachement())) return false;
 
-            foreach (var attachedStation in instance.Stations.FindAll(station => station.IsAttached()))
+            foreach (var attachedStation in instance.PrivateStations)
             {
                 var visited = new Dictionary<Station, bool>();
-                instance.Stations.ForEach(station => visited[station] = false);
-                instance.StationaryStations.ForEach(station => visited[station] = false); //alert wchodzę tutaj na bardzo grząski grunt //czy to w ogóle coś zmienia?
+                instance.AllStations.ForEach(station => visited[station] = false);
 
                 DFS(attachedStation, visited);
-                bool notAllConnected = visited.Any(item => ((Station)item.Key).IsAttached() && item.Value == false);
+                bool notAllConnected = instance.PrivateStations.Any(station => !visited[station]);
 
                 if (notAllConnected)
                 {

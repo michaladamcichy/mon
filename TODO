@@ -94,11 +94,8 @@ HMMMM jak dodam stacje stacjonarne o zasięgach różnych od 20, 30, 50
 WYWALIĆ SAVE SNAPSHOT!!! ŹRÓDŁO PRAWDOPODOBNYCH STRASZNIE TRUDNYCH DO ZNALEZIENIA BŁĘDÓW
 Dodać wybieranie najtańszych stacji na podstawie lokalizacji
 Szlifowanie powyższych po dodaniu tych kosztów
-Zakodowanie w jsonie lokalizacji stacji stacjonarnych
 Zakodowanie w jsonie lokalizacji jednostek
 Algorytmy ze stackoverflow zastąpić siszarpowymi
-Algorytm dobudowywania do istniejącej infrastruktury
-Algorytm z drzewem hierarchicznym
 Prawdziwe MST
 ChangeRangeOrBigger! - może zrobić to globalnie
     i zobaczyć, czy poprawiają się rozwiązania
@@ -115,6 +112,23 @@ jeśli nie ma żadnych stationaryUnits
 ALERT - BARDZO WAŻNE - w PrepareMapObjects
     należy dodawać MNIEJSZĄ stację do jednostki!!
     bez tego może dochodzić do bardzo dziwnych błędów
+
+ALERT - ISCONNECTED TUMANI I KŁAMIE
+ALERT - chyba nie powinienem zwracać bezpośrednio initialCost
+ALERT - niejednoznaczność
+    - raz biorę coreStations jako te z isCore == true
+    a raz po prostu te  bez attachmentów
+
+ALERT USUNĄĆ Z KODU WSZYSTKIE JEDNOKIERUNKOWOŚĆI!!!
+ZUPEŁNIE NOWY CONNECTION CHECK - olewający połączenia powstałe z prywatnych stacji
+    i sprawdzający wszystkie warunki algorytmu
+
+ALERT - w JoinNeigbours może się okazać, że (ale to mąło prawdopodobne)
+    że jest połączenie z jakąs dalszą, ale większą stacją, a my mimo to będziemy
+    próbowali połączyć z bliższą mniejszą, która nie jest w zasięgu
+ZABLOKOWAĆ PRZEŁĄCZENIE I DUPLIKOWANIE INSTANCJI PODCZAS:
+    BIG TESTU
+    PODCZAS WYKONYWANIA ALGORYTMÓW
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń
