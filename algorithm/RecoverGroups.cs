@@ -28,11 +28,16 @@ namespace algorithm
                 {
                     if (!assigned.Contains(neighbor))
                     {
-                        assigned.Add(neighbor);
                         group.Add(neighbor);
                     }
                 });
 
+                if(group.Stations.Count == 1)
+                {
+                    continue;
+                }
+
+                group.Stations.ForEach(station => assigned.Add(station));
                 groups.Add(group);
             }
 
