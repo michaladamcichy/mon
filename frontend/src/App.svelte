@@ -20,22 +20,15 @@
 	const defaultUnits = [];
 	let instances = [
 		{
+			name: 'instance',
 			ranges: defaultRanges,
 			counts: [0,0,0],
 			weights: [1.0, 1.5, 2.5],
 			isConnected: undefined,
 			oldRanges: defaultRanges,
-			stations: [
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
+			stations: [	
 			],
 			units: [
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
 			],
 		}
 	];
@@ -63,6 +56,18 @@
 		instance.oldRanges = oldRanges; //alert czy to nie może być lokalna zmienna?
 		instance.stations = stations;
 		instance.units = units;
+
+		instances = instances;
+	};
+
+	const loadInstance = instance => {
+		ranges = instance.ranges;
+		counts = instance.counts;
+		weights = instance.weights;
+		isConnected = instance.isConnected;
+		oldRanges = instance.oldRanges;
+		stations = instance.stations;
+		units = instance.units;
 
 		instances = instances;
 	};
@@ -107,6 +112,7 @@
 		console.log(instances);
 		instances.push(
 			{
+			name: 'instance',
 			ranges: [...defaultRanges],
 			counts: defaultCounts,
 			weights: [...defaultWeights],
@@ -175,15 +181,19 @@
 
 	// let serverNotResponding = true;
 	$: {
-		units; stations;
-		connectionCheck();
+		units; stations; ranges;
+		updateInstance(selectedInstance);
 	};
+
+	$: {
+		units; stations; ranges;
+		connectionCheck();
+	}
 
 	$: {
 		units;
 		updateCounts();
-	}
-
+	};
 
 
 	const updateAllStations = _stations => {
@@ -262,11 +272,11 @@
         } else {
             console.log('error');
         }
-	}
+	};
 
 	const setMap = _map => {
 		map = _map;
-	}
+	};
 </script>
 
 <svelte:head>
@@ -277,8 +287,7 @@
 </svelte:head>
 
 <div class="row">
-
-	<div id="leftCol" class="col-8">
+	<div id="leftCol" class="col-7">
 		<div id="leftTop" class="row">
 			{#if ready}
 			<Map
@@ -307,12 +316,13 @@
 				/>
 		</div>
 	</div>
-	<div id="rightCol" class="col-4">
+	<div id="rightCol" class="col-5">
 			<SidePane
 				map={map}
 				instances={instances}
 				addInstance={addInstance}
 				selectInstance={selectInstance}
+				loadInstance={loadInstance}
 				removeInstance={removeInstance}
 				duplicateInstance={duplicateInstance}
 				removeAllInstances={removeAllInstances}

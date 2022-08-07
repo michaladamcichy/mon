@@ -26,7 +26,13 @@ api.isConnected = async (stationRanges, stationCounts, stations, units) => {
 };
 
 api.algorithm = async (type, stationRanges, stationCounts, stations, units) => {
+    let _i = 1; //alert
+    stations.forEach(station => {
+        station.id = _i++;
+    });
+    console.log(stations);
     const instance = {stationRanges, stationCounts, stations, units};
+    console.log(instance);
     const result = await fetch(`${api.url}/${type}Algorithm`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
     //alert todo obsluga bledow
     if(!result.ok) {
@@ -47,4 +53,3 @@ api.testPost = async (stationRanges, stations, units) => {
     console.log('post response:')
     console.log(parsed);
 }
-

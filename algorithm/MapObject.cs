@@ -33,9 +33,6 @@ namespace algorithm
         public virtual Position Position { get; set; } = new Position();
         public virtual double Range { get; set; } = 0;
 
-        public List<MapObject> Senders { get; set; } = new List<MapObject>();
-        public List<MapObject> Receivers { get; set; } = new List<MapObject>();
-
         public MapObject() {}
         public MapObject(Position position)
         {
@@ -53,22 +50,19 @@ namespace algorithm
             return toSort;
         }
 
+        public Station GetOneNearest(List<Station> stations)
+        {
+            return stations.Aggregate((currentMin, station) => station.GetDistanceFrom(this) < currentMin.GetDistanceFrom(this) ? station : currentMin);
+        }
+        public Group GetOneNearest(List<Group> groups)
+        {
+            return groups.Aggregate((currentMin, group) => group.CentralStation.GetDistanceFrom(this) < currentMin.CentralStation.GetDistanceFrom(this) ? group : currentMin);
+        }
+
         public List<Station> GetNearest(List<Station> mapObjects)
         {
             return GetNearest(mapObjects.Cast<MapObject>().ToList()).Cast<Station>().ToList();
         }
-
-
-        public void AddSender(MapObject sender)
-        {
-            Senders.Add(sender);
-        }
-
-        public void AddReceiver(MapObject receiver)
-        {
-            Receivers.Add(receiver);
-        }
-
         public virtual bool IsInRange(MapObject other)
         {
             return GetDistanceFrom(other) < other.Range;
@@ -131,7 +125,7 @@ namespace algorithm
         public static Position MinCoveringCircleCenter(List<MapObject> mapObjects)
         {
             return CenterOfGravity(mapObjects); //alert alert wielki alert
-            return SmallestEnclosingCircleAdapter.GetCenter(mapObjects);
+            //return SmallestEnclosingCircleAdapter.GetCenter(mapObjects);
             //if (mapObjects.Count == 0) return null; //alert podstępny null
             //if (mapObjects.Count == 1) return mapObjects[0].Position;
 
@@ -161,6 +155,11 @@ namespace algorithm
             return stations.Aggregate((first, second) => MapObject.Distance(first.Position, point) > MapObject.Distance(second.Position, point) ? first : second);
         }
 
+        static double ToRadians(double degrees)
+        {
+            return (Math.PI / 180) * degrees;
+        }
+
         public static double Distance(Position first, Position second)
         {
             //TODO C# geolocation GetDistanceFrom
@@ -168,12 +167,31 @@ namespace algorithm
             ////wzięte żywcem z js, trzeba zweryfikować
             //https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
 
-            double p = 0.017453292519943295;    // Math.PI / 
+            /*double p = 0.017453292519943295;    // Math.PI / 
             double a = 0.5 - Math.Cos((second.Lat - first.Lat) * p) / 2 +
                     Math.Cos(first.Lat * p) * Math.Cos(second.Lat * p) *
                     (1 - Math.Cos((second.Lng - first.Lng) * p)) / 2;
 
-            return 12742 * Math.Asin(Math.Sqrt(a)); // 2 * R; R = 6371 
+            return 12742 * Math.Asin(Math.Sqrt(a)); // 2 * R; R = 6371 */
+            var lat1 = first.Lat;
+            var lon1 = first.Lng;
+            var lat2 = second.Lat;
+            var lon2 = second.Lng;
+
+            lon1 = ToRadians(lon1);
+            lon2 = ToRadians(lon2);
+            lat1 = ToRadians(lat1);
+            lat2 = ToRadians(lat2);
+
+            double dlon = lon2 - lon1;//alert critical nie mój kod!
+            double dlat = lat2 - lat1;
+            double a = Math.Pow(Math.Sin(dlat / 2), 2) +
+                       Math.Cos(lat1) * Math.Cos(lat2) *
+                       Math.Pow(Math.Sin(dlon / 2), 2);
+            double c = 2 * Math.Asin(Math.Sqrt(a));
+            double r = 6371;
+
+            return (c * r);
         }
 
         public static double? MinCoveringRange(Double[] ranges, List<MapObject> mapObjects) //alert move to mapobject
@@ -209,13 +227,5 @@ namespace algorithm
             return new MapObject(new Position(smaller.Position.Lat + direction.Lat * step * (1.0 - tolerance / 2.0),
                 smaller.Position.Lng + direction.Lng * step * (1.0 - tolerance / 2.0))); //alert! czy w simplearrange też tak robiłe? dokładnie tak?
         }
-    }
-
-    public enum StationType
-    {
-        A = 0,
-        B = 1,
-        C = 2,
-        Count = 3
     }
 }

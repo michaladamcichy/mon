@@ -342,5 +342,20 @@ namespace algorithm
             if(logEnabled)
                 Debug.WriteLine(operationName + "  | " + string.Join(",", Counts));
         }
+
+        public static bool IsCheaperThan(List<Station> item1, List<Station> item2)
+        {
+            if (item1.Count != item2.Count) return item1.Count < item2.Count;
+            return item1.Aggregate(0.0, (sum, item) => sum + item.Range) < item2.Aggregate(0.0, (sum, item) => sum + item.Range);
+        }
+        public static List<Station> GetCheaper(List<Station> path1, List<Station> path2)
+        {
+            if(path1.Count != path2.Count) return path1.Count < path2.Count ? path1 : path2;
+            return path1.Aggregate(0.0, (sum, item) => sum + item.Range) < path2.Aggregate(0.0, (sum, item) => sum + item.Range) ? path1 : path2;
+        }
+        public static List<Station> GetCheapest(List<List<Station>> paths)
+        {
+            return paths.Aggregate((curMin, item) => GetCheaper(curMin, item));
+        }
     }
 }

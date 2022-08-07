@@ -39,9 +39,9 @@ namespace algorithm
             return new ArrangeWithExisting().Run(instance);
         }
 
-        public static List<Station> SimpleHierarchicalTree(Instance instance)
+        public static List<Station> SimpleOptimize(Instance instance)
         {
-            return new SimpleHierarchicalTree().Run(instance);
+            return new SimpleOptimize().Run(instance);
         }
 
         //public static List<Station> SimpleArrangeAlgorithm(Instance instance)

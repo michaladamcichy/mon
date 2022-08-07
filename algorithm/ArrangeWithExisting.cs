@@ -24,7 +24,7 @@ namespace algorithm
             /*instance.UpdateCounts();*/ //alert
             Cost cost = new Cost(instance);
 
-            var lonelyUnits = instance.Units.FindAll(unit => unit.Receivers.Count == 0).ToList();
+            var lonelyUnits = instance.Units.FindAll(unit => !unit.HasAttachement()).ToList(); //alert zmieniłem tutaj
 
             var additionalStations = new List<Station>();
 
@@ -38,7 +38,7 @@ namespace algorithm
                 unit.Attach(station);
             }
 
-            var coreStations = instance.Stations.FindAll(station => station.IsCore).ToList();
+            var coreStations = instance.Stations.FindAll(station => station.IsCore).ToList(); //alert a dlaczego nie zrobiłem is not attached?
             var (newCost, oldGroups, newGroups) = AssignToGroups(cost, lonelyStations, coreStations, instance.StationCounts);
             cost = new Cost(newCost);
 
@@ -47,9 +47,9 @@ namespace algorithm
             instance.Stations.ForEach(station => { if (!newStations.Contains(station)) allStations.Add(station); });
 
             var connected = new HashSet<Station>();
-            oldGroups.ForEach(group => connected.Add(group.CoreStation));
+            oldGroups.ForEach(group => connected.Add(group.CentralStation));
             var (joiningStations, otherNewCost) =
-                JoinNearestNeighbors.Run(cost, allStations.FindAll(station => !station.IsAttached()), instance.StationaryStations, instance.UnitsConnectedToStationaryStations, connected);
+                JoinNearestNeighbors.Run(cost, instance, allStations.FindAll(station => !station.IsAttached()), instance.StationaryStations, instance.UnitsConnectedToStationaryStations, connected);
             cost = new Cost(otherNewCost);
              
             return allStations.Concat<Station>(joiningStations).Concat<Station>(instance.StationaryStations).ToList();

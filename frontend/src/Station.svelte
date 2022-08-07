@@ -14,7 +14,7 @@ let lng;
 const latlngStep = 0.1;
 </script>
 
-<div id="main" class="container">
+<div id="main" class="station container">
     <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
         <label class="col">{`${index + 1}.`}</label>
         <label class="col col-form-label">lat:</label>
@@ -26,10 +26,15 @@ const latlngStep = 0.1;
     <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
         <label class="col">{''}</label>
         <label class="col">{'range:'}</label>
+        {#if station.isStationary}
+            <input type="number" class="col" min='0.1' step = 0.1 default='50.0' bind:value={station.range} on:change={() => {update(station);}} />
+        {:else}
         {#each ranges as range}
             <button class={`col btn ${station.range == range ? 'btn-success' : 'btn-primary'}`} on:click={() => {station.range = range; update(station);}}>{range}</button>
         {/each}
+        {/if}
         <label class="col">{'km'}</label>
+        
         <button class={`col btn btn-${station.isStationary ? 'secondary' : 'primary'}`} on:click={() => {station.groupId = -1; station.isStationary = !station.isStationary; update(station);}}>
             <i class={station.isStationary ? 'fa fa-star' : 'fa fa-truck'}></i>
         </button>
@@ -59,6 +64,11 @@ const latlngStep = 0.1;
         font-weight: bold;
     }
     .row {
+        margin-bottom: 5px;
+    }
+    .station {
+        padding-top: 5px;
+        padding-bottom: 5px;
         margin-bottom: 5px;
     }
 </style>

@@ -110,8 +110,8 @@ import Station from "./Station.svelte";
             </button>
         </div>
         <div class="row">
-            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("simpleHierarchicalTree")}>
-                Hierarchical tree
+            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("simpleOptimize")}>
+                SimpleOptimize
             </button>
             <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("priorityArrange")}>
                 Priority arrange
@@ -221,7 +221,7 @@ import Station from "./Station.svelte";
                         const __stations = __res.stations;
                         const isConnected = await api.isConnected(ranges, counts, __stations.concat(stationaryStations), __units.concat(_units));
                         
-                        if(!isConnected || !test.validate(_stations, stationRanges, _units[0].counts) || bigTestRunning == false)
+                        if(!isConnected || !test.validate(__stations, stationRanges, _units[0].counts) || bigTestRunning == false)
                         {
                             updateStations(__stations);
                             updateUnits(_units.concat(__units));

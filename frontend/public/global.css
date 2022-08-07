@@ -65,3 +65,13 @@ button:focus {
 * {
 	font-size: 13px;
 }
+
+.unit:nth-of-type(even) {
+	background-color: lightgrey;
+	border-radius: 5px;
+}
+
+.station:nth-of-type(even) {
+	background-color: lightgrey;
+	border-radius: 5px;
+}

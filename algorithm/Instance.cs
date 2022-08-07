@@ -34,6 +34,12 @@ namespace algorithm
             set { MapObjects.AddRange(value); } }
 
         public List<Station> StationaryStations { get; private set; } = new List<Station>();
+
+        public List<Station> AllStations { get { return Stations.Concat<Station>(StationaryStations).ToList(); } }
+
+        public List<Station> PrivateStations { get { return Stations.Where(station => station.IsAttached()).ToList(); } }
+
+        public List<Station> CoreStations { get { return Stations.Where(station => !station.IsAttached()).ToList(); } }
         public List<Unit> UnitsConnectedToStationaryStations { get; private set; } = new List<Unit>();
         public List<Unit> Units { get { return MapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList(); } }
 
@@ -74,27 +80,32 @@ namespace algorithm
 
             var mapObjects = stations.Cast<MapObject>().Concat(units.Cast<MapObject>()).ToList();
 
-            foreach(var first in mapObjects) //alert nie uwzględniam tutaj stacjonarnych
+            foreach(var first in stations)
             {
                 foreach(var second in stations)
                 {
                     if (first == second) continue;
 
-                    if(first.IsInRange(second))
+                    if(MapObject.AreInRange(first, second))
                     {
-                        first.AddSender(second);
-                        second.AddReceiver(first);
+                        first.AddNeighbor(second);
+                        second.AddNeighbor(first);
                     }
                 }
             }
 
             foreach(var station in stations)
             {
-                if (station.IsCore) continue;
+                if (station.IsStationary) continue;
                 foreach(var unit in units)
                 {
-                    if(!unit.HasAttachement() && !station.IsAttached() && station.Position.Equals(unit.Position) && !station.IsStationary) //alert to powinno byc property
+                    if(!unit.Position.Equals(station.Position)) continue;
+                    if(!unit.HasAttachement() && !station.IsAttached())
                     {
+                        unit.Attach(station);
+                    } else if(unit.HasAttachement() && !station.IsAttached() && station.Range < unit.GetAttachment().Range)
+                    {
+                        unit.RemoveAttachment();
                         unit.Attach(station);
                     }
                 }
@@ -112,16 +123,12 @@ namespace algorithm
                 {
                     if (stationaryStation == otherStationaryStation) continue;
 
-                    if(!stationaryStation.Receivers.Contains(otherStationaryStation))
+                    if(!stationaryStation.Neighbors.Contains(otherStationaryStation))
                     {
-                        stationaryStation.AddReceiver(otherStationaryStation);
+                        stationaryStation.AddNeighbor(otherStationaryStation);
                     }
                 }
             }
-
-            int id = 0; //alert brzydko
-            this.Stations.ForEach(station => { station.id = ++id; });
-            Station._id = id;
 
             return mapObjects;
         }
@@ -220,7 +227,7 @@ namespace algorithm
 
         public void RemoveRelations()
         {
-            MapObjects.ForEach(o => { o.Senders.Clear(); o.Receivers.Clear(); });
+            AllStations.ForEach(station => station.Neighbors.Clear()); //alert all czy tylko stations?
         }
 
     }

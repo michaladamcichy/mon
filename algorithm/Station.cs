@@ -11,14 +11,15 @@ namespace algorithm
         public Position position { get; set; } = new Position();
         public double range { get; set; } = 0.0;
         public int groupId { get; set; } = -1;
-
+        public int id { get; set; } = -1;
         public bool isStationary { get; set; } = false;
         public bool isCore { get; set; } = false;
-        public StationJSON(Position position, double range, int groupId = -1, bool isStationary = false, bool isCore = false)
+        public StationJSON(Position position, double range, int groupId = -1, int id = -1, bool isStationary = false, bool isCore = false)
         {
             this.position = position;
             this.range = range;
             this.groupId = groupId;
+            this.id = id;
             this.isStationary = isStationary;
             this.isCore = isCore;
         }
@@ -28,10 +29,15 @@ namespace algorithm
     public class Station : MapObject
     {
         public static int _id = 0;
-        public int groupId { get; private set; }
-        public int id { get; set; } = ++_id; //alert
+        public List<Station> Neighbors { get; private set; } = new List<Station>();
+        public int GroupId { get; private set; }
+        public int Id { get; set; } = -1; //alert
         public bool IsStationary { get; set; } = false;
-        public bool IsCore { get; set; } = false;
+        public bool IsCore { get { return !IsAttached(); } }
+
+        public bool IsPrivate { get { return IsAttached(); } }
+
+        public Unit Unit { get; private set; } = null;
         public Station(double range) : base(new Position())
         {
             this.Range = range;
@@ -40,54 +46,63 @@ namespace algorithm
         {
             this.Range = range;
             this.IsStationary = isStationary;
-            this.IsCore = isCore;
         }
 
         public Station(Station station) //alert nie przemyślane dobrze
         {
             this.Position = new Position(station.Position);
             this.Range = station.Range;
-            this.id = station.id;
-            this.Receivers = new List<MapObject>(station.Receivers);
-            this.Senders = new List<MapObject>(station.Senders);
-            this.groupId = station.groupId;
+            this.Id = station.Id;
+            this.Neighbors = new List<Station>(station.Neighbors);
+            this.GroupId = station.GroupId;
             this.IsStationary = station.IsStationary;
-            this.IsCore = station.IsCore;
         }
         public void SetGroupId(int id)
         {
-            groupId = id;
+            GroupId = id;
         }
 
         public Station(StationJSON stationJSON) : base(stationJSON.position)
         {
             this.Range = stationJSON.range;
             this.IsStationary = stationJSON.isStationary;
-            this.IsCore = stationJSON.isCore;
+            this.Id = stationJSON.id;
         }
 
         public StationJSON GetJSON()
         {
-            return new StationJSON(Position, Range, groupId, IsStationary, IsCore ? IsCore : !IsAttached()); //alert station raczej nie może przestać być corem, więc powinno być ok, ale kto wie
+            return new StationJSON(Position, Range, GroupId, Id, IsStationary, IsCore);
+        }
+
+        public void AddNeighbor(Station station)
+        {
+            if(!Neighbors.Contains(station)) Neighbors.Add(station);
+        }
+
+        public void RemoveNeighbor(Station station)
+        {
+            Neighbors.RemoveAll(item => item == station);
         }
 
         public void AttachTo(Unit unit)
         {
-            Position = unit.Position;
-            Senders.RemoveAll(item => item is Unit);
-            Senders.Add(unit);
+            Position = unit.Position; //alert pętla ! :)
+            Unit = unit;
         }
 
         public bool IsAttached()
         {
-            return Senders.Any(item => item is Unit);
+            return Unit != null;
         }
 
         public Unit GetUnit() //alert podstępny null
         {
-            if (!IsAttached()) return null;
-            var item = Senders.Find(item => item is Unit);
-            return (Unit) item;
+            return Unit; //alert
+        }
+
+        public void Detach()
+        {
+            Unit = null; //alert słabe są te metody
         }
     }
 }
