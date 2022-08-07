@@ -7,7 +7,19 @@ using System.Threading.Tasks;
 
 namespace algorithm
 {
-    public class PriorityQueue<X, Y>
+    public class _
+    {
+        static bool enabled = false;
+        public static void Print(List<Station> stations, string message = "")
+        {
+            if (!enabled) return;
+            Debug.Write("\n" + message + ": ");
+            Debug.Write("Count = " + stations.Count.ToString() + "  | [");
+            stations.ForEach(station => Debug.Write(station.Id.ToString() + ", "));
+            Debug.Write("]\n");
+        }
+    }
+    /*public class PriorityQueue<X, Y>
     {
         Dictionary<Y, List<X>> queue = new Dictionary<Y, List<X>>();
         public PriorityQueue()
@@ -42,7 +54,7 @@ namespace algorithm
             if(queue[minPriority].Count == 0) queue.Remove(minPriority);
             return minValue;
         }
-    }
+    }*/
     /*public class Dijkstra
     {
         //List<Station> queue = new List<Station>();
@@ -166,60 +178,53 @@ namespace algorithm
 
     public class Spider
     {
-        public void LittleSpider(Instance instance, Station station, List<List<Station>> paths, List<Station> path = null, HashSet<Station> visited = null, bool firstTime = true)
+        public void LittleSpider(Instance instance, Station station, List<List<Station>> paths, List<Station> _path, HashSet<Station> visited, bool firstTime = true)
         {
-            if(visited == null) visited = new HashSet<Station>();
-            if(path == null)
-            {
-                path = new List<Station>();
-            }
-            else
-            {
-                //alert poprzednio tu było usuwanie, ale doszedłem do wniosku, że to sprzeczne z umową
-                path = new List<Station>(path);
-            }
+            
+            var path = new List<Station>(_path);
             paths.Add(path);
             path.Add(station);
-
-            var receivers = station.Receivers.Where(item => item is Station).Cast<Station>().ToList();
-            
-            if ((station.IsPrivate && !firstTime))
+            //_.Print(path, "Little spider");
+            if (station.IsPrivate && firstTime == false)
             {
                 return;
             }
 
             visited.Add(station);
 
-
-            foreach (var receiver in receivers) //alert zrobić porządek z tym
+            foreach (var neighbor in station.Neighbors)
             {
-                if(visited.Contains(receiver)) continue;
-                LittleSpider(instance, receiver, paths, path, visited, false);
+                //if(visited.Contains(neighbor)) continue;
+                if (path.Contains(neighbor)) continue; //alert!
+                LittleSpider(instance, neighbor, paths, path, visited, false);
             }
-            paths.Remove(path); //alert! wydajność!
+            //paths.Remove(path); //alert! wydajność!
         }
 
       
         //DoubleDictionary<Station, List<Station>> edges = new ;
 
-        bool Validate(List<Station> path)
+        bool Validate(Station station, List<Station> path)
         {
             if (path.Count <= 2) return false;
             if(!path.First().IsPrivate || !path.Last().IsPrivate) return false;
+            Debug.Assert(station == path.First()); //alert
             if (path.Any(item => item != path.First() && item != path.Last() && item.IsPrivate)) return false; //alert to niekonieczne, tylko dla sprawdzenia czy działą
             return true;
         }
 
-        void AddEdges(DoubleDictionary<Station, List<Station>> edges, List<List<Station>> paths)
+        void AddEdges(Station first, DoubleDictionary<Station, List<Station>> edges, List<List<Station>> paths)
         {
-            paths = paths.Where(path => Validate(path)).ToList();
+            Debug.WriteLine("station " + first.Id.ToString());
+            paths.ForEach(path => _.Print(path, "Before validation..."));
+            paths = paths.Where(path => Validate(first, path)).ToList();
+            paths.ForEach(path => _.Print(path, "After validation"));
 
             var neighbors = paths.Select(path => path.Last()).Distinct().ToList();
 
             var neighborToPaths = new Dictionary<Station, List<List<Station>>>();
             paths.ForEach(path => {
                 var neighbor = path.Last();
-                if (!neighbor.IsPrivate) return;
                 if (!neighborToPaths.ContainsKey(neighbor)) neighborToPaths[neighbor] = new List<List<Station>>();
                 neighborToPaths[neighbor].Add(path);
             });
@@ -233,12 +238,13 @@ namespace algorithm
 
         public DoubleDictionary<Station, List<Station>> Run(Instance instance)
         {
+            Debug.WriteLine("Spider running");
             var edges = new DoubleDictionary<Station, List<Station>>();
             foreach(var privateStation in instance.PrivateStations)
             {
                 var paths = new List<List<Station>>();
-                LittleSpider(instance, privateStation, paths);
-                AddEdges(edges, paths);
+                LittleSpider(instance, privateStation, paths, new List<Station>(), new HashSet<Station>());
+                AddEdges(privateStation, edges, paths);
             }
             return edges;
         }
@@ -257,6 +263,7 @@ namespace algorithm
                 Concat<Station>(instance.StationaryStations).ToList();
             return new Dijkstra().Run(instance, stations, stations.Where(item => item.IsAttached()).First(), stations.Where(item => item.IsAttached()).Last());*/
             //return new List<Station>();
+            Debug.WriteLine("Simple optimize");
 
             var edges = new Spider().Run(instance);
             var necessaryEdges = new Kruskal().Run(instance.PrivateStations, edges);

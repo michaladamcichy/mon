@@ -88,8 +88,8 @@ namespace algorithm
 
                     if(MapObject.AreInRange(first, second))
                     {
-                        first.AddSender(second);
-                        second.AddReceiver(first);
+                        first.AddNeighbor(second);
+                        second.AddNeighbor(first);
                     }
                 }
             }
@@ -123,16 +123,12 @@ namespace algorithm
                 {
                     if (stationaryStation == otherStationaryStation) continue;
 
-                    if(!stationaryStation.Receivers.Contains(otherStationaryStation))
+                    if(!stationaryStation.Neighbors.Contains(otherStationaryStation))
                     {
-                        stationaryStation.AddReceiver(otherStationaryStation);
+                        stationaryStation.AddNeighbor(otherStationaryStation);
                     }
                 }
             }
-
-            int id = 0; //alert brzydko
-            this.Stations.ForEach(station => { station.id = ++id; });
-            Station._id = id;
 
             return mapObjects;
         }
@@ -231,7 +227,7 @@ namespace algorithm
 
         public void RemoveRelations()
         {
-            MapObjects.ForEach(o => { o.Senders.Clear(); o.Receivers.Clear(); });
+            AllStations.ForEach(station => station.Neighbors.Clear()); //alert all czy tylko stations?
         }
 
     }

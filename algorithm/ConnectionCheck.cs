@@ -39,7 +39,7 @@ namespace algorithm
         {
             visited[start] = true;
 
-            foreach (var mapObject in start.Receivers.FindAll(mapObject => mapObject is Station).Cast<Station>().ToList())
+            foreach (var mapObject in start.Neighbors)
             {
                 if (visited[mapObject] == true) continue;
 

@@ -33,9 +33,6 @@ namespace algorithm
         public virtual Position Position { get; set; } = new Position();
         public virtual double Range { get; set; } = 0;
 
-        public List<MapObject> Senders { get; set; } = new List<MapObject>();
-        public List<MapObject> Receivers { get; set; } = new List<MapObject>();
-
         public MapObject() {}
         public MapObject(Position position)
         {
@@ -57,18 +54,6 @@ namespace algorithm
         {
             return GetNearest(mapObjects.Cast<MapObject>().ToList()).Cast<Station>().ToList();
         }
-
-
-        public void AddSender(MapObject sender)
-        {
-            Senders.Add(sender);
-        }
-
-        public void AddReceiver(MapObject receiver)
-        {
-            Receivers.Add(receiver);
-        }
-
         public virtual bool IsInRange(MapObject other)
         {
             return GetDistanceFrom(other) < other.Range;
@@ -131,7 +116,7 @@ namespace algorithm
         public static Position MinCoveringCircleCenter(List<MapObject> mapObjects)
         {
             return CenterOfGravity(mapObjects); //alert alert wielki alert
-            return SmallestEnclosingCircleAdapter.GetCenter(mapObjects);
+            //return SmallestEnclosingCircleAdapter.GetCenter(mapObjects);
             //if (mapObjects.Count == 0) return null; //alert podstępny null
             //if (mapObjects.Count == 1) return mapObjects[0].Position;
 
@@ -209,13 +194,5 @@ namespace algorithm
             return new MapObject(new Position(smaller.Position.Lat + direction.Lat * step * (1.0 - tolerance / 2.0),
                 smaller.Position.Lng + direction.Lng * step * (1.0 - tolerance / 2.0))); //alert! czy w simplearrange też tak robiłe? dokładnie tak?
         }
-    }
-
-    public enum StationType
-    {
-        A = 0,
-        B = 1,
-        C = 2,
-        Count = 3
     }
 }

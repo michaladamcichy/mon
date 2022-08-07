@@ -24,10 +24,7 @@ namespace algorithm
             /*instance.UpdateCounts();*/ //alert
             Cost cost = new Cost(instance);
 
-            var preNewCost = new SimplePrune().Run(cost, instance);
-            cost = new Cost(preNewCost);
-
-            var lonelyUnits = instance.Units.FindAll(unit => unit.Receivers.Count == 0).ToList();
+            var lonelyUnits = instance.Units.FindAll(unit => !unit.HasAttachement()).ToList(); //alert zmieniłem tutaj
 
             var additionalStations = new List<Station>();
 

@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +8,7 @@ namespace algorithm
 {
     public class SimplePrune
     {
-        /*Cost remove(Cost initialCost, Station station, Instance instance)
+        *//*Cost remove(Cost initialCost, Station station, Instance instance)
         {
             var senders = station.Senders.Where(item => item is Station && ((Station)item).IsCore).Cast<Station>().ToList();
             var receivers = station.Receivers.Where(item => item is Station && ((Station)item).IsCore).Cast<Station>().ToList();
@@ -29,7 +29,7 @@ namespace algorithm
             if (senders.Count != 1 || receivers.Count != 1) return cost; 
 
             return remove(cost, senders.First(), instance);
-        }*/
+        }*//*
         
         Cost remove(Cost initialCost, Station station, Instance instance)
         {
@@ -57,7 +57,7 @@ namespace algorithm
         {
             Cost cost = new Cost(initialCost);
             var coreStations = instance.Stations.FindAll(station => !station.IsAttached() && !station.IsStationary).ToList();
-            var ends = coreStations.FindAll(station => station.Receivers.Count <= 1 && station.Senders.Count <= 1).ToList();
+            var ends = coreStations.FindAll(station => station.Neighbors.Count <= 1).ToList();
 
             foreach (var end in ends)
             {
@@ -69,3 +69,4 @@ namespace algorithm
         }
     }
 }
+*/

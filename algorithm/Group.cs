@@ -113,7 +113,7 @@ namespace algorithm
                     list.Add(station);
                 }
             }
-            list.Sort((item1, item2) => item1.id - item2.id); //alert opakować to, alert straciłem kolejność, czemu?
+            list.Sort((item1, item2) => item1.Id - item2.Id); //alert opakować to, alert straciłem kolejność, czemu?
 
             return list;
         }
