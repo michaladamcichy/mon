@@ -100,7 +100,7 @@ test.getRandomStationaryStationsRelated = (stationsCount, seed, lat, lng) => {
     for(let i = 1; i < stationsCount; i++)
     {
         let direction = normalize(rand(seed++) * 2 - 1.0, rand(seed++) * 2 - 1.0);
-        let distance = rand(seed++) * 1;
+        let distance = rand(seed++) * 1; //alert
         stations.push({
             position:
                 {

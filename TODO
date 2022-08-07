@@ -123,6 +123,12 @@ ALERT - w JoinNeigbours może się okazać, że (ale to mąło prawdopodobne)
 ZABLOKOWAĆ PRZEŁĄCZENIE I DUPLIKOWANIE INSTANCJI PODCZAS:
     BIG TESTU
     PODCZAS WYKONYWANIA ALGORYTMÓW
+ZOPTYMALIZOWAĆ PAJĄKA ŻEBY NIE BYŁO TYLE ŚCIEŻEK :D
+IMPLEMENTACJA ALGORYTMU NAIWNEGO
+ALERT MAM TAKĄ WIZJĘ, ŻE CZŁONEK KOMISJI MI MÓWI:
+    nie ma Pan wypisanych wszystkich tych założeń w pracy
+
+CanChangeRange i ChangeRange - prawdopodobne ŹRÓDŁO WSZELKIEGO ZŁA
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

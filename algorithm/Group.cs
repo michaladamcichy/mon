@@ -13,7 +13,7 @@ namespace algorithm
         public override Position Position { get { return MapObject.MinCoveringCircleCenter(Stations); } set { } }  //alert empty set
         public override double Range { get { return 0.0; } set { throw new Exception(); } } //alert brzydko oraz 0.0
         
-        public Station CoreStation { get {
+        public Station CentralStation { get {
                 var core = Stations.FindAll(item => !item.IsAttached());
                 if (core.Count != 1) return null; //alert podstępny null
                 return core.First();

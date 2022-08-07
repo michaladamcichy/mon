@@ -115,7 +115,7 @@ namespace algorithm
         } 
     }*/
 
-    public class Kruskal
+    class Kruskal
     {
         public List<Tuple<Station, Station>> Run(List<Station> vertices, DoubleDictionary<Station, List<Station>> edges)
         {
@@ -125,13 +125,7 @@ namespace algorithm
             sortedEdges.Sort((item1, item2) => Cost.IsCheaperThan(edges[item1], edges[item2]) ? -1 : 1);
             
             foreach(var (station1, station2) in sortedEdges)
-            //while(stationToSet.Count != 1)
             {
-                //var edgesLeft = sortedEdges.Where(edge => !selectedEdges.Contains(edge)).ToList();
-                //if (edgesLeft.Count == 0) break; //alert do tego nie powinno dochodzić w grafie spójnym
-                //var (station1, station2) = edgesLeft.Aggregate((currentMin, item) => Cost.IsCheaperThan(
-                //    edges[item], edges[currentMin]) ? item : currentMin);
-                
                 if (stationToSet.Values.ToList().Distinct().ToList().Count == 1 && vertices.All(item => stationToSet.Values.ToList().Distinct().First().Contains(item))) break;
                 //alert za długi ŚWINQ
                 if(!stationToSet.ContainsKey(station1)) stationToSet[station1] = new HashSet<Station>() { station1 };
@@ -272,7 +266,10 @@ namespace algorithm
                 edges[necessaryEdge].ForEach(station => necessaryStations.Add(station)); 
             }
 
-            foreach(var station in instance.Stations)
+            var centralStations = new RecoverGroups().Run(instance).Select(group => group.CentralStation).ToList();
+            centralStations.ForEach(centralStation => necessaryStations.Add(centralStation));
+
+            foreach (var station in instance.Stations)
             {
                 if(!necessaryStations.Contains(station))
                 {

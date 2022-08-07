@@ -47,9 +47,9 @@ namespace algorithm
             instance.Stations.ForEach(station => { if (!newStations.Contains(station)) allStations.Add(station); });
 
             var connected = new HashSet<Station>();
-            oldGroups.ForEach(group => connected.Add(group.CoreStation));
+            oldGroups.ForEach(group => connected.Add(group.CentralStation));
             var (joiningStations, otherNewCost) =
-                JoinNearestNeighbors.Run(cost, allStations.FindAll(station => !station.IsAttached()), instance.StationaryStations, instance.UnitsConnectedToStationaryStations, connected);
+                JoinNearestNeighbors.Run(cost, instance, allStations.FindAll(station => !station.IsAttached()), instance.StationaryStations, instance.UnitsConnectedToStationaryStations, connected);
             cost = new Cost(otherNewCost);
              
             return allStations.Concat<Station>(joiningStations).Concat<Station>(instance.StationaryStations).ToList();
