@@ -9,7 +9,7 @@ namespace algorithm
 {
     public class _
     {
-        static bool enabled = true;
+        static bool enabled = false;
         public static void Print(List<Station> stations, string message = "")
         {
             if (!enabled) return;
@@ -178,7 +178,7 @@ namespace algorithm
 
     public class Spider
     {
-        public void LittleSpider(Instance instance, Station station, List<List<Station>> paths, List<Station> _path, bool firstTime = true)
+        public void LittleSpider(Instance instance, Station station, HashSet<List<Station>> paths, List<Station> _path, bool firstTime = true)
         {
             var path = new List<Station>(_path);
             paths.Add(path);
@@ -210,9 +210,10 @@ namespace algorithm
             return true;
         }
 
-        void AddEdges(Station first, DoubleDictionary<Station, List<Station>> edges, List<List<Station>> paths)
+        void AddEdges(Station first, DoubleDictionary<Station, List<Station>> edges, HashSet<List<Station>> _paths)
         {
             Debug.WriteLine("station " + first.Id.ToString());
+            var paths = _paths.ToList();
             paths.ForEach(path => _.Print(path, "Before validation..."));
             paths = paths.Where(path => Validate(first, path)).ToList();
             paths.ForEach(path => _.Print(path, "After validation"));
@@ -239,7 +240,7 @@ namespace algorithm
             var edges = new DoubleDictionary<Station, List<Station>>();
             foreach(var privateStation in instance.PrivateStations)
             {
-                var paths = new List<List<Station>>();
+                var paths = new HashSet<List<Station>>();
                 LittleSpider(instance, privateStation, paths, new List<Station>());
                 AddEdges(privateStation, edges, paths);
             }
