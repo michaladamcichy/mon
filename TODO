@@ -101,17 +101,11 @@ ChangeRangeOrBigger! - może zrobić to globalnie
     i zobaczyć, czy poprawiają się rozwiązania
 CHOLERA tworząc grupy daje wszystkim takie same stacje
     A bliższe jednostki przecież mogłyby mieć mniejsze!
-Usuwanie nadmiarowych stacji z końców palców rozgwiazdy?
-    Tylko to sprawia dodatkowe problemy...
 ---
 punkty Steinera?
 
 ALERT - jeśli stacja bazowa jest blisko, jest dołączana nawet,
 jeśli nie ma żadnych stationaryUnits
-
-ALERT - BARDZO WAŻNE - w PrepareMapObjects
-    należy dodawać MNIEJSZĄ stację do jednostki!!
-    bez tego może dochodzić do bardzo dziwnych błędów
 
 ALERT - ISCONNECTED TUMANI I KŁAMIE
 ALERT - chyba nie powinienem zwracać bezpośrednio initialCost

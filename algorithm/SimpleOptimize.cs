@@ -9,7 +9,7 @@ namespace algorithm
 {
     public class _
     {
-        static bool enabled = false;
+        static bool enabled = true;
         public static void Print(List<Station> stations, string message = "")
         {
             if (!enabled) return;
@@ -178,27 +178,24 @@ namespace algorithm
 
     public class Spider
     {
-        public void LittleSpider(Instance instance, Station station, List<List<Station>> paths, List<Station> _path, HashSet<Station> visited, bool firstTime = true)
+        public void LittleSpider(Instance instance, Station station, List<List<Station>> paths, List<Station> _path, bool firstTime = true)
         {
-            
             var path = new List<Station>(_path);
             paths.Add(path);
             path.Add(station);
-            //_.Print(path, "Little spider");
+
             if (station.IsPrivate && firstTime == false)
             {
                 return;
             }
 
-            visited.Add(station);
-
             foreach (var neighbor in station.Neighbors)
             {
                 //if(visited.Contains(neighbor)) continue;
                 if (path.Contains(neighbor)) continue; //alert!
-                LittleSpider(instance, neighbor, paths, path, visited, false);
+                LittleSpider(instance, neighbor, paths, path, false);
             }
-            //paths.Remove(path); //alert! wydajność!
+            paths.Remove(path); //alert! wydajność!
         }
 
       
@@ -243,7 +240,7 @@ namespace algorithm
             foreach(var privateStation in instance.PrivateStations)
             {
                 var paths = new List<List<Station>>();
-                LittleSpider(instance, privateStation, paths, new List<Station>(), new HashSet<Station>());
+                LittleSpider(instance, privateStation, paths, new List<Station>());
                 AddEdges(privateStation, edges, paths);
             }
             return edges;
