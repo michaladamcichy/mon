@@ -52,11 +52,13 @@ namespace algorithm
 
         public Station GetOneNearest(List<Station> stations)
         {
-            return stations.Aggregate((currentMin, station) => station.GetDistanceFrom(this) < currentMin.GetDistanceFrom(this) ? station : currentMin);
+            if (stations.Where(item => item != this).Count() == 0) return null;
+            return stations.Where(item => item != this).Aggregate((currentMin, station) => station.GetDistanceFrom(this) < currentMin.GetDistanceFrom(this) ? station : currentMin);
         }
         public Group GetOneNearest(List<Group> groups)
         {
-            return groups.Aggregate((currentMin, group) => group.CentralStation.GetDistanceFrom(this) < currentMin.CentralStation.GetDistanceFrom(this) ? group : currentMin);
+            if (groups.Where(item => item != this).Count() == 0) return null;
+            return groups.Where(item => item != this).Aggregate((currentMin, group) => group.CentralStation.GetDistanceFrom(this) < currentMin.CentralStation.GetDistanceFrom(this) ? group : currentMin);
         }
 
         public List<Station> GetNearest(List<Station> mapObjects)
@@ -82,8 +84,8 @@ namespace algorithm
         public static double MinCoveringCircleRadius(List<MapObject> mapObjects) //alert not tested, not optimalised!!!
         {
             //alert!
-            var center = CenterOfGravity(mapObjects); //alert alert wielki alert
-            return mapObjects.Select(item => item.GetDistanceFrom(new MapObject(center))).ToList().Max(); //alert alert alert
+            var center = MinCoveringCircleCenter(mapObjects); //alert alert wielki alert
+            return mapObjects.Select(item => item.GetDistanceFrom(new MapObject(center))).Max(); //alert alert alert
             //return SmallestEnclosingCircleAdapter.GetRange(mapObjects);
             //double maxDistance = 0.0;
             //mapObjects.ForEach(first => { mapObjects.ForEach(second => { maxDistance = Math.Max(maxDistance, first.GetDistanceFrom(second));});});

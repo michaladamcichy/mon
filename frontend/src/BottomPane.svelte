@@ -1,6 +1,6 @@
 <script>
 import { onMount } from "svelte";
-import { validate_component } from "svelte/internal";
+import { current_component, validate_component } from "svelte/internal";
 import { api } from "../lib/api";
 import { test } from '../lib/test.js';
 
@@ -11,9 +11,9 @@ import Station from "./Station.svelte";
     export let units;
     export let stationRanges;
     export let stationCounts;
+    export let updateCounts;
     export let stationWeights;
     export let updateRanges;
-    export let updateCounts;
     export let updateWeights;
     export let updateStations;
     export let updateUnits;
@@ -21,12 +21,15 @@ import Station from "./Station.svelte";
     export let isConnected;
     export let bigTestRunning;
     export let updateBigTestRunning;
+    export let percentageOfStations;
+    export let updatePercentage;
+    export let loadGSM;
+
+    let counts = [...stationCounts];
 
     let oldStationRanges;
     let unitsCount = 50;
     let seed = 0;
-
-    let counts = [1000, 1000, 1000];
 
     let bigTestTask;
 
@@ -40,25 +43,31 @@ import Station from "./Station.svelte";
     const getStationsStats = (_stations) => {
         const stations = [..._stations].filter(station => !station.isStationary);
         const sizes = stations.map(item => item.range);
-        console.log(stations);
+        //console.log(stations);
         let uniqueSizes = [...(new Set(sizes))];
         uniqueSizes.sort();
         let counts = [];
         uniqueSizes.forEach(size => {
             counts.push({range: size, count: sizes.filter(item => item == size).length});
         });
-        console.log(counts);
+
         return counts;
     };
+
+    const getStationsScore = stations => stations.filter(station => !station.isStationary).reduce((current, station) => current + station.range, 0);
 
     const onAlgorithmClicked = async (type) => {
         const res = await api.algorithm(type, stationRanges, stationCounts, stations, units);
         if(!res) {
-            console.log('request failed');
+            //console.log('request failed');
             return;
         }
         lastOperation = {name: type, time: res.milliseconds};
         updateStations(res.stations);
+        
+        let text = res.milliseconds.toString() + 'ms |' + res.stations.filter(item => !item.isStationary).length.toString() + ' ' + getStationsScore(res.stations).toString() + ' ';
+        getStationsStats(res.stations).forEach(item => text += item.count.toString() + 'x' + item.range + ' ');
+        console.log(text);
     };
 </script>
 
@@ -88,15 +97,21 @@ import Station from "./Station.svelte";
             <p class="col">costs</p>
         </div> -->
         <div class="row">
-            {#each stationCounts as count, index}
+            {#each counts as count, index}
                 <input type="number"
                     min={0}
                     bind:value={count}
+                    on:change={() => {updateCounts(counts);}}
                     class="col"
                     step={1}
-                    disabled/>
+                    />
             {/each}
             <p class="col">counts</p>
+        </div>
+        <div class="row">
+            <input class="col" type="number" min='0' max="100" step='10' bind:value={percentageOfStations}
+                on:change={(e) => {updatePercentage(e.target.value); loadGSM(e.target.value);}}>
+            <label class="col">% of stationary stations</label>
         </div>
         
     </BottomPaneSection>
@@ -118,15 +133,23 @@ import Station from "./Station.svelte";
             </button>
         </div>
         <div class="row">
+            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("naiveArrange")}>
+                Naive arrange
+            </button>
+            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("priorityTree")}>
+                Priority tree
+            </button>
+        </div>
+        <!-- <div class="row">
             <select bind:value={selectAlgorithm}>
                 <option value="simpleArrange"> Arrange </option>
                 <option value="arrangeWithExisting"> With existing </option>
                 <option value="priorityArrange"> Priority arrange </option>
             </select>
-        </div>
+        </div> -->
         <div class="row">
             <button class="col btn btn-primary" on:click={async () => {
-                console.log(selectAlgorithm);
+                updatePercentage(0);
                 const _unitsCount = unitsCount;
                 const positions = test.getRandomUnitsRelated(_unitsCount, seed);
             
@@ -136,10 +159,9 @@ import Station from "./Station.svelte";
                     _units[0].priority = 0;
                     _units[0].counts = [...counts];
                 }
-                
-                const stationaryStations = test.getRandomStationaryStationsRelated(
-                            Math.ceil(unitsCount / 10 + 2), seed + 1, _units[0].position.lat, _units[0].position.lng); 
-                console.log(stationaryStations);
+                //alert teraz bez stacjonarnych
+                const stationaryStations = [];//test.getRandomStationaryStationsRelated(Math.ceil(unitsCount / 10 + 2), seed + 1, _units[0].position.lat, _units[0].position.lng); 
+                //console.log(stationaryStations);
                 const res = await api.algorithm(selectAlgorithm, [...stationRanges], [...stationCounts], stationaryStations, _units);
                 //ALERT
                 // const _positions = test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), seed);
@@ -147,12 +169,16 @@ import Station from "./Station.svelte";
                 // const __stations = await api.algorithm('arrangeWithExisting', [...stationRanges], [...counts], _stations.concat(stationaryStations), _units.concat(__units));
                 
                 if(!res) {
-                    console.log('request failed');
+                    //console.log('request failed');
                     return;
                 }
                 const _stations = res.stations;
                 //const isConnected = await api.isConnected([...stationRanges], [...counts], _stations, _units);
                 lastOperation = {name: selectAlgorithm, time: res.milliseconds};
+
+                let text = res.milliseconds.toString() + 'ms |' + _stations.filter(item => !item.isStationary).length.toString() + ' ' + getStationsScore(_stations).toString() + ' ';
+                    getStationsStats(_stations).forEach(item => text += item.count.toString() + 'x' + item.range + ' ');
+                    console.log(text);
 
                 updateStations(_stations);
                 updateUnits(_units);
@@ -171,7 +197,7 @@ import Station from "./Station.svelte";
                     return;
                 }
                 updateBigTestRunning(true);
-                console.log(selectAlgorithm);
+                //console.log(selectAlgorithm);
                 // const i = setInterval(f, 500);
 
                 // async function f() {
@@ -196,7 +222,7 @@ import Station from "./Station.svelte";
                     const _unitsCount = unitsCount;
                     for(let i = 0; i < 1000000; i++)
                     {
-                        console.log(i);
+                        //console.log(i);
                         const positions = test.getRandomUnitsRelated(Math.ceil(_unitsCount / 2), i);
             
                         const _units = positions.map(position => {return {position: position, priority: 1}});
@@ -210,7 +236,7 @@ import Station from "./Station.svelte";
                             Math.ceil(unitsCount / 10 + 2), i+1, _units[0].position.lat, _units[0].position.lng); 
                         const res = await api.algorithm(selectAlgorithm, ranges, _counts, stationaryStations, _units);
                         if(!res) {
-                            console.log('request failed');
+                            //console.log('request failed');
                             return;
                         }
                         const _stations = res.stations;
@@ -237,12 +263,12 @@ import Station from "./Station.svelte";
                 Big test
             </button>
         </div>
-        <div class="row">
+        <!-- <div class="row">
             {#each counts as count}
                 <input bind:value={count} class="col" type="number" min='0' step='1'/>
             {/each}
             <label class="col">counts for test</label>
-        </div>
+        </div> -->
     </BottomPaneSection>
     <BottomPaneSection title={'Status'}>
         <div class="row status">
@@ -257,8 +283,14 @@ import Station from "./Station.svelte";
         <div class="row">
             <div class="col">
                 <p><b>{units.length}</b> {' units, '}
-                    <b>{stations.filter(station => !station.isStationary).length}</b> {'stations (mobile)'}</p>
+                    <b>{stations.filter(station => !station.isStationary).length}</b> {'mobile, '}
+                    <b>{stations.filter(station => station.isStationary).length}</b> {'stationary'}
+                </p>
             </div>
+        </div>
+        <div class="row">
+            <p class="col">Total cost:</p>
+            <p class="col"><b>{getStationsScore(stations)}</b></p>
         </div>
         <div class="row">
         {#each getStationsStats(stations) as stat}
@@ -269,7 +301,7 @@ import Station from "./Station.svelte";
         <div class="row">
             <p class="col">{`Last operation: `} <b>{`${lastOperation.name}`} </b></p>
         </div>
-        <div class="row">
+        <div class="row">  
             <p class="col">{`Completed within: `} <b>{`${lastOperation.time / 1000} s`} </b></p>
         </div>
         {/if}

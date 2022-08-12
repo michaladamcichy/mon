@@ -96,7 +96,6 @@ Dodać wybieranie najtańszych stacji na podstawie lokalizacji
 Szlifowanie powyższych po dodaniu tych kosztów
 Zakodowanie w jsonie lokalizacji jednostek
 Algorytmy ze stackoverflow zastąpić siszarpowymi
-Prawdziwe MST
 ChangeRangeOrBigger! - może zrobić to globalnie
     i zobaczyć, czy poprawiają się rozwiązania
 CHOLERA tworząc grupy daje wszystkim takie same stacje
@@ -129,6 +128,14 @@ ALERT MAM TAKĄ WIZJĘ, ŻE CZŁONEK KOMISJI MI MÓWI:
     nie ma Pan wypisanych wszystkich tych założeń w pracy
 
 CanChangeRange i ChangeRange - prawdopodobne ŹRÓDŁO WSZELKIEGO ZŁA
+
+CHOLERA - CO Z TOLERANCJĄ?? 
+MINIMUM COVERING CIRCLE - w sumie może jednak się da?
+ALERT - jednostki w zasięgu stacjonarnej posiadające stacje prywatne -> disconected - poprawić
+PRZYWRÓCIĆ GLOBALNOŚĆ ZASOBÓW
+ALERT SKONFRONTOWAĆ ZAKRES Z KARTY PRACY Z RZECZYWISTOŚCIA
+ALERT - CEL MINIMALIZACJI JEST PROBLEMATYCZNY
+ALERT ALERT - GET ONE NEAREST NIE OBSŁUGUJE PUSTYCH KOLEKCCI LUB ZAWIERAJĄCYECH TEN ELEMENT
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

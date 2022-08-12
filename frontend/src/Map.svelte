@@ -68,8 +68,8 @@ import { onMount } from "svelte";
 
 
     const generateMarkers = (map, mapObjects, update) => {
-        console.log('HERE');
-        console.log(mapObjects);
+        //console.log('HERE');
+        //console.log(mapObjects);
         mapObjects.forEach((mapObject, index) => {
             const marker = new google.maps.Marker({
                 position: mapObject.position,
@@ -90,20 +90,20 @@ import { onMount } from "svelte";
             });
 
             marker.addListener('click', e => {
-                console.log('start');
+                //console.log('start');
                 if(!e.domEvent.shiftKey) {
-                    console.log('!shift');
+                    //console.log('!shift');
                     selectedToCopyPosition = null;
                     return;
                 }
 
                 if(!selectedToCopyPosition) {
-                    console.log('!selectedToCopy');
+                    //console.log('!selectedToCopy');
                     selectedToCopyPosition = marker;
                     return;
                 }
 
-                console.log('else');
+                //console.log('else');
                 mapObject.position.lat = selectedToCopyPosition.getPosition().lat();
                 mapObject.position.lng = selectedToCopyPosition.getPosition().lng();
                 update(mapObject);
@@ -141,7 +141,7 @@ import { onMount } from "svelte";
             circle.bindTo('center', markers[index], 'position');
             circles.push(circle);
         });
-            //console.log({lat: unit.lat, lng: unit.lng});
+            ////console.log({lat: unit.lat, lng: unit.lng});
             
     };
 </script>

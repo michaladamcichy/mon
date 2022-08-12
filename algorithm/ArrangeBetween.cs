@@ -68,6 +68,7 @@ namespace algorithm
             Cost cost = new Cost(initialCost);
             var stations = new List<Station>();
 
+            if (!cost.CanGetAny()) return (cost, new List<Station>());
             cost.ChangeRange(first, cost.QueryMax().Value);
             cost.ChangeRange(last, cost.QueryMax().Value);
             if (MapObject.AreInRange(first, last) || !cost.CanGetAny()) return (cost, new List<Station>());

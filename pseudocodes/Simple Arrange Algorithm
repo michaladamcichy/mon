@@ -12,28 +12,28 @@
 
 
 Ad 2 - Grupowanie
-1. Póki wszystkie stacje nie zostały już przypisane do jakichś grup, dla każdej stacji (STACJA A) wykonuj:
+1. Póki istnieje stacja należąca do privateStations, która nie należy do żadnej grupy z groups, powtarzaj dla każdej stacji z stations:
     1.1. Jeśli STACJA A została już przydzielona do jakiejś grupy, pomiń ją.
-        1.2. STACJA A jest pierwszą stacją w nowej grupie. Dla każdej stacji (STACJA B) spośród stacji nienależących do żadnej grupy,
-            posortowanych rosnąco względem odlegości od STACJI A (stacje NAJBLIŻSZE), wykonuj:
+        1.2. Utwórz nową grupę group. Dodaj do group stację A. Dodaj group do groups. Dla każdej stacji (STACJA B) spośród stacji nienależących do żadnej grupy z groups,
+            posortowanych rosnąco względem odlegości od STACJI A (lista nearest), wykonuj:
             1.2.1. Jeśli nie jest dostępna dodatkowa stacja o takim zasięgu, żeby pokryć zasięgiem wszystkie stacje należące do grupy oraz stację B,
-                pomiń tę stację i przejdź do kolejnej stacji spośród NAJBLIŻSZYCH i do kroku 1.2.1.
+                pomiń tę stację i przejdź do kolejnej stacji spośród nearest i do kroku 1.2.1.
             1.2.2. W przeciwnym wypadku dodaj stację B do grupy.
             1.2.3. Jeśli grupa zawiera tylko 2 stacje lub mniej, przejdź do kolejnego punktu. W przeciwnym wypadku oblicz
-                minimalny promień koła pokrywającego wszystkie stacje z grupy, ze środkiem w punkcie ciężkości grupy. Następnie znajdź
+                minimalny promień koła pokrywającego wszystkie stacje z grupy group, ze środkiem w punkcie ciężkości grupy. Następnie znajdź
                 stację najdalszą od środka ciężkości grupy. Jeśli jest to ostatnio dodana stacja, przejdź do kolejnego punktu. W przeciwnym wypadku 
                 spróbuj usunąć tę najdalszą stację z grupy. Oblicz minimalny promień koła pokrywającego wszystkie stację z grupy. Jeśli promień nie jest mniejszy
                 niż poprzednio (skupienie się nie poprawiło) to dodajemy usuniętą stację z powrotem do grupy.
-                Jeśli promień jest mniejszy (skupienie poprawiło się) to dodajemy usuniętą stację do zbioru usuniętych (USUNIĘTE).
-        1.3. Dla każdej stacji ze zbioru usuniętych (STACJA C): jeśli jest dostępna dodatkowa stacja, która może pokryć całą grupę wraz ze
-            stacją C, to dodaj stację C do grupy.
+                Jeśli promień jest mniejszy (skupienie poprawiło się) to dodajemy usuniętą stację do zbioru usuniętych (removed).
+        1.3. Dla każdej stacji ze zbioru removed (STACJA C): jeśli jest dostępna dodatkowa stacja, która może pokryć całą grupę wraz ze
+            stacją C, to dodaj stację C do grupy group.
         1.4. Jeżeli można dostosować zasięg wszystkich grup do zasięgu stacji centralnej, to robimy to i grupa jest gotowa. Przechodzę do kolejnej stacji i kroku 1.1.
         1.5. W przeciwnym wypadku wracam do punktu 1.1 i wykonuje te same kroki dla stacji A, ale tym razem zabraniam używania stacji o zasięgu 50 km.
             Jeśli wciąż się nie uda, to zakazuję 50km i 30km, pozwalając już tylko na 20km. Jeśli żadna z tych prób nie utworzy rozwiązania, na które nam
-            wystarczy stacji, przeglądamy te trzy poprzednio utworzone rozwiązania i zachowując zasięgi każdej ze stacji usuwamy z grup po kolei stacje najdalsze od środka ciężkości
-            grupy licząc, że w końcu uzyskamy rozwiązanie, na które nas stać. Jeśli któreś z tych wariantów dają rozwiązanie, na które nam wystarczy stacji i grupa będzie liczyła przynajmniej 2 stacje + 1 stacja centralna,
-            to wybieram to rozwiązanie, które tworzy grupę złożoną z największej liczby stacji.
-            Jeżeli wszystko zawiedzie, algorytm zwraca grupę złożoną jedynie ze stacji A z przydzielonym
+            wystarczy stacji, przeglądamy te trzy poprzednio utworzone rozwiązania i zachowując zasięgi każdej ze stacji usuwamy z grupy po kolei stacje najdalsze od środka ciężkości
+            grupy licząc, że w końcu uzyskamy rozwiązanie, na które nas stać. Jeśli któreś z tych wariantów dają rozwiązanie, na które nam wystarczy stacji i grupa będzie liczyła
+            przynajmniej 2 stacje prywatne + 1 stacja centralna, to wybieram to rozwiązanie, które tworzy grupę złożoną z największej liczby stacji.
+            Jeżeli wszystko zawiedzie, grupa group ostatecznie jest grupą złożoną jedynie ze stacji A z przydzielonym
             najmniejszym możliwym zasięgiem oraz z dołożoną do niej stacją centralną o najmniejszym możliwym zasięgu. Jeśli nawet tego nie mogę zrobić, to 
             przerywam grupowanie.
  

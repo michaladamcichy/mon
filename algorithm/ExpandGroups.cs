@@ -14,8 +14,8 @@ namespace algorithm
             var assigned = new HashSet<Station>();
 
             var groups = coreStations.Select(coreStation => new Group(new List<Station>() { coreStation })).ToList();
-
-            foreach(var lonely in lonelyStations)
+            if(groups.Count == 0) return (cost, groups, lonelyStations.FindAll(station => !assigned.Contains(station)));
+            foreach (var lonely in lonelyStations)
             {
                 var group = lonely.GetOneNearest(groups);
                 //alert teoretycznie nie najbliższa grupa może być najlepsza - ale chrzanić to

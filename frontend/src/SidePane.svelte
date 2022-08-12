@@ -24,6 +24,7 @@ import Instance from './Instance.svelte';
     export let updateAllStations;
     export let updateAllUnits;
     export let priorities;
+    export let percentageOfStations;
 
 
     let instancesHidden = false;
@@ -31,10 +32,10 @@ import Instance from './Instance.svelte';
     let unitsHidden = false;
 
     const addStation = range => {
-        console.log('add station');
-        console.log(stationRanges);
+        //console.log('add station');
+        //console.log(stationRanges);
         const newStation = {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: range, isStationary: false};
-        console.log(newStation);
+        //console.log(newStation);
         updateAllStations([...stations, newStation]);
     };
 
@@ -47,13 +48,13 @@ import Instance from './Instance.svelte';
             {
                 position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, 
                 priority: priority != undefined ? priority : 1, //alert
-                counts: priority == 0 ? [1000, 1000, 1000] : undefined, //alert
                 master: priority > 0 ? master : undefined,
+                name: 'Unit',
             }
         ];
         updateAllUnits(newUnits);
-        console.log('add unit');
-        console.log(newUnits);
+        //console.log('add unit');
+        //console.log(newUnits);
     };
 
     const toggleUnitsVisibility = () => {
@@ -94,7 +95,7 @@ import Instance from './Instance.svelte';
         <hr>
         {#each instances as instance, index}
             <Instance index={index} instance={instance} select={selectInstance} remove={removeInstance} selected={selectedInstance} duplicate={duplicateInstance}
-                load={loadInstance}/>
+                load={loadInstance} percentageOfStations={percentageOfStations}/>
         {/each}
     {/if}
     <div class="row">

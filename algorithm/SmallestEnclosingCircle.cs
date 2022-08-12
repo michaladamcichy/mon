@@ -27,13 +27,36 @@ using System.Threading.Tasks;
 
 namespace algorithm
 {
+	/*public class Circle
+    {
+		public List<Station> GetRelevant(List<Station> points)
+        {
+			var allPairs = new HashSet<Tuple<Station, Station>>();
+			points.ForEach(first => points.ForEach(second => //alert optymalizacja
+			{
+				if(!allPairs.Contains(new Tuple<Station, Station>(second, first))) allPairs.Add(new Tuple<Station, Station>(first, second));
+            }));
+
+			var sorted = allPairs.OrderByDescending((item) => item.Item1.GetDistanceFrom(item.Item2)).ToList();
+
+			return new List<Station> { sorted[0].Item1, sorted[2].Item2, sorted[1].Item1, sorted[1].Item2 }; //alert big alert
+        }
+
+		public 
+    }*/
+
 	public class SmallestEnclosingCircleAdapter
     {
-		static (Position, double) GetCircle(List<MapObject> mapObjects)
+		static (Position, double) GetCircle(List<MapObject> mapObjects) //alert brzydki kod
         {
 			var points = mapObjects.Select(mapObject => new Point(mapObject.Position.Lat, mapObject.Position.Lng)).ToList();
 			var circle = SmallestEnclosingCircle.MakeCircle(points);
-			return (new Position(circle.c.x, circle.c.y), circle.r);
+			return (new Position(circle.c.x, circle.c.y), points.Aggregate(0.0, (currentDistance, item) =>
+				new MapObject(new Position(circle.c.x, circle.c.y)).GetDistanceFrom(new MapObject(new Position(item.x, item.y))) >
+				currentDistance ?
+				new MapObject(new Position(circle.c.x, circle.c.y)).GetDistanceFrom(new MapObject(new Position(item.x, item.y))) :
+				currentDistance
+				));
         }
 
 		public static Position GetCenter(List<MapObject> mapObjects)
@@ -56,7 +79,30 @@ namespace algorithm
 			return GetRange(stations.Cast<MapObject>().ToList());
         }
 	}
-	class SmallestEnclosingCircle
+	/* 
+ * Smallest enclosing circle - Library (C#)
+ * 
+ * Copyright (c) 2020 Project Nayuki
+ * https://www.nayuki.io/page/smallest-enclosing-circle
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program (see COPYING.txt and COPYING.LESSER.txt).
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+public class SmallestEnclosingCircle
 	{
 
 		/* 
@@ -85,6 +131,7 @@ namespace algorithm
 				if (c.r < 0 || !c.Contains(p))
 					c = MakeCircleOnePoint(shuffled.GetRange(0, i + 1), p);
 			}
+
 			return c;
 		}
 
@@ -144,6 +191,7 @@ namespace algorithm
 				return left.r <= right.r ? left : right;
 		}
 
+
 		public static Circle MakeDiameter(Point a, Point b)
 		{
 			Point c = new Point((a.x + b.x) / 2, (a.y + b.y) / 2);
@@ -153,7 +201,6 @@ namespace algorithm
 
 		public static Circle MakeCircumcircle(Point a, Point b, Point c)
 		{
-			//return findCircle(a.x, a.y, b.x, b.y, c.x, c.y);
 			// Mathematical algorithm from Wikipedia: Circumscribed circle
 			double ox = (Math.Min(Math.Min(a.x, b.x), c.x) + Math.Max(Math.Max(a.x, b.x), c.x)) / 2;
 			double oy = (Math.Min(Math.Min(a.y, b.y), c.y) + Math.Max(Math.Max(a.y, b.y), c.y)) / 2;
@@ -168,63 +215,6 @@ namespace algorithm
 			Point p = new Point(ox + x, oy + y);
 			double r = Math.Max(Math.Max(p.Distance(a), p.Distance(b)), p.Distance(c));
 			return new Circle(p, r);
-		}
-
-		static Circle findCircle(double x1, double y1,
-						double x2, double y2,
-						double x3, double y3)
-		{
-			double x12 = x1 - x2;
-			double x13 = x1 - x3;
-
-			double y12 = y1 - y2;
-			double y13 = y1 - y3;
-
-			double y31 = y3 - y1;
-			double y21 = y2 - y1;
-
-			double x31 = x3 - x1;
-			double x21 = x2 - x1;
-
-			// x1^2 - x3^2
-			double sx13 = (double)(Math.Pow(x1, 2) -
-							Math.Pow(x3, 2));
-
-			// y1^2 - y3^2
-			double sy13 = (double)(Math.Pow(y1, 2) -
-							Math.Pow(y3, 2));
-
-			double sx21 = (double)(Math.Pow(x2, 2) -
-							Math.Pow(x1, 2));
-
-			double sy21 = (double)(Math.Pow(y2, 2) -
-							Math.Pow(y1, 2));
-
-			double f = ((sx13) * (x12)
-					+ (sy13) * (x12)
-					+ (sx21) * (x13)
-					+ (sy21) * (x13))
-					/ (2 * ((y31) * (x12) - (y21) * (x13)));
-			double g = ((sx13) * (y12)
-					+ (sy13) * (y12)
-					+ (sx21) * (y13)
-					+ (sy21) * (y13))
-					/ (2 * ((x31) * (y12) - (x21) * (y13)));
-
-			double c = -(double)Math.Pow(x1, 2) - (double)Math.Pow(y1, 2) - 2 * g * x1 - 2 * f * y1;
-
-			// eqn of circle be x^2 + y^2 + 2*g*x + 2*f*y + c = 0
-			// where centre is (h = -g, k = -f) and radius r
-			// as r^2 = h^2 + k^2 - c
-			double h = -g;
-			double k = -f;
-			double sqr_of_r = h * h + k * k - c;
-
-			// r is the radius
-			double r = Math.Round(Math.Sqrt(sqr_of_r), 5);
-
-			return new Circle(new Point(h, k), r);
-			Console.WriteLine("Centre = (" + h + "," + k + ")");
 		}
 
 	}
@@ -292,8 +282,6 @@ namespace algorithm
 
 		public double Distance(Point p)
 		{
-			return MapObject.Distance(new Position(p.x, p.y), new Position(x, y));
-
 			double dx = x - p.x;
 			double dy = y - p.y;
 			return Math.Sqrt(dx * dx + dy * dy);

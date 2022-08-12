@@ -37,14 +37,14 @@ namespace algorithm
                 return (cost, stations);
             }
 
-            var joiningStation = cost.Join(first, last);
+            var joiningStation = cost.Join(first, last, tolerance);
             if (joiningStation != null)
             {
                 stations.Add(joiningStation);
                 return (cost, stations);
             }
 
-            var next = MapObject.GetNextFromTowards(first, last);
+            var next = MapObject.GetNextFromTowards(first, last, tolerance);
             if(!cost.CanGetAny()) return (cost, null);
             var station = new Station(next.Position, cost.GetMax().Value);
 

@@ -37,6 +37,20 @@ namespace backend.Controllers
         }
 
         [HttpPost]
+        [Route("naiveArrangeAlgorithm")]
+        public Result naiveArrangeAlgorithm(InstanceJSON instanceJSON)
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            instanceJSON.stations.Clear(); //alert! alert!
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.NaiveArrange(instance).Select(item => item.GetJSON()).ToList();
+
+            stopwatch.Stop();
+            return new Result(ret, stopwatch.ElapsedMilliseconds);// stopwatch.ElapsedMilliseconds);
+        }
+
+        [HttpPost]
         [Route("simpleArrangeAlgorithm")]
         public Result simpleArrangeAlgorithm(InstanceJSON instanceJSON)
         {

@@ -1,6 +1,6 @@
 <script>
 import {saveFile} from '../lib/file.js';
-import {stationaryStations} from '../lib/stationaryStations.js';
+import {_wpUnits} from '../lib/wp.js';
 export let instance;
 export let index;
 export let select;
@@ -8,12 +8,13 @@ export let remove;
 export let selected;
 export let duplicate;
 export let load; //alert to jest bubel
+export let percentageOfStations;
 
 let input;
 let fileInput;
 
 const onFileSelected =(e)=>{
-    console.log('loading');
+    //console.log('loading');
     let file = e.target.files[0];
     let reader = new FileReader();
     reader.readAsText(file);
@@ -23,20 +24,17 @@ const onFileSelected =(e)=>{
             instance = JSON.parse(text);
             load(instance);
         }   catch(e) {
-            console.log(e);
+            //console.log(e);
         } 
     };
 }
 
-const loadGSM = async () => {
-    instance.stations = instance.stations.concat(
-        stationaryStations.map(ss => ({position: ss.position, range: ss.range, isStationary: true})));
+const loadWP = async () => {
+    instance.units = instance.units.concat(_wpUnits);
+
     load(instance);
 };
 
-const loadWP = () => {
-
-};
 </script>
 
 <div id="main" class="container" on:click={() => {select(instance);}}>
@@ -55,7 +53,6 @@ const loadWP = () => {
             />
         <button class="col btn btn-primary" on:click={() => {fileInput.click();}}>Load</button>
         <button class="col btn btn-primary" on:click={() => {saveFile(instance.name, JSON.stringify(instance));}}>Save</button>
-        <button class="col btn btn-primary" on:click={() => {loadGSM();}}>GSM</button>
         <button class="col btn btn-primary" on:click={() => {loadWP();}}>WP</button>
         <button class="col btn btn-primary" on:click={() => {duplicate(instance);}}>Dupl.</button>
         <div class="col"></div>

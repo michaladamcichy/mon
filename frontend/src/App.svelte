@@ -3,6 +3,7 @@
 	import Map from './Map.svelte';
 	import SidePane from './SidePane.svelte';
 	import BottomPane from './BottomPane.svelte';
+	import {_stationaryStations} from '../lib/stationaryStations.js';
 
 	import { onMount } from 'svelte';
 
@@ -14,7 +15,7 @@
 	let map;
 
 	const defaultRanges = [20, 30, 50];
-	const defaultCounts = [0,0,0];
+	const defaultCounts = [1000,1000,1000];
 	const defaultWeights = [1.0, 1.5, 2.5];
 	const defaultStations = [];
 	const defaultUnits = [];
@@ -22,7 +23,6 @@
 		{
 			name: 'instance',
 			ranges: defaultRanges,
-			counts: [0,0,0],
 			weights: [1.0, 1.5, 2.5],
 			isConnected: undefined,
 			oldRanges: defaultRanges,
@@ -36,21 +36,42 @@
 	let selectedInstance;
 
 	let ranges;
-	let counts;
+	let counts = [...defaultCounts];
 	let weights;
 	let isConnected;
 	let oldRanges;
 	let stations;
 	let units;
 	let bigTestRunning = false;
+	let percentageOfStations = 0.0;
 
+	const loadGSM = async (percentage = percentageOfStations) => {
+		selectedInstance.stations = selectedInstance.stations.filter(station => !station.isStationary);
+		if(percentage == 0) {
+			loadInstance(selectedInstance);
+			return;
+		}
+		
+		let stationaryStations = [];
+		for(let i = 0; i < _stationaryStations.length; i++) {
+			//console.log(Math.round(1/ (percentage/100)));
+			if(i % Math.ceil(1/ (percentage/100)) != 0) continue;
+			stationaryStations.push(_stationaryStations[i]);
+		}
 
+		selectedInstance.stations = selectedInstance.stations.concat(
+			stationaryStations.map(ss => ({position: ss.position, range: ss.range, isStationary: true})));
+		loadInstance(selectedInstance);
+	};
+
+	const updatePercentage = (newValue) => {
+		percentageOfStations = newValue;
+	};
 	const updateBigTestRunning = (value) => {
 		bigTestRunning = value;
 	}
 	const updateInstance = instance => {
 		instance.ranges = ranges;
-		instance.counts = counts;
 		instance.weights = weights;
 		instance.isConnected = isConnected;
 		instance.oldRanges = oldRanges; //alert czy to nie może być lokalna zmienna?
@@ -62,7 +83,6 @@
 
 	const loadInstance = instance => {
 		ranges = instance.ranges;
-		counts = instance.counts;
 		weights = instance.weights;
 		isConnected = instance.isConnected;
 		oldRanges = instance.oldRanges;
@@ -91,7 +111,6 @@
 		updateInstance(selectedInstance);
 
 		ranges = instance.ranges;
-		counts = instance.counts;
 		weights = instance.weights;
 		isConnected = instance.isConnected;
 		oldRanges = instance.oldRanges; //alert czy to nie może być lokalna zmienna?
@@ -102,19 +121,18 @@
 		
 		instances = instances;
 		connectionCheck();
-		console.log(instances);
+		//console.log(instances);
 	};
 
 	selectInstance(instances[0]);
 
 	const addInstance = () => {
-		console.log('addInstance');
-		console.log(instances);
+		//console.log('addInstance');
+		//console.log(instances);
 		instances.push(
 			{
 			name: 'instance',
 			ranges: [...defaultRanges],
-			counts: defaultCounts,
 			weights: [...defaultWeights],
 			isConnected: undefined,
 			oldRanges: defaultRanges,
@@ -155,25 +173,15 @@
 			if(index >= 0) {
 				station.range = ranges[index];
 			} else {
-				console.log('custom range');
+				//console.log('custom range');
 			}
 			return station;
 		}));
 		oldRanges = [...ranges];
 	};
 
-	const updateCounts = () => {
-		let runningCounts = [0,0,0];
-		units.forEach(unit => {
-			if(unit.priority === 0)
-			{
-				unit.counts.forEach((count, index) => {
-					runningCounts[index] += count;
-				});
-			}
-		});
-
-		counts = runningCounts;
+	const updateCounts = (_counts) => {
+		counts = _counts;
 	};
 
 	onMount(() => {
@@ -190,12 +198,6 @@
 		connectionCheck();
 	}
 
-	$: {
-		units;
-		updateCounts();
-	};
-
-
 	const updateAllStations = _stations => {
 		stations = _stations;
 	};
@@ -206,23 +208,23 @@
             stations[index] = station;
             updateAllStations(stations);
         } else {
-            console.log('error');
+            //console.log('error');
         }
     };
 
 	const removeStation = station => {
-		console.log('removing');
+		//console.log('removing');
 		const index = stations.indexOf(station);
         if(index >= 0) {
 			stations = stations.filter((item, _index) => _index != index);
             updateAllStations(stations);
         } else {
-            console.log('error');
+            //console.log('error');
         }
 	}
 
 	const removeInstance = instance => {
-		console.log('removing');
+		//console.log('removing');
 		const index = instances.indexOf(instance);
         if(index >= 0) {
 			instances = instances.filter((item, _index) => _index != index);
@@ -239,7 +241,7 @@
 				selectInstance(instances[0]);
 			}
         } else {
-            console.log('error');
+            //console.log('error');
         }
 	}
 
@@ -259,18 +261,18 @@
             units[index] = unit;
             updateAllUnits(units);
         } else {
-            console.log('error');
+            //console.log('error');
         }
 	};
 
 	const removeUnit = unit => {
-		console.log('removing');
+		//console.log('removing');
 		const index = units.indexOf(unit);
         if(index >= 0) {
             units = units.filter((item, _index) => _index != index); 
             updateAllUnits(units);
         } else {
-            console.log('error');
+            //console.log('error');
         }
 	};
 
@@ -305,6 +307,7 @@
 				units={units}
 				stationRanges={ranges}
 				stationCounts={counts}
+				updateCounts={updateCounts}
 				stationWeights={weights}
 				updateRanges={updateRanges}
 				updateStations={updateAllStations}
@@ -313,6 +316,9 @@
 				isConnected={isConnected}
 				bigTestRunning={bigTestRunning}
 				updateBigTestRunning={updateBigTestRunning}
+				percentageOfStations={percentageOfStations}
+				updatePercentage={updatePercentage}
+				loadGSM={loadGSM}
 				/>
 		</div>
 	</div>
@@ -339,6 +345,7 @@
 				stationCounts={counts}
 				priorities={priorities}
 				bigTestRunning={bigTestRunning}
+				percentageOfStations={percentageOfStations}
 				/>
 	</div>
 </div>

@@ -29,7 +29,12 @@ namespace algorithm
         {
             return new SimpleArrange().Run(instance);
         }
-        
+
+        public static List<Station> NaiveArrange(Instance instance)
+        {
+            return new NaiveArrange().Run(instance);
+        }
+
         public static List<Station> PriorityArrange(Instance instance)
         {
             return new PriorityArrange().Run(instance);

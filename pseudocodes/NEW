@@ -1,61 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+DostosujGrupe(grupa):
+    Usuwaj stacje w kolejności od najdalszej do bieżącego środka grupy, dopóki koszt stacji centralnej
+    obejmującej zasięgiem wszystkie stacje w grupie oraz koszt dostosowania stacji prywatnych, aby były połączone
+    ze tą stacją centralną, będzie dopuszczalny.
 
-namespace algorithm
-{
-    public class SimpleCreateGroups
-    {
-        Instance instance;
+MinimalnyZasięg(grupa):
+    zwróć zasięg możliwie najmniejszej dostępnej stacji, która jest w stanie pokryć wszystkie stacje z grupy 
 
-        public SimpleCreateGroups(Instance instance)
-        {
-            this.instance = instance;
-        }
+CreateGroup(Station first, Cost initialCost, List<Group> groups)
+    grupa = {first};
+    najbliższe - lista stacji mobilnych posortowanych rosnąco wg odległości od first
+    dla każdej stacji z listy najbliższe:
+        jeżeli stacja == first lub stacja należy już do jakiejś grupy:
+            kontynuuj //(w rozumieniu: przejdź do kolejnej iteracji pętli) //alert czy wiadomo o co chodzi?
 
-        (Group?, Cost) AdjustGroup(Group _group, Cost initialCost)
-        {
-            var group = new Group(_group);
-            Cost cost = new Cost(initialCost);
+        jeśli MinimalnyZasięg(grupa U {stacja} ) == null:
+            kontynuuj
 
-            while(group.Stations.Count > 1)
+        grupa U= {stacja}
+        
+        jeśli rozmiar grupy <= 2:
+            kontynuuj
+        
+        najdalsza = stacja z grupy najdalsza od bieżącego środka grupy
+        jeżeli najdalsza == stacja:
+            kontynuuj
+        
+        usuń najdalszą z grupy
+
+    dla każdej stacji spośród dotychczas usuniętych z grupy:
+        jeżeli MinimalnyZasięg(grupa U {usunięta}) == null:
+            kontynuuj
+        grupa U= {usunięta}
+
+    
+    minimalnyZasięg = MinimalnyZasięg(grupa)
+
+    sukces = spróbuj dodać do grupy stację centralną z lokalizacją w środku ciężkości grupy i zmienić zasięg każdej stacji z grupy na minimalnyZasięg
+    jeżeli sukces = true:
+        zwróć grupę
+
+    
+    sukces = DostosujGrupe(grupa);
+    jeżeli sukces = true:
+        zwróć grupę
+    
+    stacjaCentralna = nowa stacja o najmniejszym dostępnym zasięgu, o lokalizacji takiej samej jak first
+    zwróć {first, stacjaCentralna}
+
             {
-                var minCoveringRange = cost.QueryMinCoveringRange(group.Stations);
-                if (minCoveringRange != null && cost.CanGet(minCoveringRange.Value, group.Stations.Count + 1))
-                {
-                    cost.Get(minCoveringRange.Value, group.Stations.Count);
-                    return (group, cost);
-                }
+                if (station == first || NieNależyDoŻadnejGrupy(station)) continue;
 
-                var furthestFromCenter = group.GetFurthestFromCenter();
-                group.Remove(furthestFromCenter);
-            }
-
-            return (null, cost);
-        }
-
-        (Group?, Cost) CreateGroup(Station first, Cost initialCost, List<Group> groups)
-        {
-            var cost = new Cost(initialCost);
-            var group = new Group(new List<Station> { first });
-            var removedStations = new List<Station>();
-            if (!cost.CanGetAny()) return (null, initialCost);
-
-            var nearestStations = first.GetNearest(instance.Stations);
-            
-            foreach (var station in nearestStations)
-            {
-                if (station == first || groups.Any(item => item.Contains(station))) continue;
-
-                var minCoveringRangeAfterAdding = cost.QueryMinCoveringRange(group.Stations.Concat<Station>(new List<Station>() { station }).ToList());
-                if (minCoveringRangeAfterAdding == null) continue; //alert co ze stacjami nie należacymi do grupy a istniejącymi?
+                var minCoveringRangeAfterAdding = ZnajdźNajmniejsząDostępnąStacjęPokrywającąWszystkieStacjeZGrupy();
+                if (minCoveringRangeAfterAdding == null) continue;
                 group.Add(station);
 
-                //probujemy usunac i patrzymy czy poprawia sie skupienie
-                if (group.Stations.Count > 2)
+                if (group.Count > 2)
                 {
+
                     var furthestFromCenter = MapObject.GetFurthestFrom(group.Stations, MapObject.MinCoveringCircleCenter(group.Stations)); //alert zamienić na metodę Group
                     if (furthestFromCenter == station) continue; //alert to było potrzebne, aby zachować właściwość pływania
                     var minCoveringCircleRadiusBeforeRemoving = MapObject.MinCoveringCircleRadius(group.Stations);
@@ -176,5 +177,3 @@ namespace algorithm
 
             return (groups, cost); //alert
         }
-    }
-}

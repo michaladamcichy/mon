@@ -7,11 +7,11 @@ api.headers = {'Content-Type' : 'application/json'};
 // api.headers = {'Access-Control-Allow-Origin': '*'};
 
 api.test = async () => {
-    console.log('running api test');
+    //console.log('running api test');
 
     const json = await fetch(`${api.url}`);
     const res = await json.json();
-    console.log(res);
+    //console.log(res);
 };
 
 api.isConnected = async (stationRanges, stationCounts, stations, units) => {
@@ -30,19 +30,19 @@ api.algorithm = async (type, stationRanges, stationCounts, stations, units) => {
     stations.forEach(station => {
         station.id = _i++;
     });
-    console.log(stations);
+    //console.log(stations);
     const instance = {stationRanges, stationCounts, stations, units};
-    console.log(instance);
+    //console.log(instance);
     const result = await fetch(`${api.url}/${type}Algorithm`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
     //alert todo obsluga bledow
     if(!result.ok) {
-        console.log('request failed');
+        //console.log('request failed');
         return;
     }
 
-    console.log('result');
+    //console.log('result');
     const res = await result.json();
-    console.log(res);
+    //console.log(res);
     return res;
 }
 
@@ -50,6 +50,6 @@ api.testPost = async (stationRanges, stations, units) => {
     const instance = {stationRanges, stationCounts: [1000,1000,1000], stations, units};
     const result = await fetch(api.url, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
     const parsed = await result.json();
-    console.log('post response:')
-    console.log(parsed);
+    //console.log('post response:')
+    //console.log(parsed);
 }

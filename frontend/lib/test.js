@@ -60,7 +60,7 @@ test.getRandomUnitsRandom = (unitsCount, seed) => {
         units.push({lat: randomLat(seed++), lng: randomLng(seed++)});
     }
 
-    console.log(`Seed: ${seed}`);
+    //console.log(`Seed: ${seed}`);
 
     return units;
 };

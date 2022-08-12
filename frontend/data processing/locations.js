@@ -500,7 +500,7 @@ const nameToLocation = async name => {
     try{
         return await idToLocation(await textToId(name));
     } catch(e) {
-        //console.log(e);
+        ////console.log(e);
         return {lat: 0, lng: 0};
     }
 };
@@ -508,9 +508,9 @@ const nameToLocation = async name => {
 const saveFile = async (filename, data) => {
     fs.writeFile(filename, JSON.stringify(data), function(err) {
         if(err) {
-            return console.log(err);
+            return //console.log(err);
         }
-        //console.log("The file was saved!");
+        ////console.log("The file was saved!");
     });
 }
 
@@ -519,7 +519,7 @@ const saveFile = async (filename, data) => {
     
     for(let i = 0; i < data.length; i++) {
         const position = await nameToLocation(data[i].name);
-        console.log(position);
+        //console.log(position);
         result.push({name: data[i].name, position, range: data[i].range});
     }
 
