@@ -32,7 +32,7 @@ api.algorithm = async (type, stationRanges, stationCounts, stations, units) => {
     });
     //console.log(stations);
     const instance = {stationRanges, stationCounts, stations, units};
-    //console.log(instance);
+    // console.log(units);
     //console.log(`${api.url}/${type}Algorithm`);
     const result = await fetch(`${api.url}/${type}Algorithm`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
     //alert todo obsluga bledow

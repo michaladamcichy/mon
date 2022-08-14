@@ -10,6 +10,8 @@ const normalize = (lat, lng) => {
 const multiplier = 1000;
 
 const rand = (seed) => {
+    //aLert!!!
+    return Math.random();
     var x = Math.sin(seed) * 10000;
     return x - Math.floor(x);
 };
@@ -77,7 +79,9 @@ test.getRandomUnitsRelated = (unitsCount, seed) => {
     {
         let direction = normalize(rand(seed++) * 2 - 1.0, rand(seed++) * 2 - 1.0);
         let distance = rand(seed++) * 1;
-        units.push({lat: units[i-1].lat + direction.lat * distance, lng: units[i-1].lng + direction.lng * distance});
+        units.push({lat: units[i-1].lat + direction.lat * distance, 
+            lng: units[i-1].lng + direction.lng * distance,
+        });
     }
 
     return units;
@@ -126,12 +130,48 @@ test.validate = (stations, ranges, counts) => {
 };
 ////////////////////
 
-const printTimes = series => {
-    console.log(series);
+const printTimes = seriess => {
+    console.log('TIMES');
+    const N = Object.keys(seriess[0]);
+    N.forEach(n => {
+        let text = `${n.toString()}`;
+        seriess.forEach(series => {
+            const avgTime = Math.round(series[n].reduce((cur, next) => cur + next, 0) / series[n].length * 100.0) / 100;
+            const timeDev = Math.round(Math.sqrt(series[n].reduce((cur, next) => cur + Math.pow(next - avgTime,2), 0) / (series[n].length - 1)) * 100.0) / 100;
+            text += ` & ${avgTime} & ${timeDev}`;
+        });
+        text += '\\\\\n';
+
+        console.log(text);
+    });
 };
 
-const printCosts = series => {
-    console.log(series);
+const getStationsScore = stations => stations.filter(station => !station.isStationary).reduce((current, station) => current + station.range, 0);
+
+
+const printCosts = seriess => {
+    console.log('COSTS');
+    const N = Object.keys(seriess[0]);
+    //console.log(seriess);
+    N.forEach(n => {
+        let text = `${n.toString()}`;
+        seriess.forEach(series => {
+            const counts = series[n].map(item => item.length);
+            const costs = series[n].map(item => getStationsScore(item));
+            
+            const avgStationsCount = Math.round(counts.reduce((cur, next) => cur + next, 0) / counts.length * 100.0) / 100;
+            const stationsCountDev = Math.round(Math.sqrt(counts.reduce((cur, next) => cur + Math.pow(next - avgStationsCount,2), 0) / (counts.length - 1)) * 100.0) / 100;
+            
+            const avgCost = Math.round(costs.reduce((cur, next) => cur + next, 0) / (costs.length) * 100.0) / 100;
+            const costDev = Math.round(Math.sqrt(costs.reduce((cur, next) => cur + Math.pow(next - avgCost,2), 0) / (costs.length - 1)) * 100.0) / 100;
+            
+            
+            text += ` & (${avgStationsCount}, ${avgCost}) & (${stationsCountDev}, ${costDev})`;
+        });
+        text += '\\\\\n';
+
+        console.log(text);
+    });
 };
 
 // let text = res.milliseconds.toString() + 'ms |' + res.stations.filter(item => !item.isStationary).length.toString() + ' ' + getStationsScore(res.stations).toString() + ' ';
@@ -148,36 +188,39 @@ const algorithm = async (algorithm, ranges, counts, stations, units) =>
 const naiveVsSimple = async (N, k, ranges, counts) => {
     console.log('naiveSimple');
     
-    naiveTimes = {};
-    naiveStations = {};
-    simpleTimes = {};
-    simpleStations = {};
+    const naiveTimes = {};
+    const naiveStations = {};
+    const simpleTimes = {};
+    const simpleStations = {};
 
     for(let i = 0; i < N.length; i++)
     {
         const n = N[i];
+        console.log(n);
         naiveTimes[n] = [];
-        naiveCosts[n] = [];
+        naiveStations[n] = [];
         simpleTimes[n] = [];
-        simpleCosts[n] = [];
+        simpleStations[n] = [];
 
         for(let i = 0; i < k; i++) {
-            const units = test.getRandomUnitsRelated(n);
-
+            const units = test.getRandomUnitsRelated(n).map(position => {return {position: position, priority: 1}});;
+            //console.log(units);
             const naiveResults = await algorithm("naiveArrange", ranges, counts,  [], units);
             const simpleResults = await algorithm("simpleArrange", ranges, counts, [], units);
-            naiveTimes.push(naiveResults.milliseconds);
-            naiveStations.push(naiveResults.stations);
-            simpleTimes.push(simpleResults.milliseconds);
-            simpleStations.push(simpleResults.stations);
+            //console.log(naiveResults.stations);
+            //console.log(simpleResults.stations);
+            naiveTimes[n].push(naiveResults.time);
+            naiveStations[n].push(naiveResults.stations);
+            simpleTimes[n].push(simpleResults.time);
+            simpleStations[n].push(simpleResults.stations);
         }
     }
     printTimes([naiveTimes, simpleTimes]);
-    printCosts([naiveCosts, simpleCosts]);
+    printCosts([naiveStations, simpleStations]);
 };
-
 
 test.run = async () => {
     console.log('TEST');
-    await naiveVsSimple([10, 20, 30, 40], 10, [20, 30, 50], [10000,10000,10000]);
+    await naiveVsSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
+    // await naiveVsSimple([50], 4, [20, 30, 50], [10000,10000,10000]);
 };

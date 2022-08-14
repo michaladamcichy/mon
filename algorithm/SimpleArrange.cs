@@ -10,6 +10,9 @@ namespace algorithm
     {
         public List<Station> Run(Instance instance)
         {
+            //alert! CRITICAL//alert! CRITICAL//alert! CRITICAL//alert! CRITICAL
+            //alert! CRITICAL//alert! CRITICAL//alert! CRITICAL//alert! CRITICAL
+            //alert! CRITICAL//alert! CRITICAL//alert! CRITICAL//alert! CRITICAL
             var cost = new Cost(instance);
             instance.MapObjects.RemoveAll(item => item is Station && !((Station) item).IsStationary);
 

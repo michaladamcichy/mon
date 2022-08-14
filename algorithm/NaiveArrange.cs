@@ -37,7 +37,7 @@ namespace algorithm
             var lastConnected = centralStations.First();
             while(centralStations.Any(station => !connected.Contains(station)))
             {
-                var nearestNotConnected = lastConnected.GetOneNearest(connected.ToList());
+                var nearestNotConnected = lastConnected.GetOneNearest(centralStations.Where(station =>!connected.Contains(station))     .ToList());
                 /*Tuple<Station, Station> nearest = null;
                 double nearestDistance = 0.0;
                 foreach(var notConnected in centralStations.Where(station => !connected.Contains(station)))
@@ -58,6 +58,7 @@ namespace algorithm
                 cost = new Cost(newCost);
                 connected.Add(nearestNotConnected);
                 additionalStations.AddRange(moreAdditionalStations);
+                lastConnected = nearestNotConnected;
                 //moreAdditionalStations.ForEach(station => { connected.Add(station); });
             }
 
