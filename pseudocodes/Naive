@@ -1,13 +1,42 @@
 Wejście:
     units - zbiór jednostek
         (lat, lng, priority) - zwykła jednostka,
-        (lat, lng, priority, counts: (count1, count2, count3)) - jednostka będąca magazynem
     stationaryStations - zbiór stacji stacjonarnych
         (lat, lng, range), range > 0
 
 Wyjście:
     result - zbiór stacji mobilnych
         (lat, lng, range)
+
+
+NaiveAlgorithm(units):
+    prywatne = {}
+    pośredniczące = {}
+    result = {}
+    dla każdej unit z units:
+        prywatna = weź najmniejszą dostępną stację
+        prywatna.location = unit.location
+        prywatne U= prywatna
+        pośrednicząca = weź najmniejszą dostępną stację
+        pośrednicząca.location = unit.location
+        pośredniczące U= {pośrednicząca}
+    result = prywatne U pośredniczące
+    connected = {pośredniczące[0]}
+    póki |connected| < |pośredniczące|:
+        (not_connected_station, connected_station) = znajdź takę parę (not_connected_station, connected_station)
+            że not_connected_station \in pośredniczące/connected i connected_station \in connected, że odległość między NaiveAlgorithm
+            jest najmniejsza możliwa
+        stacje_łączące = PołączŁańcuchem(not_connected, connected) //TODO 
+        
+        connected = connected U {not_connected}
+        result = result U stacje_łączące
+
+    zwróc result
+
+
+    
+
+
 
 NAIVE ALGORITHM
 1. Ze zbioru units odrzuć każdą jednostke u, dla której istnieje taka stacja stacjonarna s_s, że u jest w zasięgu s_s

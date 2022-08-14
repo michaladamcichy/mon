@@ -277,7 +277,7 @@ namespace algorithm
                 }
             }
 
-            return instance.AllStations; //alert
+            return instance.Stations; //alert
         }
     }
 }

@@ -18,6 +18,7 @@ namespace algorithm
         {
             this.position = position;
             this.range = range;
+
             this.groupId = groupId;
             this.id = id;
             this.isStationary = isStationary;

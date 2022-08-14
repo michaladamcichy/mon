@@ -1,3 +1,4 @@
+import {api} from './api.js';
 export const test = {};
 
 const startPosition = {lat: 52.2297, lng: 21.0122};
@@ -122,4 +123,61 @@ test.validate = (stations, ranges, counts) => {
         if(stations.filter(station => station.range == ranges[i]).length > counts[i]) return false;
     }
     return true;
+};
+////////////////////
+
+const printTimes = series => {
+    console.log(series);
+};
+
+const printCosts = series => {
+    console.log(series);
+};
+
+// let text = res.milliseconds.toString() + 'ms |' + res.stations.filter(item => !item.isStationary).length.toString() + ' ' + getStationsScore(res.stations).toString() + ' ';
+//         getStationsStats(res.stations).forEach(item => text += item.count.toString() + 'x' + item.range + ' ');
+//         console.log(text);
+
+const algorithm = async (algorithm, ranges, counts, stations, units) => 
+{
+    let res = await api.algorithm(algorithm, ranges, counts, stations, units);
+    
+    return {stations: res.stations, time: res.milliseconds};
+}
+
+const naiveVsSimple = async (N, k, ranges, counts) => {
+    console.log('naiveSimple');
+    
+    naiveTimes = {};
+    naiveStations = {};
+    simpleTimes = {};
+    simpleStations = {};
+
+    for(let i = 0; i < N.length; i++)
+    {
+        const n = N[i];
+        naiveTimes[n] = [];
+        naiveCosts[n] = [];
+        simpleTimes[n] = [];
+        simpleCosts[n] = [];
+
+        for(let i = 0; i < k; i++) {
+            const units = test.getRandomUnitsRelated(n);
+
+            const naiveResults = await algorithm("naiveArrange", ranges, counts,  [], units);
+            const simpleResults = await algorithm("simpleArrange", ranges, counts, [], units);
+            naiveTimes.push(naiveResults.milliseconds);
+            naiveStations.push(naiveResults.stations);
+            simpleTimes.push(simpleResults.milliseconds);
+            simpleStations.push(simpleResults.stations);
+        }
+    }
+    printTimes([naiveTimes, simpleTimes]);
+    printCosts([naiveCosts, simpleCosts]);
+};
+
+
+test.run = async () => {
+    console.log('TEST');
+    await naiveVsSimple([10, 20, 30, 40], 10, [20, 30, 50], [10000,10000,10000]);
 };

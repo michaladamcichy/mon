@@ -9,13 +9,14 @@
 
 	import {maps} from '../lib/maps.js';
 	import {api} from '../lib/api';
+	import { test } from '../lib/test';
 
 	export let ready;
 
 	let map;
 
 	const defaultRanges = [20, 30, 50];
-	const defaultCounts = [1000,1000,1000];
+	const defaultCounts = [10000,10000,10000];
 	const defaultWeights = [1.0, 1.5, 2.5];
 	const defaultStations = [];
 	const defaultUnits = [];
@@ -44,6 +45,11 @@
 	let units;
 	let bigTestRunning = false;
 	let percentageOfStations = 0.0;
+	let disableMap = false;
+
+	const updateDisableMap = (newValue) => {
+		disableMap = newValue;
+	}
 
 	const loadGSM = async (percentage = percentageOfStations) => {
 		selectedInstance.stations = selectedInstance.stations.filter(station => !station.isStationary);
@@ -60,7 +66,7 @@
 		}
 
 		selectedInstance.stations = selectedInstance.stations.concat(
-			stationaryStations.map(ss => ({position: ss.position, range: ss.range, isStationary: true})));
+			stationaryStations.map(ss => ({position: ss.position, range: 50, isStationary: true}))); //alert CRITICAL ALERT
 		loadInstance(selectedInstance);
 	};
 
@@ -185,6 +191,7 @@
 	};
 
 	onMount(() => {
+		test.run();
 	});
 
 	// let serverNotResponding = true;
@@ -319,6 +326,8 @@
 				percentageOfStations={percentageOfStations}
 				updatePercentage={updatePercentage}
 				loadGSM={loadGSM}
+				disableMap={disableMap}
+				updateDisableMap={updateDisableMap}
 				/>
 		</div>
 	</div>

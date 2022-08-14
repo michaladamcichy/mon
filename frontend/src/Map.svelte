@@ -115,6 +115,7 @@ import { onMount } from "svelte";
     };
 
     const updateMarkers = (map, stations, units) => {
+        return;
         markers.forEach(marker => { //alert todo nowa for loop
             marker.setMap(null);
         });
@@ -125,6 +126,7 @@ import { onMount } from "svelte";
     };
 
     const updateCircles = (map, stations) => {
+        return;
         circles.forEach(circle => {circle.setMap(null)});
         circles = [];
         stations.forEach((unit,index) => {

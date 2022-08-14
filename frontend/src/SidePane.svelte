@@ -31,10 +31,10 @@ import Instance from './Instance.svelte';
     let stationsHidden = false;
     let unitsHidden = false;
 
-    const addStation = range => {
+    const addStation = (range, isStationary = false) => {
         //console.log('add station');
         //console.log(stationRanges);
-        const newStation = {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: range, isStationary: false};
+        const newStation = {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: range, isStationary};
         //console.log(newStation);
         updateAllStations([...stations, newStation]);
     };
@@ -62,7 +62,9 @@ import Instance from './Instance.svelte';
     };
 
     const removeAllStations = () => {
-        updateAllStations([]);
+        const stationary= stations.filter(station => station.isStationary);
+        const _stations = stationary.length != stations.length ? stationary : [];
+        updateAllStations(_stations);
     };
 
     const removeAllUnits = () => {
@@ -116,6 +118,7 @@ import Instance from './Instance.svelte';
                 <button class="col btn btn-primary" on:click={() => {addStation(range)}}>{range}</button>
             {/each}
             <div class="col">km</div>
+            <button class="col btn btn-primary fa fa-star ss" on:click={() => {addStation(stationRanges[stationRanges.length-1], true)}}></button>
             <div class="col"></div>
             <div class="col"></div>
             <button class="col btn btn-danger removeAllButton" on:click={() => {removeAllStations()}} disabled={stations.length == 0}>X</button>
@@ -190,6 +193,10 @@ import Instance from './Instance.svelte';
 
     #x:nth-child(even) {
         background-color: lightblue;
+    }
+
+    .ss {
+       font-size: 20px;
     }
     
 </style>

@@ -228,6 +228,7 @@ namespace algorithm
 
         public double? QueryMakeBigger(Station station)
         {
+            if (station.IsStationary) return null;
             for (var i = Instance.StationRanges.ToList().IndexOf(station.Range) + 1; i < Instance.StationRanges.Count(); i++)
             {
                 if (CanGet(Instance.StationRanges[i]))
@@ -241,6 +242,7 @@ namespace algorithm
 
         public double? QueryMakeSmaller(Station station)
         {
+            if(station.IsStationary) return null;
             for (var i = Instance.StationRanges.ToList().IndexOf(station.Range) - 1; i >= 0; i--)
             {
                 if (CanGet(Instance.StationRanges[i]))
@@ -254,6 +256,7 @@ namespace algorithm
 
         public bool CanChangeRange(Station station, double newRange)
         {
+            if (station.IsStationary) return false;
             if (station.Range == newRange) return true;
             if (!CanGet(newRange)) return false;
             return true;
@@ -261,6 +264,7 @@ namespace algorithm
 
         public bool CanChangeRange(List<Station> stations, double newRange)
         {
+            if (stations.Any(station => station.IsStationary)) return false;
             Cost cost = new Cost(this, false);
             foreach(var station in stations)
             {
@@ -333,6 +337,7 @@ namespace algorithm
         
         public void GiveBack(double range, int count = 1)
         {
+            Debug.Assert(Instance.StationRanges.Contains(range)); //alert! usun
             Counts[Instance.StationRanges.ToList().IndexOf(range)] += count;
             Log("GiveBack " + range.ToString() + " x" + count.ToString());
         }

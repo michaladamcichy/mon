@@ -36,10 +36,10 @@ const latlngStep = 0.1;
                 class={`col btn selectButton ${unit.priority == priority.priority ? 'btn-success' : 'btn-primary'}`}
                     on:click={() => {
                         unit.priority = priority.priority;
-                        if(priority.priority == 0)
-                        {
-                            unit.counts = [1000, 1000, 1000]; //alert
-                        }
+                        // if(priority.priority == 0)
+                        // {
+                        //     unit.counts = [1000, 1000, 1000]; //alert
+                        // }
                         update(unit);
                         }}>
                 <i class={priority.icon}></i>

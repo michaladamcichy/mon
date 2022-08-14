@@ -478,7 +478,6 @@ const data = [
 
 import fetch from "node-fetch";
 import fs from 'fs';
-import { resourceLimits } from "worker_threads";
 
 const textToId = async text => {
     const formattedText = encodeURIComponent(text);
@@ -500,8 +499,12 @@ const nameToLocation = async name => {
     try{
         return await idToLocation(await textToId(name));
     } catch(e) {
-        ////console.log(e);
-        return {lat: 0, lng: 0};
+        try{
+            return await idToLocation(await textToId(name.split(' ')[0]));
+        } catch(e) {
+            ////console.log(e);
+            return {lat: 0, lng: 0};
+        }
     }
 };
 
@@ -515,11 +518,13 @@ const saveFile = async (filename, data) => {
 }
 
 (async () => {
+    console.log('start');
     let result = [];
     
     for(let i = 0; i < data.length; i++) {
-        const position = await nameToLocation(data[i].name);
-        //console.log(position);
+        let position = await nameToLocation(data[i].name);
+        console.log(data[i].name);
+        console.log(position);
         result.push({name: data[i].name, position, range: data[i].range});
     }
 

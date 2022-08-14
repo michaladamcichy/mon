@@ -13,13 +13,17 @@ namespace algorithm
             var units = instance.Units;
 
             if (units.Any(item => !item.HasAttachement())) return false;
+            if (instance.PrivateStations.Any(station => station.Neighbors.Where(neighbor => neighbor.IsCore).Count() == 0)) return false;
 
-            foreach (var attachedStation in instance.PrivateStations)
+            var neighbors = new HashSet<Station>();
+            instance.PrivateStations.ForEach(station => station.Neighbors.ForEach(neighbor => { if (neighbor.IsCore) neighbors.Add(neighbor); }));
+
+            foreach (var station in neighbors)
             {
                 var visited = new Dictionary<Station, bool>();
-                instance.AllStations.ForEach(station => visited[station] = false);
+                instance.Stations.ForEach(station => visited[station] = false);
 
-                DFS(attachedStation, visited);
+                DFS(station, visited);
                 bool notAllConnected = instance.PrivateStations.Any(station => !visited[station]);
 
                 if (notAllConnected)
@@ -27,7 +31,7 @@ namespace algorithm
                     return false;
                 }
             }
-
+            
             return true;
         }
 

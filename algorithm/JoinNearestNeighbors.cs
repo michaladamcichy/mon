@@ -53,8 +53,7 @@ namespace algorithm
 
             return (additionalStations, cost);
         }*/
-        public static (List<Station>, Cost) Run(Cost initialCost, Instance instance, List<Station> coreStations, List<Station> stationaryStations,
-            List<Unit> unitsConnectedToStationaryStations, HashSet<Station> _connected = null)
+        public static (List<Station>, Cost) Run(Cost initialCost, Instance instance, List<Station> coreStations, HashSet<Station> _connected = null)
         {
             var cost = new Cost(initialCost);
             if (coreStations.Count == 0 || !cost.CanGetAny()) return (new List<Station>(), cost);
@@ -62,13 +61,10 @@ namespace algorithm
             var connected = _connected == null ? new HashSet<Station>() : _connected;
             var additionalStations = new List<Station>();
 
-            //if (unitsConnectedToStationaryStations.Count > 0) //alert chyba jednak nie powinno tak być
-            stationaryStations.ForEach(stationaryStation => connected.Add(stationaryStation));
-
             var stationToSet = new Dictionary<Station, HashSet<Station>>();
             connected.ToList().ForEach(station => { stationToSet[station] = connected; });
 
-            var allStations = coreStations.Concat<Station>(stationaryStations).ToList();
+            var allStations = new List<Station>(coreStations);
             /*var edges = new Dictionary<Tuple<Station, Station>, double>();
             allStations.ForEach(first => { allStations.ForEach(second =>
             {
@@ -105,7 +101,7 @@ namespace algorithm
                         }
                     }
                 }
-                if (nearest == null) break; 
+                if (nearest == null) break;
 
                 var (f, s) = nearest;
                 var s1 = stationToSet[f];

@@ -42,7 +42,7 @@ namespace backend.Controllers
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            instanceJSON.stations.Clear(); //alert! alert!
+            instanceJSON.stations.RemoveAll(item => !item.isStationary);
             var instance = new Instance(instanceJSON);
             var ret = Algorithm.NaiveArrange(instance).Select(item => item.GetJSON()).ToList();
 
@@ -53,12 +53,12 @@ namespace backend.Controllers
         [HttpPost]
         [Route("simpleArrangeAlgorithm")]
         public Result simpleArrangeAlgorithm(InstanceJSON instanceJSON)
-        {
+        { //alert CRITICAL ALERT!
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
             var instance = new Instance(instanceJSON);
-            var ret = Algorithm.SimpleArrange(instance).Select(item => item.GetJSON()).ToList();
+            var ret = Algorithm.ArrangeWithExisting(instance).Select(item => item.GetJSON()).ToList();
             
             stopwatch.Stop();
             return new Result(ret, stopwatch.ElapsedMilliseconds);// stopwatch.ElapsedMilliseconds);

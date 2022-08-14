@@ -24,6 +24,8 @@ import Station from "./Station.svelte";
     export let percentageOfStations;
     export let updatePercentage;
     export let loadGSM;
+    export let disableMap;
+    export let updateDisableMap;
 
     let counts = [...stationCounts];
 
@@ -36,6 +38,9 @@ import Station from "./Station.svelte";
     let selectAlgorithm = 'simpleArrange';
     let lastOperation = {name: null, time: null};
     
+    //alert
+    let lastI = 0;
+
     onMount(() => {
         oldStationRanges = [...stationRanges];
     });
@@ -186,7 +191,7 @@ import Station from "./Station.svelte";
                 Random instance
             </button>
             <input type="number" bind:value={unitsCount} class="col" min='0' step='1'>
-            <input type="number" bind:value={seed} class="col" min='0' step='1'>
+            <input type="number" bind:value={lastI} class="col" min='0' step='1'>
         </div>
         <div class="row">
             <button class={`col btn ${bigTestRunning ? 'btn-warning' : 'btn-primary'}`} on:click={() => {
@@ -220,9 +225,9 @@ import Station from "./Station.svelte";
                 const _counts = [...counts];
                 bigTestTask = setTimeout(async () => {
                     const _unitsCount = unitsCount;
-                    for(let i = 0; i < 1000000; i++)
+                    for(let i = lastI; i < 1000000; i++)
                     {
-                        //console.log(i);
+                        console.log(i);
                         const positions = test.getRandomUnitsRelated(Math.ceil(_unitsCount / 2), i);
             
                         const _units = positions.map(position => {return {position: position, priority: 1}});
@@ -240,13 +245,14 @@ import Station from "./Station.svelte";
                             return;
                         }
                         const _stations = res.stations;
-                        const _positions = test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), i);
+                        const _positions =[];//test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), i);
                         let priority = 1;
                         const __units = _positions.map(position => {return {position: position, priority: (priority++)%4 + 1}}); 
-                        const __res = await api.algorithm('arrangeWithExisting', ranges, _counts, _stations.concat(stationaryStations), _units.concat(__units));
-                        const __stations = __res.stations;
+                        //const __res = await api.algorithm('arrangeWithExisting', ranges, _counts, _stations.concat(stationaryStations), _units.concat(__units));
+                        const __stations = _stations;//__res.stations;
                         const isConnected = await api.isConnected(ranges, counts, __stations.concat(stationaryStations), __units.concat(_units));
                         
+                        lastI = i+1;
                         if(!isConnected || !test.validate(__stations, stationRanges, _units[0].counts) || bigTestRunning == false)
                         {
                             updateStations(__stations);

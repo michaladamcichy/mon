@@ -1,9 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace algorithm
 {
@@ -31,7 +28,7 @@ namespace algorithm
     public class MapObject
     {
         public virtual Position Position { get; set; } = new Position();
-        public virtual double Range { get; set; } = 0;
+        public virtual double Range { get; set; } = 0.0;
 
         public MapObject() {}
         public MapObject(Position position)
@@ -44,8 +41,7 @@ namespace algorithm
         }
         public List<MapObject> GetNearest(List<MapObject> mapObjects)
         {
-            var THIS = this; //alert alert!
-            var toSort = mapObjects.FindAll(item => item != THIS);
+            var toSort = mapObjects.FindAll(item => item != this);
             toSort.Sort((item1, item2) => this.GetDistanceFrom(item1).CompareTo(this.GetDistanceFrom(item2)));
             return toSort;
         }
@@ -63,6 +59,7 @@ namespace algorithm
 
         public List<Station> GetNearest(List<Station> mapObjects)
         {
+            if(mapObjects.Where(item => item != this).Count()==0) return new List<Station>();
             return GetNearest(mapObjects.Cast<MapObject>().ToList()).Cast<Station>().ToList();
         }
         public virtual bool IsInRange(MapObject other)

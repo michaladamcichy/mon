@@ -1,0 +1,67 @@
+        public static (Cost, double?) AdjustLast(Cost initialCost, Station first, Station last, double tolerance = 0.1)
+        {
+            Cost cost = new Cost(initialCost);
+
+            var lastCopy = new Station(last);
+
+            while(cost.CanMakeBigger(lastCopy))
+            {
+                cost.MakeBigger(lastCopy);
+                if (MapObject.AreInRange(first, last)) return (cost, lastCopy.Range);
+            }
+            return (cost, null);
+        }
+
+
+        NextPosition(first, last):
+            directionLat = (last.postion.lat - first.position.lat) / Distance(first, last)
+            directionLng = (last.postion.lng - first.position.lng) / Distance(first, last)
+            zwróc (lat: first.position.lat + directionLat * first.range, 
+                lng: first.position.lng + directionLng * first.range)
+
+        ArrangeBetween(first, last):
+            jeżeli first last są już w swoim zasięgu:
+                zwróc {}
+            jeżeli SpróbujPołączyćPowiększającStacje(first, last) == true:
+                zwróc {}
+            dodatkowaStacja = SpróbujPołączyćZaPomocąDodatkowejStacji(first, last)
+            jeżeli dodatkowaStacja != null:
+                zwróć {dodatkowaStacja}
+            
+            kolejnaStacjaWŁańcuchu = weź największą dostępną stację i umiejsców ją w pozycji równej NextPosition(first, last)
+            
+
+        public static (Cost, List<Station>) ArrangeBetween(Cost initialCost, Station first, Station last, double tolerance = 0.1)
+        {
+            Cost cost = new Cost(initialCost);
+            var stations = new List<Station>();
+
+            if(MapObject.AreInRange(first, last)) return (cost, stations);
+
+            var (newCost, newRange) = AdjustLast(cost, first, last, tolerance);
+            if (newRange != null)
+            {
+                cost = new Cost(newCost);
+                cost.ChangeRange(last, newRange.Value);
+                return (cost, stations);
+            }
+
+            var joiningStation = cost.Join(first, last, tolerance);
+            if (joiningStation != null)
+            {
+                stations.Add(joiningStation);
+                return (cost, stations);
+            }
+
+            var next = MapObject.GetNextFromTowards(first, last, tolerance);
+            if(!cost.CanGetAny()) return (cost, null);
+            var station = new Station(next.Position, cost.GetMax().Value);
+
+            stations.Add(station);
+            var (otherNewCost, newStations) = ArrangeBetween(cost, station, last, tolerance); //alert czy koszt jest zliczany dobrze w rekru
+            if (newStations == null) return (otherNewCost, null);
+            cost = new Cost(otherNewCost);
+            stations.AddRange(newStations);
+
+            return (cost, stations);
+        }

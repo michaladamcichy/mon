@@ -44,7 +44,7 @@ namespace algorithm
             if (!cost.CanGetAny()) return (null, initialCost);
 
             var nearestStations = first.GetNearest(instance.Stations);
-            
+            if(nearestStations.Count == 0) return (new Group(new List<Station>() { first, new Station(first.Position, cost.GetMin().Value) }), cost);
             foreach (var station in nearestStations)
             {
                 if (station == first || groups.Any(item => item.Contains(station))) continue;
@@ -114,7 +114,7 @@ namespace algorithm
         {
             Cost cost = new Cost(initialCost);
             //if nie rozbudowujemy tylko zaczynamy od zera //alert!
-            Station._id = 0;//alert
+            //Station._id = 0;//alert
             var groups = new List<Group>();
 
             foreach (var unit in instance.Units)

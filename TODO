@@ -136,6 +136,19 @@ PRZYWRÓCIĆ GLOBALNOŚĆ ZASOBÓW
 ALERT SKONFRONTOWAĆ ZAKRES Z KARTY PRACY Z RZECZYWISTOŚCIA
 ALERT - CEL MINIMALIZACJI JEST PROBLEMATYCZNY
 ALERT ALERT - GET ONE NEAREST NIE OBSŁUGUJE PUSTYCH KOLEKCCI LUB ZAWIERAJĄCYECH TEN ELEMENT
+ALERT - stacja stacjonarna mająca w zasięgu prywatną może być uznana za centralną, choć nie jest potrzebna
+ALERT - sprawdzić czy gdzieś nie ma próby zmiany zasięgu stacji stacjonarnej
+ZAPOMNIAŁEM DODAĆ DO PRACY CONNECTION CHECK
+CHCIAŁBYM, ŻEBY SIMPLE O
+PTIMIZE zwracało ucięte końce ośmiornicy
+ALERT - NIE MAM ŻADNEGO TESTU Z OGRANICZONYMI STACJAMI - może priorytetowy??
+ALERT - UWAGA, nie napisałem nic o trzykrotnym uruchamianiu Creategroups
+ALERT - dodałem dołączanie do infrastrukury także w naive - OPISZ TO
+ALERT - NAIWNY MA TERAZ ZBYT DŁUGI CZAS WYKOANIA
+ALERT - napisać przy każdym algorytmie, które tego wymaga, że JEST URUCHAMIANY 3 RAZY!
+ALERT - w recursive arrange between ostatecznie nie porównuję moim kryterium! a powinieniem!
+ALERT - ujednolicić location i postiion
+WAŻNE- to, że czasmi algorytmowi braknie stacji mimo że są dostępne wynika z jakiegoś błędu w RecursiveArrangeBetween!
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

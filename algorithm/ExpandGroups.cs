@@ -15,6 +15,7 @@ namespace algorithm
 
             var groups = coreStations.Select(coreStation => new Group(new List<Station>() { coreStation })).ToList();
             if(groups.Count == 0) return (cost, groups, lonelyStations.FindAll(station => !assigned.Contains(station)));
+            
             foreach (var lonely in lonelyStations)
             {
                 var group = lonely.GetOneNearest(groups);

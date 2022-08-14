@@ -23,16 +23,15 @@ namespace algorithm
         {
             /*instance.UpdateCounts();*/ //alert
             Cost cost = new Cost(instance);
-
+            
             var lonelyUnits = instance.Units.FindAll(unit => !unit.HasAttachement()).ToList(); //alert zmieniłem tutaj
-
             var additionalStations = new List<Station>();
 
             var lonelyStations = new List<Station>();
             foreach(var unit in lonelyUnits)
             {
                 var range = cost.GetMin();
-                if (range == null) return lonelyStations.Concat<Station>(instance.Stations).Concat<Station>(instance.StationaryStations).ToList();
+                if (range == null) return lonelyStations.Concat<Station>(instance.Stations).ToList(); //alert
                 var station = new Station(unit.Position, range.Value);
                 lonelyStations.Add(station);
                 unit.Attach(station);
@@ -47,12 +46,12 @@ namespace algorithm
             instance.Stations.ForEach(station => { if (!newStations.Contains(station)) allStations.Add(station); });
 
             var connected = new HashSet<Station>();
-            oldGroups.ForEach(group => connected.Add(group.CentralStation));
+            oldGroups.Where(group => !group.CentralStation.IsStationary).ToList().ForEach(group => connected.Add(group.CentralStation));
             var (joiningStations, otherNewCost) =
-                JoinNearestNeighbors.Run(cost, instance, allStations.FindAll(station => !station.IsAttached()), instance.StationaryStations, instance.UnitsConnectedToStationaryStations, connected);
+                JoinNearestNeighbors.Run(cost, instance, allStations.FindAll(station => !station.IsAttached()), connected);
             cost = new Cost(otherNewCost);
              
-            return allStations.Concat<Station>(joiningStations).Concat<Station>(instance.StationaryStations).ToList();
+            return allStations.Concat<Station>(joiningStations).ToList();
             /*var (groups, newCost) = (new SimpleCreateGroups(instance)).Run(cost);
             cost = new Cost(newCost);
             if (instance.Units.Any(unit => !unit.HasAttachement())) return Group.Flatten(groups).Concat<Station>(instance.StationaryStations).ToList(); //alert data flow po kryjomu modyfikuje instnace.Stations
