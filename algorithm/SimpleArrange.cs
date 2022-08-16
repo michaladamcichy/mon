@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace algorithm
 {
-    public class SimpleArrange : IArrangeAlgorithm //critical alert
+    public class SimpleArrange //critical alert
     {
-        public List<Station> Run(Instance instance)
+      /*  public List<Station> Run(Instance instance)
         {
             //alert! CRITICAL//alert! CRITICAL//alert! CRITICAL//alert! CRITICAL
             //alert! CRITICAL//alert! CRITICAL//alert! CRITICAL//alert! CRITICAL
@@ -22,12 +22,12 @@ namespace algorithm
             
             var coreStations = groups.FindAll(group => group.CentralStation != null).Select(group => group.CentralStation).Concat<Station>(instance.StationaryStations).ToList();
 
-            var (additionalStations, otherNewCost) = JoinNearestNeighbors.Run(cost, instance, coreStations);
+            var (additionalStations, otherNewCost, edges) = JoinNearestNeighbors.Run(cost, instance, coreStations);
             cost = new Cost(otherNewCost);
             //var additionalStations = new List<Station>();
             return Group.Flatten(groups).Concat<Station>(additionalStations).ToList().ToList();
         }
-
+*/
 
         //alert scenariusze łączęnia grup:
         //zbuduje drogę miedzy stacjami

@@ -53,10 +53,10 @@ namespace algorithm
 
             return (additionalStations, cost);
         }*/
-        public static (List<Station>, Cost) Run(Cost initialCost, Instance instance, List<Station> coreStations, HashSet<Station> _connected = null)
+        public static (List<Station>, Cost, DoubleDictionary<Station, List<Station>>) Run(Cost initialCost, Instance instance, List<Station> coreStations, HashSet<Station> _connected = null)
         {
             var cost = new Cost(initialCost);
-            if (coreStations.Count == 0 || !cost.CanGetAny()) return (new List<Station>(), cost);
+            if (coreStations.Count == 0 || !cost.CanGetAny()) return (new List<Station>(), cost, new DoubleDictionary<Station, List<Station>>());
 
             var connected = _connected == null ? new HashSet<Station>() : _connected;
             var additionalStations = new List<Station>();
@@ -74,7 +74,9 @@ namespace algorithm
                 if(!stationToSet.ContainsKey(station)) stationToSet[station] = new HashSet<Station> { station };
             });
 
-            if (coreStations.Count == 0) return (additionalStations, cost);
+            if (coreStations.Count == 0) return (additionalStations, cost, new DoubleDictionary<Station, List<Station>>());
+
+            var edges = new DoubleDictionary<Station, List<Station>>();
 
             while (coreStations.Any(station => stationToSet[coreStations.First()] != stationToSet[station]))
             {
@@ -113,11 +115,12 @@ namespace algorithm
                 cost = new Cost(newCost);
                 additionalStations.AddRange(moreAdditionalStations);
                 allStations.AddRange(moreAdditionalStations);
+                edges[f, s] = new List<Station> { f }.Concat<Station>(moreAdditionalStations).Concat<Station>(new List<Station>{ s }).ToList();
 
                 if (!cost.CanGetAny()) break;
             }
 
-            return (additionalStations, cost);
+            return (additionalStations, cost, edges);
         }
     }
 }

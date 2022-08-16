@@ -1,4 +1,6 @@
 import {api} from './api.js';
+import {_wpUnits} from './wp.js';
+import {_stationaryStations} from './stationaryStations.js';
 export const test = {};
 
 const startPosition = {lat: 52.2297, lng: 21.0122};
@@ -219,8 +221,179 @@ const naiveVsSimple = async (N, k, ranges, counts) => {
     printCosts([naiveStations, simpleStations]);
 };
 
+const existingSimple = async (N, k, ranges, counts) => {
+    console.log('simpleExisting');
+    
+    const existingTimes = {};
+    const existingStations = {};
+    const simpleTimes = {};
+    const simpleStations = {};
+
+    for(let i = 0; i < N.length; i++)
+    {
+        const n = N[i];
+        console.log(n);
+        existingTimes[n] = [];
+        existingStations[n] = [];
+        simpleTimes[n] = [];
+        simpleStations[n] = [];
+
+        for(let i = 0; i < k; i++) {
+            const _units = test.getRandomUnitsRelated(n / 2).map(position => {return {position: position, priority: 1}});
+            //console.log(units);
+            const initial = await algorithm("simpleArrange", ranges, counts, [], _units);
+            const isConnected = await api.isConnected(ranges, counts, initial.stations, _units);
+            if(!isConnected) console.log('CRITICAL ERROR!!!');
+            if(!isConnected) console.log('CRITICAL ERROR!!!');
+            if(!isConnected) console.log('CRITICAL ERROR!!!');
+            if(!isConnected) console.log('CRITICAL ERROR!!!');
+            const stations = initial.stations;
+            
+            const moreUnits = test.getRandomUnitsRelated(n / 2).map(position => {return {position: position, priority: 1}});
+            const units = _units.concat(moreUnits);
+
+            const existingResults = await algorithm("arrangeWithExisting", ranges, counts,  stations, units);
+            const simpleResults = await algorithm("simpleArrange", ranges, counts, [], units);
+            //console.log(naiveResults.stations);
+            //console.log(simpleResults.stations);
+            existingTimes[n].push(existingResults.time);
+            existingStations[n].push(existingResults.stations);
+            simpleTimes[n].push(simpleResults.time);
+            simpleStations[n].push(simpleResults.stations);
+        }
+    }
+    printTimes([existingTimes, simpleTimes]);
+    printCosts([existingStations, simpleStations]);
+};
+
+const simplePriority = async (N, k, ranges, counts) => {
+    console.log('simplePriority');
+    
+    const naiveTimes = {};
+    const naiveStations = {};
+    const simpleTimes = {};
+    const simpleStations = {};
+
+    for(let i = 0; i < N.length; i++)
+    {
+        const n = N[i];
+        console.log(n);
+        naiveTimes[n] = [];
+        naiveStations[n] = [];
+        simpleTimes[n] = [];
+        simpleStations[n] = [];
+
+        for(let i = 0; i < k; i++) {
+            const units = test.getRandomUnitsRelated(n).map(position => {return {position: position,
+                priority: [0,1,2,3,4][Math.floor(Math.random() * 5)]}});
+            //console.log(units);
+            const naiveResults = await algorithm("simpleArrange", ranges, counts,  [], units);
+            const simpleResults = await algorithm("priorityArrange", ranges, counts, [], units);
+            //console.log(naiveResults.stations);
+            //console.log(simpleResults.stations);
+            naiveTimes[n].push(naiveResults.time);
+            naiveStations[n].push(naiveResults.stations);
+            simpleTimes[n].push(simpleResults.time);
+            simpleStations[n].push(simpleResults.stations);
+        }
+    }
+    printTimes([naiveTimes, simpleTimes]);
+    printCosts([naiveStations, simpleStations]);
+};
+
+const simplesimpleOptimize = async (N, k, ranges, counts) => {
+    console.log('simpleSimpleOptimize');
+    
+    const simpleTimes = {};
+    const simpleStations = {};
+    const optimizeTimes = {};
+    const optimizeStations = {};
+
+    for(let i = 0; i < N.length; i++)
+    {
+        const n = N[i];
+        console.log(n);
+        simpleTimes[n] = [];
+        simpleStations[n] = [];
+        optimizeTimes[n] = [];
+        optimizeStations[n] = [];
+
+        for(let i = 0; i < k; i++) {
+            console.log(i);
+            const _units = test.getRandomUnitsRelated(n).map(position => {return {position: position, priority: 1}});;
+            //console.log(units);
+            const simpleResults = await algorithm("simpleArrange", ranges, counts,  [], _units);
+            const stations = simpleResults.stations;
+            const units = _units.filter(unit => _units.indexOf(unit) % 2 == 0);
+            const optimizeResults = await algorithm("simpleOptimize", ranges, counts, stations, units);
+            console.log('done');
+            //console.log(naiveResults.stations);
+            //console.log(simpleResults.stations);
+            naiveTimes[n].push(simpleResults.time);
+            naiveStations[n].push(simpleResults.stations);
+            simpleTimes[n].push(optimizeResults.time);
+            simpleStations[n].push(optimizeResults.stations);
+        }
+    }
+    printTimes([simpleTimes, optimizeTimes]);
+    printCosts([simpleStations, optimizeStations]);
+};
+
+const loadGSM = async (percentage = percentageOfStations) => {
+    if(percentage == 0) {
+        return [];
+    }
+    
+    let stationaryStations = [];
+    for(let i = 0; i < _stationaryStations.length; i++) {
+        //console.log(Math.round(1/ (percentage/100)));
+        if(i % Math.ceil(1/ (percentage/100)) != 0) continue;
+        stationaryStations.push(_stationaryStations[i]);
+    }
+
+    return stationaryStations.map(ss => ({position: ss.position, range: ss.range, isStationary: true}));
+};
+
+const real = async (N, k, ranges, counts) => {
+    console.log('real');
+    
+    const simpleTimes = {};
+    const simpleStations = {};
+    const priorityTimes = {};
+    const priorityStations = {};
+
+    for(let i = 0; i < N.length; i++)
+    {
+        const n = N[i];
+        console.log(n);
+        simpleTimes[n] = [];
+        simpleStations[n] = [];
+        priorityTimes[n] = [];
+        priorityStations[n] = [];
+
+        for(let i = 0; i < k; i++) {
+            const units = _wpUnits;
+            const stations = await loadGSM(n);
+            const simpleResults = await algorithm("simpleArrange", ranges, counts, stations, units);
+            const priorityResults = await algorithm("priorityArrange", ranges, counts, stations, units);
+            //console.log(naiveResults.stations);
+            //console.log(simpleResults.stations);
+            simpleTimes[n].push(simpleResults.time);
+            simpleStations[n].push(simpleResults.stations);
+            priorityTimes[n].push(priorityResults.time);
+            priorityStations[n].push(priorityResults.stations);
+        }
+    }
+    printTimes([simpleTimes, priorityTimes]);
+    printCosts([simpleStations, priorityStations]);
+};
+
 test.run = async () => {
     console.log('TEST');
-    await naiveVsSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
-    // await naiveVsSimple([50], 4, [20, 30, 50], [10000,10000,10000]);
+    //await naiveVsSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
+    await existingSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
+    //await simplePriority([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
+    //await simplesimpleOptimize([50, 100, /*200, 300, 400, 500, 600, 700, 800, 900, 1000*/], 3, [20, 30, 50], [10000,10000,10000]);
+    //await real([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], 1, [20, 30, 50], [10000,10000,10000]);
+    
 };

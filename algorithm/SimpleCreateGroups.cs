@@ -147,7 +147,7 @@ namespace algorithm
                         
                         if(_group != null)
                         {
-                            if(lastGroup == null || _group.Stations.Count > lastGroup.Stations.Count)
+                            if(lastGroup == null || _group.Stations.Count >= lastGroup.Stations.Count) //alert dodałem =
                             {
                                 group = _group;
                                 groupCost = newCost;

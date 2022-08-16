@@ -1,0 +1,10 @@
+Kruskal(V, E):
+    połączone = {}
+    wierzchołekDoZbioru = utwórz tablicę asocjacyjną
+    dla każdego v z V:
+        wierzchołekDoZbioru U= (v => {v})
+    
+    dla każdej krawędzi e=(v1, v2) należącej do E, posortowanych rosnąco wg wag krawędzi
+        scalonyZbiór = wierzchołekDoZbioru[v1] U wierzchołekDoZbioru[v2]
+        dla każdego wierzchołka v należącego do scalonyZbiór:
+            wierzchołekDoZbioru[v] = scalonyZbiór       

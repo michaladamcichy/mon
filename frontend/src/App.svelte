@@ -66,7 +66,7 @@
 		}
 
 		selectedInstance.stations = selectedInstance.stations.concat(
-			stationaryStations.map(ss => ({position: ss.position, range: 50, isStationary: true}))); //alert CRITICAL ALERT
+			stationaryStations.map(ss => ({position: ss.position, range: ss.range, isStationary: true}))); //alert CRITICAL ALERT
 		loadInstance(selectedInstance);
 	};
 

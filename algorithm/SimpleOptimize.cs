@@ -249,7 +249,7 @@ namespace algorithm
 
         }*/
 
-        public List<Station> Run(Instance instance)
+        public List<Station> Run(Instance instance, DoubleDictionary<Station, List<Station>> edges = null)
         {
             /*var stations = instance.Stations.*//*Where(station => !station.IsAttached()).*//* //alert!
                 Concat<Station>(instance.StationaryStations).ToList();
@@ -257,7 +257,7 @@ namespace algorithm
             //return new List<Station>();
             Debug.WriteLine("Simple optimize");
 
-            var edges = new Spider().Run(instance);
+            if(edges == null) edges = new Spider().Run(instance);
             var necessaryEdges = new Kruskal().Run(instance.PrivateStations, edges);
             var necessaryStations = new HashSet<Station>();
 
@@ -271,7 +271,7 @@ namespace algorithm
 
             foreach (var station in instance.Stations)
             {
-                if(!necessaryStations.Contains(station))
+                if(!necessaryStations.Contains(station) && !station.IsStationary)
                 {
                     instance.MapObjects.Remove(station);
                 }

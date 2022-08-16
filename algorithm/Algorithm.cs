@@ -25,10 +25,10 @@ namespace algorithm
             return new ConnectionCheck().Run(stations, counts);
         }
 
-        public static List<Station> SimpleArrange(Instance instance)
+       /* public static List<Station> SimpleArrange(Instance instance)
         {
             return new SimpleArrange().Run(instance);
-        }
+        }*/
 
         public static List<Station> NaiveArrange(Instance instance)
         {

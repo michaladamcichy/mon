@@ -149,6 +149,11 @@ ALERT - napisać przy każdym algorytmie, które tego wymaga, że JEST URUCHAMIA
 ALERT - w recursive arrange between ostatecznie nie porównuję moim kryterium! a powinieniem!
 ALERT - ujednolicić location i postiion
 WAŻNE- to, że czasmi algorytmowi braknie stacji mimo że są dostępne wynika z jakiegoś błędu w RecursiveArrangeBetween!
+ALERT - PRZYPAŁ - budowanie od zera jest gorsze niż dobudowywanie! :D
+ALERT - OBOWIĄZKOWA OPTYMALIZACJA PO SIMPLE ARRANGE
+TODO wspomnieć, że wbudowałem optymalizację w simple arrange
+ALERT - kosekwencja (u,v) a {u, v}
+ZROBIĆ TO CHRZANIONE DRZEWO PRIORYTETOWE
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

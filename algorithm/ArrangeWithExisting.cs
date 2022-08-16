@@ -21,6 +21,7 @@ namespace algorithm
 
         public List<Station> Run(Instance instance)
         {
+            var noInitialMobileStations = instance.MobileStations.Count == 0;
             /*instance.UpdateCounts();*/ //alert
             Cost cost = new Cost(instance);
             
@@ -47,11 +48,21 @@ namespace algorithm
 
             var connected = new HashSet<Station>();
             oldGroups.Where(group => !group.CentralStation.IsStationary).ToList().ForEach(group => connected.Add(group.CentralStation));
-            var (joiningStations, otherNewCost) =
+            var (joiningStations, otherNewCost, edges) =
                 JoinNearestNeighbors.Run(cost, instance, allStations.FindAll(station => !station.IsAttached()), connected);
             cost = new Cost(otherNewCost);
-             
-            return allStations.Concat<Station>(joiningStations).ToList();
+
+            if(!noInitialMobileStations) return allStations.Concat<Station>(joiningStations).ToList();
+
+            joiningStations.ForEach(joining => { if (!instance.MapObjects.Contains(joining)) instance.MapObjects.Add(joining); });
+            allStations.ForEach(station => { if (!instance.MapObjects.Contains(station)) instance.MapObjects.Add(station); });
+            //instance = new Instance(instance.Stations, instance.Units, instance.StationCounts);
+            //alert ta instance nie ma przeliczonych relacji!!!
+            var ret = new SimpleOptimize().Run(instance, edges);
+
+            
+            return ret.Concat<Station>(allStations.Where(station => station.IsPrivate && !instance.MapObjects.Contains(station))).ToList();
+            //return allStations.Concat<Station>(joiningStations).ToList();
             /*var (groups, newCost) = (new SimpleCreateGroups(instance)).Run(cost);
             cost = new Cost(newCost);
             if (instance.Units.Any(unit => !unit.HasAttachement())) return Group.Flatten(groups).Concat<Station>(instance.StationaryStations).ToList(); //alert data flow po kryjomu modyfikuje instnace.Stations
