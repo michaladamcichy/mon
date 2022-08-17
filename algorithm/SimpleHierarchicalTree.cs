@@ -41,7 +41,7 @@ namespace algorithm
             var additionalStations = new List<Station>();
             //alert skopiowany kod!!!
             //if nie rozbudowujemy tylko zaczynamy od zera //alert!
-            instance.MapObjects.RemoveAll(item => item is Station); //alert!!
+            instance.Stations.Clear();
             Station._id = 0;//alert
 
             foreach (var unit in instance.Units)
@@ -49,7 +49,7 @@ namespace algorithm
                 var minRange = cost.GetMin();
                 if (minRange == null) return additionalStations; //alert todo
                 var station = new Station(minRange.Value);
-                instance.MapObjects.Add(station);
+                instance.Stations.Add(station); //alert
                 unit.Attach(station);
             }
 

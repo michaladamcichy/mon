@@ -23,7 +23,7 @@ namespace algorithm
                     {
                         unit.Attach(station);
                     }
-                    instance.MapObjects.Add(station);
+                    instance.Stations.Add(station);
                 }
             }
 

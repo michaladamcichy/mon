@@ -42,18 +42,21 @@ namespace algorithm
             }
 
             var (newCost, oldGroups, newGroups) = AssignToGroups(instance, cost, lonelyStations, freshStart);
+            //return Group.Flatten(oldGroups.Concat<Group>(newGroups).ToList());
             cost = new Cost(newCost);
             //alert
             var connected = oldGroups.Select(group => group.CentralStation).ToList(); //alert wydajność - zbiory haszujące
             
             var notConnected = newGroups.Select(group => group.CentralStation).ToList();
 
+            instance.CreateRelations();
+
             var (allStations, otherNewCost, edges) =
                 JoinNearestNeighbors.Run(cost, instance, notConnected, connected);
             cost = new Cost(otherNewCost);
 
-            
-            return allStations.Concat<Station>(instance.PrivateStations).ToList();
+            instance.PrivateStations.Where(station => !allStations.Contains(station)).ToList().ForEach(station => allStations.Add(station));
+            return allStations;
             //alert 
 
             //alert

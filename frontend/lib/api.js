@@ -14,8 +14,15 @@ api.test = async () => {
     //console.log(res);
 };
 
+
+const RANGES = [20, 30, 40, 50, 71, 100];
+
+const parseCounts = (counts) => {
+    return [counts[0], counts[1], 0, counts[2], 0, 0];
+};
+
 api.isConnected = async (stationRanges, stationCounts, stations, units) => {
-    const instance = {stationRanges, stationCounts, stations, units};
+    const instance = {stationRanges/*: RANGES*/, stationCounts/*: parseCounts(stationCounts)*/, stations, units}; //alert!!!
     
     const result = await fetch(`${api.url}/isConnected`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
 
@@ -31,7 +38,7 @@ api.algorithm = async (type, stationRanges, stationCounts, stations, units) => {
         station.id = _i++;
     });
     //console.log(stations);
-    const instance = {stationRanges, stationCounts, stations, units};
+    const instance = {stationRanges/*: RANGES*/, stationCounts/*: parseCounts(stationCounts)*/, stations, units};
     // console.log(units);
     //console.log(`${api.url}/${type}Algorithm`);
     const result = await fetch(`${api.url}/${type}Algorithm`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
@@ -45,12 +52,4 @@ api.algorithm = async (type, stationRanges, stationCounts, stations, units) => {
     const res = await result.json();
     //console.log(res);
     return res;
-}
-
-api.testPost = async (stationRanges, stations, units) => {
-    const instance = {stationRanges, stationCounts: [1000,1000,1000], stations, units};
-    const result = await fetch(api.url, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
-    const parsed = await result.json();
-    //console.log('post response:')
-    //console.log(parsed);
 }

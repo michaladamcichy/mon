@@ -122,7 +122,7 @@ namespace algorithm
                 var minRange = cost.GetMin();
                 if(minRange == null) return (new List<Group>() { new Group(instance.Stations) }, cost) ;
                 var station = new Station(minRange.Value);
-                instance.MapObjects.Add(station);
+                instance.Stations.Add(station);
                 unit.Attach(station);
             }
 

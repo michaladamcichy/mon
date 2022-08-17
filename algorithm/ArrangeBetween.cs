@@ -8,7 +8,7 @@ namespace algorithm
 {
     public class ArrangeBetween
     {
-        static Cost MakeBothStationsBigger(Cost initialCost, Station first, Station second) //alert powinno zwracać proponowane range'e
+        /*static Cost MakeBothStationsBigger(Cost initialCost, Station first, Station second) //alert powinno zwracać proponowane range'e
         {
             Cost cost = new Cost(initialCost);
             while (first.Range < second.Range && cost.CanMakeBigger(first))
@@ -41,7 +41,7 @@ namespace algorithm
             }
 
             return cost;
-        }
+        }*/
 
         static Cost AdjustEnds(Station first, List<Station> middles, Station last, Cost initialCost, double tolerance)
         {

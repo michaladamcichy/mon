@@ -72,10 +72,32 @@ namespace backend.Controllers
             stopwatch.Start();
             instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
             var instance = new Instance(instanceJSON);
-            var ret = Algorithm.PriorityArrange(instance).Select(item => item.GetJSON()).ToList();
+            ///var ret = Algorithm.PriorityArrange(instance).Select(item => item.GetJSON()).ToList();
+
+            var units = new List<Unit>(instance.Units);
+
+            instance.Units = units.Where(unit => unit.Priority >= 4).ToList();
+            var ret = new ArrangeWithExisting().Run(instance);
+            instance.Stations = ret;
+
+            instance.Units = units.Where(unit => unit.Priority >= 3).ToList();
+            ret = new ArrangeWithExisting().Run(instance);
+            instance.Stations = ret;
+
+            instance.Units = units.Where(unit => unit.Priority >= 2).ToList();
+            ret = new ArrangeWithExisting().Run(instance);
+            instance.Stations = ret;
+
+            instance.Units = units.Where(unit => unit.Priority >= 1).ToList();
+            ret = new ArrangeWithExisting().Run(instance);
+            instance.Stations = ret;
+
+            instance.Units = units.Where(unit => unit.Priority >= 0).ToList();
+            ret = new ArrangeWithExisting().Run(instance);
+            instance.Stations = ret;
 
             stopwatch.Stop();
-            return new Result(ret, stopwatch.ElapsedMilliseconds);
+            return new Result(ret.Select(item => item.GetJSON()).ToList(), stopwatch.ElapsedMilliseconds);
         }
 
         [HttpPost]

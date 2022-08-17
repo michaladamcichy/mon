@@ -145,27 +145,28 @@ import Station from "./Station.svelte";
                 Priority tree
             </button>
         </div>
-        <!-- <div class="row">
+        <div class="row">
             <select bind:value={selectAlgorithm}>
                 <option value="simpleArrange"> Arrange </option>
                 <option value="arrangeWithExisting"> With existing </option>
                 <option value="priorityArrange"> Priority arrange </option>
             </select>
-        </div> -->
+        </div>
         <div class="row">
             <button class="col btn btn-primary" on:click={async () => {
                 updatePercentage(0);
                 const _unitsCount = unitsCount;
                 const positions = test.getRandomUnitsRelated(_unitsCount, seed);
             
-                const _units = positions.map(position => {return {position: position, priority: (seed)%4 + 1}});
+                // let ____i = 0;
+                const _units = positions.map(position => {return {position: position, priority: positions.indexOf(position)%5}});
                 if(_units.length > 0)
                 {
                     _units[0].priority = 0;
                     _units[0].counts = [...counts];
                 }
                 //alert teraz bez stacjonarnych
-                const stationaryStations = [];//test.getRandomStationaryStationsRelated(Math.ceil(unitsCount / 10 + 2), seed + 1, _units[0].position.lat, _units[0].position.lng); 
+                const stationaryStations = [];//test.getRandomStationaryStationsRelated(Math.ceil(unitsCount /*/ 10 + 2*/), seed + 1, _units[0].position.lat, _units[0].position.lng); 
                 //console.log(stationaryStations);
                 const res = await api.algorithm(selectAlgorithm, [...stationRanges], [...stationCounts], stationaryStations, _units);
                 //ALERT
@@ -230,7 +231,8 @@ import Station from "./Station.svelte";
                         console.log(i);
                         const positions = test.getRandomUnitsRelated(Math.ceil(_unitsCount / 2), i);
             
-                        const _units = positions.map(position => {return {position: position, priority: 1}});
+                        let _i = 0;
+                        const _units = positions.map(position => {return {position: position, priority: ((_i++)%5)}});
                         if(_units.length > 0)
                         {
                             _units[0].priority = 0;
@@ -238,7 +240,7 @@ import Station from "./Station.svelte";
                         }
 
                         const stationaryStations = test.getRandomStationaryStationsRelated(
-                            Math.ceil(unitsCount / 10 + 2), i+1, _units[0].position.lat, _units[0].position.lng); 
+                            Math.ceil(unitsCount /* / 10 + 2*/), i+1, _units[0].position.lat, _units[0].position.lng); 
                         const res = await api.algorithm(selectAlgorithm, ranges, _counts, stationaryStations, _units);
                         if(!res) {
                             //console.log('request failed');

@@ -11,7 +11,7 @@ namespace algorithm
         public List<Station> Run(Instance initialInstance)
         {
             initialInstance.RemoveRelations(); //ALERT! allstation czy stations w definicji tej metody
-      
+
             var priorities = new HashSet<int>();
             initialInstance.Units.ForEach(unit => priorities.Add(unit.Priority));
 
@@ -19,18 +19,26 @@ namespace algorithm
             sortedPriorities.Sort();
             sortedPriorities.Reverse();
 
-            var stations = new List<Station>();
-            var units = new List<Unit>();
-
-            foreach (var priority in priorities) //alert tutaj będę polegał wyłącznie na dobudowywaniu
+            //var stations = new List<Station>();
+            var units = new List<Unit>(initialInstance.Units);
+            //var instance = initialInstance;
+                foreach (var priority in sortedPriorities) //alert tutaj będę polegał wyłącznie na dobudowywaniu
             {
-                units.AddRange(initialInstance.Units.FindAll(unit => unit.Priority == priority).ToList());
+                //units.AddRange(initialInstance.Units.FindAll(unit => unit.Priority == priority).ToList());
 
-                var instance = new Instance(stations.Concat<Station>(initialInstance.StationaryStations).ToList(), units, initialInstance.Ranges, initialInstance.Counts); //alert
-                stations = new ArrangeWithExisting().Run(instance); //alert nie obsługuję nigdzie niedomyślnych rangów
+                //instance = new Instance(instance.Stations, units, initialInstance.Ranges, initialInstance.Counts); //alert
+                //var newStations = new ArrangeWithExisting().Run(instance);
+                //instance.Stations.AddRange(newStations.Where(station => !instance.Stations.Contains(station))); //alert nie obsługuję nigdzie niedomyślnych rangów
+
+
+                initialInstance.Units = units.Where(unit => unit.Priority >= priority).ToList();
+                initialInstance.CreateRelations();
+                initialInstance.Stations = new ArrangeWithExisting().Run(initialInstance);
+
+                
             }
 
-            return stations;
+            return initialInstance.Stations;
         }
     }
 }

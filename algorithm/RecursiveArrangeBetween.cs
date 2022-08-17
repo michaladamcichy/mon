@@ -24,6 +24,7 @@ namespace algorithm
         }
         public static (Cost, List<Station>) ArrangeBetween(Cost initialCost, Station first, Station last, double tolerance = 0.1)
         {
+
             Cost cost = new Cost(initialCost);
             var stations = new List<Station>();
 
@@ -44,7 +45,7 @@ namespace algorithm
                 return (cost, stations);
             }
 
-            var next = MapObject.GetNextFromTowards(first, last, tolerance);
+            var next = MapObject.GetNextFromTowards(first, last, cost.QueryMax() ?? 0.0, tolerance);
             if(!cost.CanGetAny()) return (cost, null);
             var station = new Station(next.Position, cost.GetMax().Value);
 
@@ -78,7 +79,7 @@ namespace algorithm
                 var (newCost, stations) = ArrangeBetween(loopCost, first, last, tolerance);
                 if(stations != null)
                 {
-                    if(optimalStations == null /*|| (optimalStations.Count > stations.Count)*/) //alert docelowo tutaj porównanie kosztów 
+                    if(optimalStations == null /*|| (optimalStations.Count > stations.Count)*/) //ALERT! alert docelowo tutaj porównanie kosztów 
                     {
                         optimalStations = stations;
                         optimalCost = newCost;

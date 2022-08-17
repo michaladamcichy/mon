@@ -118,7 +118,7 @@ import Instance from './Instance.svelte';
                 <button class="col btn btn-primary" on:click={() => {addStation(range)}}>{range}</button>
             {/each}
             <div class="col">km</div>
-            <button class="col btn btn-primary fa fa-star ss" on:click={() => {addStation(stationRanges[stationRanges.length-1], true)}}></button>
+            <button class="col btn btn-primary fa fa-star ss" on:click={() => {addStation(100.0, true)}}></button>
             <div class="col"></div>
             <div class="col"></div>
             <button class="col btn btn-danger removeAllButton" on:click={() => {removeAllStations()}} disabled={stations.length == 0}>X</button>

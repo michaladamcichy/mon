@@ -273,7 +273,7 @@ namespace algorithm
             {
                 if(!necessaryStations.Contains(station) && !station.IsStationary)
                 {
-                    instance.MapObjects.Remove(station);
+                    instance.Stations.Remove(station);
                 }
             }
 

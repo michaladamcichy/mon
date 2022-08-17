@@ -50,6 +50,15 @@ namespace algorithm
             UpdateCounts(); //alert
         }
 
+        public Instance(Instance instance)
+        {
+            Ranges = instance.Ranges;
+            Counts = instance.Counts;
+            Stations = instance.Stations;
+            Units = instance.Units;
+            CreateRelations();
+    }
+
         public Instance(List<Station> stations, List<Unit> units, double[] ranges, int[] counts)
         {
             this.Ranges = (double[]) ranges.Clone();

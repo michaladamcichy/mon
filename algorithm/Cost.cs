@@ -228,7 +228,7 @@ namespace algorithm
 
         public double? QueryMakeBigger(Station station)
         {
-            if (station.IsStationary) return null;
+            if (station.IsStationary) return null; //alert!
             for (var i = Instance.Ranges.ToList().IndexOf(station.Range) + 1; i < Instance.Ranges.Count(); i++)
             {
                 if (CanGet(Instance.Ranges[i]))
@@ -310,7 +310,7 @@ namespace algorithm
 
             var middlePoint = MapObject.CenterOfGravity(new List<MapObject>() { smaller, bigger });
             var middlePointRange = QueryMin(1, (smaller.GetDistanceFrom(bigger) / 2.0) * (1.0 + tolerance / 2.0)); //alert czy na pewno przez 2?
-            if(middlePointRange != null)
+            if (middlePointRange != null)
             {
                 var middleStation = new Station(middlePoint, middlePointRange.Value);
                 if (MapObject.AreInRange(smaller, middleStation) && MapObject.AreInRange(middleStation, bigger))
@@ -319,8 +319,10 @@ namespace algorithm
                     return middleStation;
                 }
             }
-            var potentialJoiningStation = MapObject.GetNextFromTowards(smaller, bigger);
-            if (!potentialJoiningStation.IsInRange(bigger)) return null;
+
+            if (!CanGetAny()) return null;
+            var potentialJoiningStation = MapObject.GetNextFromTowards(smaller, bigger, QueryMax() ?? 0, tolerance); //ALERT źle działą
+            if(!potentialJoiningStation.IsInRange(bigger)) return null;
             var minRange = Math.Max(smaller.Range, potentialJoiningStation.GetDistanceFrom(bigger) * (1.0 + tolerance / 2.0)); //alert na pewno przez 2?
 
             var range = QueryMin(1, minRange);
@@ -337,7 +339,7 @@ namespace algorithm
         
         public void GiveBack(double range, int count = 1)
         {
-            Debug.Assert(Instance.Ranges.Contains(range)); //alert! usun
+            Debug.Assert(Instance.Ranges.Contains(range)); //alert! alert!
             Counts[Instance.Ranges.ToList().IndexOf(range)] += count;
             Log("GiveBack " + range.ToString() + " x" + count.ToString());
         }

@@ -66,8 +66,11 @@
 		}
 
 		selectedInstance.stations = selectedInstance.stations.concat(
-			stationaryStations.map(ss => ({position: ss.position, range: ss.range, isStationary: true}))); //alert CRITICAL ALERT
+			stationaryStations.map(ss => ({position: ss.position, range: ss.range/*[20, 30, 50][Math.floor(Math.random() * 3)]*/, isStationary: true}))); //alert CRITICAL ALERT
 		loadInstance(selectedInstance);
+
+
+		console.log(new Set(stationaryStations.map(ss => ss.range)));
 	};
 
 	const updatePercentage = (newValue) => {

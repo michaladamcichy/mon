@@ -213,7 +213,7 @@ namespace algorithm
             return MinCoveringRange(ranges, stations.Cast<MapObject>().ToList());
         }
 
-        public static MapObject GetNextFromTowards(Station first, Station second, double tolerance = 0.1)
+        public static MapObject GetNextFromTowards(Station first, Station second, double maxAvailableRange, double tolerance = 0.1)
         {
             //alert smaller bigger nieaktualne!
             var smaller = first; //first.Range < second.Range ? first : second; //alert
@@ -222,7 +222,7 @@ namespace algorithm
             var distanceToCover = smaller.GetDistanceFrom(bigger);
             var direction = new Position((bigger.Position.Lat - smaller.Position.Lat) / distanceToCover, (bigger.Position.Lng - smaller.Position.Lng) / distanceToCover);
 
-            var step = first.Range;//Math.Min(smaller.Range, bigger.Range); //alert! niesprawdzone
+            var step = Math.Min(first.Range, maxAvailableRange);//Math.Min(smaller.Range, bigger.Range); //alert! niesprawdzone
             return new MapObject(new Position(smaller.Position.Lat + direction.Lat * step * (1.0 - tolerance / 2.0),
                 smaller.Position.Lng + direction.Lng * step * (1.0 - tolerance / 2.0))); //alert! czy w simplearrange też tak robiłe? dokładnie tak?
         }
