@@ -33,6 +33,7 @@ namespace algorithm
         public List<Station> Neighbors { get; private set; } = new List<Station>();
         public int GroupId { get; private set; }
         public int Id { get; set; } = -1; //alert
+        public bool IsMobile { get { return !IsStationary; } }
         public bool IsStationary { get; set; } = false;
         public bool IsCore { get { return !IsAttached(); } }
 

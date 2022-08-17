@@ -24,61 +24,56 @@ namespace algorithm
     }
     public class Instance
     {
-        public double[] StationRanges { get; set; } = new double[0];
-        public int[] StationCounts { get; set; } = new int[0];
+        public double[] Ranges { get; set; } = new double[0];
+        public int[] Counts { get; set; } = new int[0];
         public List<int> Priorities { get { return getPriorities(); } }
 
-        public List<MapObject> MapObjects { get; set; } = new List<MapObject>(); //alert! setter
+        public List<MapObject> MapObjects { get { return new List<MapObject>().Concat<MapObject>(Stations).Concat<MapObject>(Units).ToList(); } }
 
-        public List<Station> Stations { get { return MapObjects.FindAll(item => item is Station).Cast<Station>().ToList(); }
-            set { MapObjects.AddRange(value); } }
+        public List<Station> Stations { get; set; } = new List<Station>();
+        public List<Unit> Units { get; set; } = new List<Unit>();
 
-        public List<Station> CoreStations { get { return Stations.Where(station => !station.IsAttached()).ToList(); } }
-        public List<Station> PrivateStations { get { return Stations.Where(station => station.IsAttached()).ToList(); } }
+        public List<Station> CoreStations { get { return Stations.Where(station => station.IsCore).ToList(); } }
+        public List<Station> PrivateStations { get { return Stations.Where(station => !station.IsCore).ToList(); } }
         public List<Station> StationaryStations { get { return Stations.Where(station => station.IsStationary).ToList(); } }
         public List<Station> MobileStations { get { return Stations.Where(station => !station.IsStationary).ToList(); } }
 
-        public List<Unit> Units { get { return MapObjects.FindAll(item => item is Unit).Cast<Unit>().ToList(); } }
-
+        public List<Station> MobileCoreStations { get { return Stations.Where(station => station.IsMobile && station.IsCore).ToList(); } }
         public Instance(InstanceJSON instanceJSON, bool initialize = true)
         {
-            this.StationRanges = instanceJSON.stationRanges;
-            this.StationCounts = instanceJSON.stationCounts;
-            var stations = instanceJSON.stations.Select(item => new Station(item)).ToList();
-            var units = instanceJSON.units.Select(item => new Unit(item)).ToList();
+            this.Ranges = instanceJSON.stationRanges;
+            this.Counts = instanceJSON.stationCounts;
+            Stations = instanceJSON.stations.Select(item => new Station(item)).ToList();
+            Units = instanceJSON.units.Select(item => new Unit(item)).ToList();
 
-            this.MapObjects = prepareMapObjects(stations, units);
+            CreateRelations();
             UpdateCounts(); //alert
         }
 
-        public Instance(List<Station> stations, List<Unit> units, int[] counts = null, bool initialize = true)
+        public Instance(List<Station> stations, List<Unit> units, double[] ranges, int[] counts)
         {
-            var ranges = new List<double>();
-            stations.ForEach(item => ranges.Add(item.Range));
+            this.Ranges = (double[]) ranges.Clone();
+            this.Counts = (int[]) counts.Clone(); 
 
-            this.StationRanges = new double[] {20.0, 30.0, 50.0 }; //alert 
-            this.StationCounts = counts == null ? new int[] { 1000, 1000, 1000 } : counts;
-
-            this.MapObjects = prepareMapObjects(stations, units);
+            Stations = new List<Station>(stations);
+            Units = new List<Unit>(units);
+            CreateRelations();
             UpdateCounts(); //alert
         }
 
-        public Instance(List<Station> stations, int[] counts) : this(stations, new List<Unit>(), counts) {}
+        public Instance(List<Station> stations, double[] ranges, int[] counts) : this(stations, new List<Unit>(), ranges, counts) {}
 
-        public Instance(int[] counts)
+        public Instance(int[] counts, double[] ranges = null)
         {
-            StationRanges = new double[] { 20.0, 30.0, 50.0 }; //alert
-            this.StationCounts = counts;
+            this.Counts = counts;
+            this.Ranges = ranges == null ?  new double[] { 20.0, 30.0, 50.0 } : ranges;
         }
 
-        public List<MapObject> prepareMapObjects(List<Station> stations, List<Unit> units) //alert
+        public void CreateRelations()
         {
-            //RemoveRelations(); //alert
-
-            var mapObjects = stations.Cast<MapObject>().Concat(units.Cast<MapObject>()).ToList();
-            foreach(var first in stations)
+            foreach(var first in Stations)
             {
-                foreach(var second in stations)
+                foreach(var second in Stations)
                 {
                     if (first == second) continue;
 
@@ -90,44 +85,46 @@ namespace algorithm
                 }
             }
 
-            foreach(var station in stations)
+            var unitToStations = new Dictionary<Unit, HashSet<Station>>();
+            foreach(var unit in Units)
             {
-                if (station.IsStationary) continue;
-                foreach(var unit in units)
+                unitToStations[unit] = new HashSet<Station>();
+                
+                foreach(var station in Stations.Where(station => station.IsMobile))
                 {
-                    if(!unit.Position.Equals(station.Position)) continue;
-                    if(!unit.HasAttachement() && !station.IsAttached())
+                    if(unit.Position.Equals(station.Position))
                     {
-                        unit.Attach(station);
-                    } else if(unit.HasAttachement() && !station.IsAttached() && station.Range < unit.GetAttachment().Range)
-                    {
-                        unit.RemoveAttachment();
-                        unit.Attach(station);
+                        unitToStations[unit].Add(station);
                     }
                 }
             }
 
-
-            return mapObjects;
+            foreach(var (unit, stations) in unitToStations)
+            {
+                var notAttached = stations.Where(station => !station.IsAttached());
+                if (notAttached.Count() == 0) continue;
+                var smallestStation = notAttached.Aggregate((current, next) => next.Range < current.Range ? next : current);
+                unit.Attach(smallestStation);
+            }
         }
 
         public bool CanAcquireStation(double range, int howMany = 1) //alert stations czy station??
         {
-            var index = StationRanges.ToList().FindIndex(item => item == range);
+            var index = Ranges.ToList().FindIndex(item => item == range);
             if (index == -1) return false;
-            return StationCounts[index] >= howMany;
+            return Counts[index] >= howMany;
         }
 
         public Station? AquireStation(List<Station> stations)
         {
             double minCoveringRadius = MapObject.MinCoveringCircleRadius(stations);
 
-            for(int i =0; i < StationRanges.Count(); i++)
+            for(int i =0; i < Ranges.Count(); i++)
             {
-                if(StationRanges[i] <= minCoveringRadius && StationCounts[i] > 0)
+                if(Ranges[i] <= minCoveringRadius && Counts[i] > 0)
                 {
-                    StationCounts[i]--;
-                    return new Station(StationRanges[i]);
+                    Counts[i]--;
+                    return new Station(Ranges[i]);
                 }
             }
 
@@ -136,12 +133,12 @@ namespace algorithm
 
         public Station? AquireMinStation() //alert walnąć jednolinijkowca
         {
-            for (int i = 0; i < StationRanges.Count(); i++)
+            for (int i = 0; i < Ranges.Count(); i++)
             {
-                if (StationCounts[i] > 0)
+                if (Counts[i] > 0)
                 {
-                    StationCounts[i]--;
-                    return new Station(StationRanges[i]);
+                    Counts[i]--;
+                    return new Station(Ranges[i]);
                 }
             }
 
@@ -150,12 +147,12 @@ namespace algorithm
 
         public Station? AquireMaxStation()
         {
-            for (int i = StationRanges.Count() - 1; i >= 0; i--)
+            for (int i = Ranges.Count() - 1; i >= 0; i--)
             {
-                if (StationCounts[i] > 0)
+                if (Counts[i] > 0)
                 {
-                    StationCounts[i]--;
-                    return new Station(StationRanges[i]);
+                    Counts[i]--;
+                    return new Station(Ranges[i]);
                 }
             }
 
@@ -164,11 +161,11 @@ namespace algorithm
 
         public void GiveBackStation(Station station)
         {
-            for(int i=0; i < StationRanges.Count(); i++)
+            for(int i=0; i < Ranges.Count(); i++)
             {
-                if(StationRanges[i] == station.Range)
+                if(Ranges[i] == station.Range)
                 {
-                    StationCounts[i]++;
+                    Counts[i]++;
                 }
             }
         }
@@ -197,9 +194,9 @@ namespace algorithm
 
         public void UpdateCounts() //alert brzydkie
         {
-            for(var i = 0; i < StationCounts.Count(); i++)
+            for(var i = 0; i < Counts.Count(); i++)
             {
-                StationCounts[i] -= Stations.FindAll(station => station.Range == StationRanges[i]).Count;
+                Counts[i] -= Stations.FindAll(station => station.Range == Ranges[i]).Count;
             }
         }
 

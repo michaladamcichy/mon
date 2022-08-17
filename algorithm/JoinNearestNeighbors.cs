@@ -53,39 +53,29 @@ namespace algorithm
 
             return (additionalStations, cost);
         }*/
-        public static (List<Station>, Cost, DoubleDictionary<Station, List<Station>>) Run(Cost initialCost, Instance instance, List<Station> coreStations, HashSet<Station> _connected = null)
+        public static (List<Station>, Cost, DoubleDictionary<Station, List<Station>>) Run(Cost initialCost, Instance instance, List<Station> notConnected, List<Station> connected)
         {
             var cost = new Cost(initialCost);
-            if (coreStations.Count == 0 || !cost.CanGetAny()) return (new List<Station>(), cost, new DoubleDictionary<Station, List<Station>>());
+            if(connected == null) connected = new List<Station>();
 
-            var connected = _connected == null ? new HashSet<Station>() : _connected;
             var additionalStations = new List<Station>();
-
             var stationToSet = new Dictionary<Station, HashSet<Station>>();
-            connected.ToList().ForEach(station => { stationToSet[station] = connected; });
-
-            var allStations = new List<Station>(coreStations);
-            /*var edges = new Dictionary<Tuple<Station, Station>, double>();
-            allStations.ForEach(first => { allStations.ForEach(second =>
-            {
-                if(first == second || edges.ContainsKey(new Tuple<Station, Station>(second, first))) return;
-            }); });*/
-            coreStations.ForEach(station => {
-                if(!stationToSet.ContainsKey(station)) stationToSet[station] = new HashSet<Station> { station };
-            });
-
-            if (coreStations.Count == 0) return (additionalStations, cost, new DoubleDictionary<Station, List<Station>>());
-
+            var connectedAsSet = connected.ToHashSet();
+            connected.ForEach(station => stationToSet[station] = connectedAsSet);
+            notConnected.ForEach(station => stationToSet[station] = new HashSet<Station> { station });
             var edges = new DoubleDictionary<Station, List<Station>>();
+            var all = connected.Concat<Station>(notConnected).ToList();
 
-            while (coreStations.Any(station => stationToSet[coreStations.First()] != stationToSet[station]))
+            if (notConnected.Count == 0 || !cost.CanGetAny()) return (all, cost, new DoubleDictionary<Station, List<Station>>());
+
+            while (notConnected.Any(station => stationToSet[connected.Count == 0 ? notConnected.First() : connected.First()] != stationToSet[station]))
             {
                 Tuple<Station, Station> nearest = null;
                 var nearestDistance = 0.0;
 
-                foreach (var first in allStations) //alert zrobić kurde jednolinijkowca!
+                foreach (var first in all) //alert zrobić kurde jednolinijkowca!
                 {
-                    foreach (var second in allStations) //alert pozwalam na dołączanie do infrastruktury
+                    foreach (var second in all) //alert pozwalam na dołączanie do infrastruktury
                     {
                         if (first == second) continue;
                         
@@ -114,13 +104,13 @@ namespace algorithm
                 var (newCost, moreAdditionalStations) = RecursiveArrangeBetween.Run(cost, f, s);
                 cost = new Cost(newCost);
                 additionalStations.AddRange(moreAdditionalStations);
-                allStations.AddRange(moreAdditionalStations);
+                all.AddRange(moreAdditionalStations);
                 edges[f, s] = new List<Station> { f }.Concat<Station>(moreAdditionalStations).Concat<Station>(new List<Station>{ s }).ToList();
 
                 if (!cost.CanGetAny()) break;
             }
 
-            return (additionalStations, cost, edges);
+            return (all, cost, edges);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace algorithm
         public override double Range { get { return 0.0; } set { throw new Exception(); } } //alert brzydko oraz 0.0
         
         public Station CentralStation { get {
-                var core = Stations.FindAll(item => !item.IsAttached());
+                var core = Stations.FindAll(item => item.IsCore);
                 if (core.Count != 1) return null; //alert podstępny null
                 return core.First();
             } }

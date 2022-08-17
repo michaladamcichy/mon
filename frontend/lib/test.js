@@ -71,6 +71,8 @@ test.getRandomUnitsRandom = (unitsCount, seed) => {
 };
 
 test.getRandomUnitsRelated = (unitsCount, seed) => {
+    //alert critical
+    return test.getRandomUnitsRandom(unitsCount, seed);
     let units = [];
 
     seed = seed ? seed : Math.floor(Math.random() * 10000000);
@@ -391,7 +393,7 @@ const real = async (N, k, ranges, counts) => {
 test.run = async () => {
     console.log('TEST');
     //await naiveVsSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
-    await existingSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
+    //await existingSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
     //await simplePriority([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
     //await simplesimpleOptimize([50, 100, /*200, 300, 400, 500, 600, 700, 800, 900, 1000*/], 3, [20, 30, 50], [10000,10000,10000]);
     //await real([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], 1, [20, 30, 50], [10000,10000,10000]);

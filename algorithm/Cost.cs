@@ -12,7 +12,7 @@ namespace algorithm
         public Instance Instance { get; }
         public int[] Counts { get; private set; } = new int[] { 0, 0, 0 };
 
-        public double[] Ranges { get { return Instance.StationRanges; } }
+        public double[] Ranges { get { return Instance.Ranges; } }
 
         public HashSet<double> ForbiddenRanges { get; private set; } = new HashSet<double>();
         //public List<Station> Stations { get; } = new List<Station>();
@@ -20,7 +20,7 @@ namespace algorithm
         public Cost(Instance instance)
         {
             this.Instance = instance;
-            Counts = (int[]) Instance.StationCounts.Clone(); //alert czy to działa?
+            Counts = (int[]) Instance.Counts.Clone(); //alert czy to działa?
         }
 
         public Cost(Cost cost, bool logEnabled = true)
@@ -46,14 +46,14 @@ namespace algorithm
 
         public bool CanGet(double range, int count = 1)
         {
-            var index = Instance.StationRanges.ToList().IndexOf(range);
+            var index = Instance.Ranges.ToList().IndexOf(range);
             if (Counts[index] - count < 0 || ForbiddenRanges.Contains(range)) return false;
             return true;
         }
 
         public bool Get(double range, int count = 1)
         {
-            var index = Instance.StationRanges.ToList().IndexOf(range);
+            var index = Instance.Ranges.ToList().IndexOf(range);
             if (Counts[index] - count < 0 || ForbiddenRanges.Contains(range))
             {
                 Log("Get " + range.ToString() + " x" + count.ToString() + " failed");
@@ -73,7 +73,7 @@ namespace algorithm
                 return null;
             }
 
-            Counts[Instance.StationRanges.ToList().IndexOf(max.Value)] -= count;
+            Counts[Instance.Ranges.ToList().IndexOf(max.Value)] -= count;
             Log("Get max " + max.ToString());
             return max;
         }
@@ -87,27 +87,27 @@ namespace algorithm
                 return null;
             }
 
-            Counts[Instance.StationRanges.ToList().IndexOf(min.Value)] -= count;
+            Counts[Instance.Ranges.ToList().IndexOf(min.Value)] -= count;
             Log("GetMin " + min.ToString());
             return min;
         }
 
         public double? QueryMax(int count = 1, double maxRange = double.MaxValue)
         {
-            for (var i = Instance.StationCounts.Count() - 1; i >= 0; i--)
+            for (var i = Instance.Counts.Count() - 1; i >= 0; i--)
             {
-                if (Counts[i] - count < 0 || Instance.StationRanges[i] > maxRange || ForbiddenRanges.Contains(Instance.StationRanges[i])) continue;
-                return Instance.StationRanges[i];
+                if (Counts[i] - count < 0 || Instance.Ranges[i] > maxRange || ForbiddenRanges.Contains(Instance.Ranges[i])) continue;
+                return Instance.Ranges[i];
             }
             return null;
         }
 
         public double? QueryMin(int count = 1, double minRange = 0.0)
         {
-            for (var i = 0; i < Instance.StationCounts.Count(); i++)
+            for (var i = 0; i < Instance.Counts.Count(); i++)
             {
-                if (Counts[i] - count < 0 || Instance.StationRanges[i] < minRange || ForbiddenRanges.Contains(Instance.StationRanges[i])) continue;
-                return Instance.StationRanges[i];
+                if (Counts[i] - count < 0 || Instance.Ranges[i] < minRange || ForbiddenRanges.Contains(Instance.Ranges[i])) continue;
+                return Instance.Ranges[i];
             }
             return null;
         }
@@ -121,7 +121,7 @@ namespace algorithm
                 return null;
             }
 
-            Counts[Instance.StationRanges.ToList().IndexOf(minCoveringRange.Value)]--;
+            Counts[Instance.Ranges.ToList().IndexOf(minCoveringRange.Value)]--;
             Log("GetMinCoveringRange " + minCoveringRange.ToString());
             return minCoveringRange.Value;
         }
@@ -130,11 +130,11 @@ namespace algorithm
         {
             var minCoveringCircleRadius = MapObject.MinCoveringCircleRadius(stations);
 
-            for (var i = 0; i < Instance.StationCounts.Count(); i++)
+            for (var i = 0; i < Instance.Counts.Count(); i++)
             {
-                if (Instance.StationRanges[i] >= minCoveringCircleRadius && Counts[i] > 0 && !ForbiddenRanges.Contains(Instance.StationRanges[i]))
+                if (Instance.Ranges[i] >= minCoveringCircleRadius && Counts[i] > 0 && !ForbiddenRanges.Contains(Instance.Ranges[i]))
                 {
-                    return Instance.StationRanges[i];
+                    return Instance.Ranges[i];
                 }
             }
             return null;
@@ -142,9 +142,9 @@ namespace algorithm
 
         public bool CanGetAny()
         {
-            for (var i = 0; i < Instance.StationRanges.Count(); i++)
+            for (var i = 0; i < Instance.Ranges.Count(); i++)
             {
-                if (Counts[i] > 0 && !ForbiddenRanges.Contains(Instance.StationRanges[i]))
+                if (Counts[i] > 0 && !ForbiddenRanges.Contains(Instance.Ranges[i]))
                 {
                     return true;
                 }
@@ -205,7 +205,7 @@ namespace algorithm
                 return false;
             }
             GiveBack(station.Range);
-            Counts[Instance.StationRanges.ToList().IndexOf(range.Value)]--;
+            Counts[Instance.Ranges.ToList().IndexOf(range.Value)]--;
             station.Range = range.Value;
             Log("MakeBigger ->" + range.Value.ToString());
             return true;
@@ -220,7 +220,7 @@ namespace algorithm
             }
 
             GiveBack(station.Range);
-            Counts[Instance.StationRanges.ToList().IndexOf(range.Value)]--;
+            Counts[Instance.Ranges.ToList().IndexOf(range.Value)]--;
             station.Range = range.Value;
             Log("MakeSmaller ->" + range.ToString());
             return true;
@@ -229,11 +229,11 @@ namespace algorithm
         public double? QueryMakeBigger(Station station)
         {
             if (station.IsStationary) return null;
-            for (var i = Instance.StationRanges.ToList().IndexOf(station.Range) + 1; i < Instance.StationRanges.Count(); i++)
+            for (var i = Instance.Ranges.ToList().IndexOf(station.Range) + 1; i < Instance.Ranges.Count(); i++)
             {
-                if (CanGet(Instance.StationRanges[i]))
+                if (CanGet(Instance.Ranges[i]))
                 {
-                    return Instance.StationRanges[i];
+                    return Instance.Ranges[i];
                 }
             }
 
@@ -243,11 +243,11 @@ namespace algorithm
         public double? QueryMakeSmaller(Station station)
         {
             if(station.IsStationary) return null;
-            for (var i = Instance.StationRanges.ToList().IndexOf(station.Range) - 1; i >= 0; i--)
+            for (var i = Instance.Ranges.ToList().IndexOf(station.Range) - 1; i >= 0; i--)
             {
-                if (CanGet(Instance.StationRanges[i]))
+                if (CanGet(Instance.Ranges[i]))
                 {
-                    return Instance.StationRanges[i];
+                    return Instance.Ranges[i];
                 }
             }
 
@@ -337,8 +337,8 @@ namespace algorithm
         
         public void GiveBack(double range, int count = 1)
         {
-            Debug.Assert(Instance.StationRanges.Contains(range)); //alert! usun
-            Counts[Instance.StationRanges.ToList().IndexOf(range)] += count;
+            Debug.Assert(Instance.Ranges.Contains(range)); //alert! usun
+            Counts[Instance.Ranges.ToList().IndexOf(range)] += count;
             Log("GiveBack " + range.ToString() + " x" + count.ToString());
         }
 

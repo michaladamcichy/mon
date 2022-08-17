@@ -8,60 +8,65 @@ namespace algorithm
 {
     public class ArrangeWithExisting
     {
-        public (Cost, List<Group>, List<Group>) AssignToGroups(Cost initialCost, List<Station> lonelyStations, List<Station> coreStations, int[] counts)
+        public (Cost, List<Group>, List<Group>) AssignToGroups(Instance instance, Cost initialCost, List<Station> lonelyStations, bool freshStart = false)
         {
             var cost = new Cost(initialCost);
-            var (newCost, groups, lonelyLeft) = (new ExpandGroups()).Run(cost, lonelyStations, coreStations);
+
+            var (newCost, oldGroups, lonelyLeft) = (new ExpandGroups()).Run(cost, lonelyStations, instance.CoreStations, freshStart);
             cost = new Cost(newCost);
-            var (newGroups, otherNewCost) = (new SimpleCreateGroups(new Instance(lonelyLeft, counts))).Run(cost); //alert czy to zadziała?
+            var (newGroups, otherNewCost) = (new SimpleCreateGroups(new Instance(lonelyLeft, instance.Ranges, instance.Counts))).Run(cost); //alert czy to zadziała?
             cost = new Cost(otherNewCost);
 
-            return (cost, groups, newGroups);
+            var stationaryGroups = oldGroups.Where(group => group.CentralStation.IsStationary);
+            oldGroups = oldGroups.Where(group => group.CentralStation.IsMobile).ToList();
+            newGroups.AddRange(stationaryGroups);
+            return (cost, oldGroups, newGroups);
         }
 
         public List<Station> Run(Instance instance)
         {
-            var noInitialMobileStations = instance.MobileStations.Count == 0;
-            /*instance.UpdateCounts();*/ //alert
             Cost cost = new Cost(instance);
-            
-            var lonelyUnits = instance.Units.FindAll(unit => !unit.HasAttachement()).ToList(); //alert zmieniłem tutaj
-            var additionalStations = new List<Station>();
+            var freshStart = instance.MobileStations.Count == 0;
 
+            var lonelyUnits = instance.Units.FindAll(unit => !unit.HasAttachement()).ToList();
+            
             var lonelyStations = new List<Station>();
             foreach(var unit in lonelyUnits)
             {
                 var range = cost.GetMin();
-                if (range == null) return lonelyStations.Concat<Station>(instance.Stations).ToList(); //alert
+                if (range == null) return instance.Stations;
                 var station = new Station(unit.Position, range.Value);
                 lonelyStations.Add(station);
+                instance.Stations.Add(station);
                 unit.Attach(station);
             }
 
-            var coreStations = instance.Stations.FindAll(station => station.IsCore).ToList(); //alert a dlaczego nie zrobiłem is not attached?
-            var (newCost, oldGroups, newGroups) = AssignToGroups(cost, lonelyStations, coreStations, instance.StationCounts);
+            var (newCost, oldGroups, newGroups) = AssignToGroups(instance, cost, lonelyStations, freshStart);
             cost = new Cost(newCost);
+            //alert
+            var connected = oldGroups.Select(group => group.CentralStation).ToList(); //alert wydajność - zbiory haszujące
+            
+            var notConnected = newGroups.Select(group => group.CentralStation).ToList();
 
-            var newStations = Group.Flatten(oldGroups.Concat<Group>(newGroups).ToList());
-            var allStations = new List<Station>(newStations);
-            instance.Stations.ForEach(station => { if (!newStations.Contains(station)) allStations.Add(station); });
-
-            var connected = new HashSet<Station>();
-            oldGroups.Where(group => !group.CentralStation.IsStationary).ToList().ForEach(group => connected.Add(group.CentralStation));
-            var (joiningStations, otherNewCost, edges) =
-                JoinNearestNeighbors.Run(cost, instance, allStations.FindAll(station => !station.IsAttached()), connected);
+            var (allStations, otherNewCost, edges) =
+                JoinNearestNeighbors.Run(cost, instance, notConnected, connected);
             cost = new Cost(otherNewCost);
 
-            if(!noInitialMobileStations) return allStations.Concat<Station>(joiningStations).ToList();
+            
+            return allStations.Concat<Station>(instance.PrivateStations).ToList();
+            //alert 
 
-            joiningStations.ForEach(joining => { if (!instance.MapObjects.Contains(joining)) instance.MapObjects.Add(joining); });
-            allStations.ForEach(station => { if (!instance.MapObjects.Contains(station)) instance.MapObjects.Add(station); });
+            //alert
+           // if (!noInitialMobileStations) return allStations.Concat<Station>(joiningStations).Concat<Station>(instance.PrivateStations).ToList();
+
+/*            joiningStations.ForEach(joining => { if (!instance.MapObjects.Contains(joining)) instance.MapObjects.Add(joining); });
+            allStations.ForEach(station => { if (!instance.MapObjects.Contains(station)) instance.MapObjects.Add(station); });*/
             //instance = new Instance(instance.Stations, instance.Units, instance.StationCounts);
             //alert ta instance nie ma przeliczonych relacji!!!
-            var ret = new SimpleOptimize().Run(instance, edges);
+            //var ret = new SimpleOptimize().Run(instance, edges);
 
             
-            return ret.Concat<Station>(allStations.Where(station => station.IsPrivate && !instance.MapObjects.Contains(station))).ToList();
+            //return ret.Concat<Station>(allStations.Where(station => station.IsPrivate && !instance.MapObjects.Contains(station))).ToList();
             //return allStations.Concat<Station>(joiningStations).ToList();
             /*var (groups, newCost) = (new SimpleCreateGroups(instance)).Run(cost);
             cost = new Cost(newCost);

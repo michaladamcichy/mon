@@ -34,11 +34,6 @@ namespace algorithm
             
             return true;
         }
-
-        public bool Run(List<Station> stations, int[] counts)
-        {
-            return Run(new Instance(stations, counts));
-        }
         public void DFS(Station start, Dictionary<Station, bool> visited)
         {
             visited[start] = true;

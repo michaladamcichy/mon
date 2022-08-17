@@ -136,7 +136,7 @@ namespace algorithm
                     Dictionary<Station, double> groupSnapshot = null;
                     Group group = null;
                     Cost groupCost = null;
-                    var reversedRanges = new List<double>(instance.StationRanges.ToList());
+                    var reversedRanges = new List<double>(instance.Ranges.ToList());
                     reversedRanges.Reverse();
 
                     var rangesSnapshot = instance.SaveRangesSnapshot(); //alert!
