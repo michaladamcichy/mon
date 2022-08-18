@@ -57,30 +57,12 @@ namespace algorithm
 
             instance.PrivateStations.Where(station => !allStations.Contains(station)).ToList().ForEach(station => allStations.Add(station));
             return allStations;
-            //alert 
 
-            //alert
-           // if (!noInitialMobileStations) return allStations.Concat<Station>(joiningStations).Concat<Station>(instance.PrivateStations).ToList();
+            // instance.Stations.AddRange(allStations.Where(station => !instance.Stations.Contains(station)));
 
-/*            joiningStations.ForEach(joining => { if (!instance.MapObjects.Contains(joining)) instance.MapObjects.Add(joining); });
-            allStations.ForEach(station => { if (!instance.MapObjects.Contains(station)) instance.MapObjects.Add(station); });*/
-            //instance = new Instance(instance.Stations, instance.Units, instance.StationCounts);
-            //alert ta instance nie ma przeliczonych relacji!!!
-            //var ret = new SimpleOptimize().Run(instance, edges);
-
-            
-            //return ret.Concat<Station>(allStations.Where(station => station.IsPrivate && !instance.MapObjects.Contains(station))).ToList();
-            //return allStations.Concat<Station>(joiningStations).ToList();
-            /*var (groups, newCost) = (new SimpleCreateGroups(instance)).Run(cost);
-            cost = new Cost(newCost);
-            if (instance.Units.Any(unit => !unit.HasAttachement())) return Group.Flatten(groups).Concat<Station>(instance.StationaryStations).ToList(); //alert data flow po kryjomu modyfikuje instnace.Stations
-
-            var coreStations = groups.FindAll(group => group.CoreStation != null).Select(group => group.CoreStation).ToList();
-
-            var (additionalStations, otherNewCost) = JoinNearestNeighbors.Run(cost, coreStations, instance.StationaryStations, instance.UnitsConnectedToStationaryStations);*//*
-            cost = new Cost(otherNewCost);
-            //var additionalStations = new List<Station>();
-            return Group.Flatten(groups).Concat<Station>(additionalStations).ToList().Concat<Station>(instance.StationaryStations).ToList();*/
+            // var privateStations = instance.PrivateStations.ToList();
+            // return new SimpleOptimize().Run(instance, edges).Concat<Station>(privateStations).ToList();
+            //return instance.Stations;
         }
 
     }

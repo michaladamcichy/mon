@@ -155,7 +155,9 @@ TODO wspomnieć, że wbudowałem optymalizację w simple arrange
 ALERT - kosekwencja (u,v) a {u, v}
 ZROBIĆ TO CHRZANIONE DRZEWO PRIORYTETOWE
 RECURSIVE ARRANGE BETWEEN - wstawić kryterium kosztu!!!
-czy złe koszty nie wynikają z rekurencji w RecursiveArrangeBetween
+czy złe koszty nie wynikają z rekurencji w RecursiveArrangeBetween  
+ALERT - kruskal w moim przypadku ma de facto złożoność n*n log n
+POZA TYM OKREŚLENIE LINIOWO LOGARYTMICZNA CHYBA NIE PASUJE DO DWÓCH RÓŻNYCH ZMIENNYCH
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

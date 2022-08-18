@@ -269,6 +269,7 @@ namespace algorithm
             var centralStations = new RecoverGroups().Run(instance).Select(group => group.CentralStation).ToList();
             centralStations.ForEach(centralStation => necessaryStations.Add(centralStation));
 
+            instance.Stations = instance.Stations.Where(station => necessaryStations.Contains(station)).ToList();
             foreach (var station in instance.Stations)
             {
                 if(!necessaryStations.Contains(station) && !station.IsStationary)
