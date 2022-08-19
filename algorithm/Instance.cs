@@ -12,7 +12,9 @@ namespace algorithm
         public int[] stationCounts { get; set; } = new int[0];
 
         public List<StationJSON> stations { get; set; } = new List<StationJSON>();
-        public List<UnitJSON> units { get; set;  } = new List<UnitJSON>();
+        public List<UnitJSON> units { get; set; } = new List<UnitJSON>();
+
+        public bool optimized { get; set; } = false;
 
         public InstanceJSON(double[] stationRanges, int[] stationCounts, List<StationJSON> stations, List<UnitJSON> units)
         {
@@ -20,6 +22,8 @@ namespace algorithm
             this.stationCounts = stationCounts;
             this.stations = stations;
             this.units = units;
+            this.optimized = optimized;
+
         }
     }
     public class Instance
@@ -33,6 +37,8 @@ namespace algorithm
         public List<Station> Stations { get; set; } = new List<Station>();
         public List<Unit> Units { get; set; } = new List<Unit>();
 
+        public bool Optimized { get; private set; } = false;
+
         public List<Station> CoreStations { get { return Stations.Where(station => station.IsCore).ToList(); } }
         public List<Station> PrivateStations { get { return Stations.Where(station => !station.IsCore).ToList(); } }
         public List<Station> StationaryStations { get { return Stations.Where(station => station.IsStationary).ToList(); } }
@@ -45,6 +51,7 @@ namespace algorithm
             this.Counts = instanceJSON.stationCounts;
             Stations = instanceJSON.stations.Select(item => new Station(item)).ToList();
             Units = instanceJSON.units.Select(item => new Unit(item)).ToList();
+            Optimized = instanceJSON.optimized;
 
             CreateRelations();
             UpdateCounts(); //alert
@@ -213,7 +220,7 @@ namespace algorithm
         public void RemoveRelations()
         {
             Stations.ForEach(station => { station.Neighbors.Clear(); if(station.Unit != null) station.Unit.RemoveAttachment(); }); //alert all czy tylko stations?
-            //alert!
+
         }
 
     }

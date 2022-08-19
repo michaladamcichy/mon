@@ -56,7 +56,12 @@ namespace algorithm
             cost = new Cost(otherNewCost);
             
             instance.PrivateStations.Where(station => !allStations.Contains(station)).ToList().ForEach(station => allStations.Add(station));
-            return allStations;
+
+            if(!instance.Optimized) return allStations; //alert
+
+            instance.RemoveRelations();
+            var i = new Instance(allStations, instance.Units, instance.Ranges, instance.Counts);
+            return new SimpleOptimize().Run(i);
         }
 
     }

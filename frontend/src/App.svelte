@@ -46,10 +46,28 @@
 	let bigTestRunning = false;
 	let percentageOfStations = 0.0;
 	let disableMap = false;
+	let optimized = true;
+
+	const updateOptimized = (newValue) => {
+		optimized = newValue;
+		console.log(optimized);
+	};
 
 	const updateDisableMap = (newValue) => {
 		disableMap = newValue;
 	}
+
+	function fisherYates( array ){
+    var count = array.length,
+        randomnumber,
+        temp;
+    while( count ){
+     randomnumber = Math.random() * count-- | 0;
+     temp = array[count];
+     array[count] = array[randomnumber];
+     array[randomnumber] = temp
+    }
+   }
 
 	const loadGSM = async (percentage = percentageOfStations) => {
 		selectedInstance.stations = selectedInstance.stations.filter(station => !station.isStationary);
@@ -58,6 +76,7 @@
 			return;
 		}
 		
+		fisherYates(_stationaryStations);
 		const stationaryStations = [];
 		for(let i = 0; i < Math.floor(percentage/100 * _stationaryStations.length); i++) {
 			stationaryStations.push(_stationaryStations[i]);
@@ -326,6 +345,8 @@
 				loadGSM={loadGSM}
 				disableMap={disableMap}
 				updateDisableMap={updateDisableMap}
+				optimized={optimized}
+				updateOptimized={updateOptimized}
 				/>
 		</div>
 	</div>

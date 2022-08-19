@@ -9,7 +9,7 @@ namespace algorithm
 {
     public class _
     {
-        static bool enabled = true;
+        static bool enabled = false;
         public static void Print(List<Station> stations, string message = "")
         {
             if (!enabled) return;
@@ -98,10 +98,10 @@ namespace algorithm
                 return;
             }
 
-            foreach (var neighbor in station.Neighbors.Where(neighbor => neighbor.IsCore))
+            foreach (var neighbor in station.Neighbors)
             {
                 //if(visited.Contains(neighbor)) continue;
-                if (path.Contains(neighbor)) continue; //alert!
+                if (neighbor.IsPrivate || path.Contains(neighbor)) continue; //alert!
                 LittleSpider(neighbor, paths, path, false);
             }
             paths.Remove(path); //alert! wydajność!
@@ -175,7 +175,8 @@ namespace algorithm
             //return new List<Station>();
             Debug.WriteLine("Simple optimize");
 
-            var centralStations = new RecoverGroups().Run(instance).Select(group => group.CentralStation).ToList();
+            var groups = new RecoverGroups().Run(instance);
+            var centralStations = groups.Select(group => group.CentralStation).ToList();
 
             if (edges == null) edges = new Spider(centralStations.ToHashSet()).Run(centralStations);
             var necessaryEdges = new Kruskal().Run(centralStations, edges);

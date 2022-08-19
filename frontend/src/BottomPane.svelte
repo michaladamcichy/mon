@@ -26,6 +26,8 @@ import Station from "./Station.svelte";
     export let loadGSM;
     export let disableMap;
     export let updateDisableMap;
+    export let optimized;
+    export let updateOptimized;
 
     let counts = [...stationCounts];
 
@@ -62,7 +64,7 @@ import Station from "./Station.svelte";
     const getStationsScore = stations => stations.filter(station => !station.isStationary).reduce((current, station) => current + station.range, 0);
 
     const onAlgorithmClicked = async (type) => {
-        const res = await api.algorithm(type, stationRanges, stationCounts, stations, units);
+        const res = await api.algorithm(type, stationRanges, stationCounts, stations, units, optimized);
         if(!res) {
             //console.log('request failed');
             return;
@@ -141,9 +143,7 @@ import Station from "./Station.svelte";
             <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("naiveArrange")}>
                 Naive arrange
             </button>
-            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("priorityTree")}>
-                Priority tree
-            </button>
+            <input class="col" type="checkbox" bind:checked={optimized} on:change={() => {updateOptimized(optimized);}}>
         </div>
         <div class="row">
             <select bind:value={selectAlgorithm}>
@@ -155,8 +155,7 @@ import Station from "./Station.svelte";
         <div class="row">
             <button class="col btn btn-primary" on:click={async () => {
                 updatePercentage(0);
-                const _unitsCount = unitsCount;
-                const positions = test.getRandomUnitsRelated(_unitsCount, seed);
+                const positions = test.getRandomUnitsRelated(unitsCount, seed);
             
                 // let ____i = 0;
                 const _units = positions.map(position => {return {position: position, priority: positions.indexOf(position)%5}});
@@ -219,11 +218,10 @@ import Station from "./Station.svelte";
                 const ranges = [...stationRanges];
                 const _counts = [...counts];
                 bigTestTask = setTimeout(async () => {
-                    const _unitsCount = unitsCount;
                     for(let i = lastI; i < 1000000; i++)
                     {
                         console.log(i);
-                        const positions = test.getRandomUnitsRelated(Math.ceil(_unitsCount / 2), i);
+                        const positions = test.getRandomUnitsRelated(Math.ceil(unitsCount), i);
             
                         let _i = 0;
                         const _units = positions.map(position => {return {position: position, priority: ((_i++)%5)}});
@@ -233,9 +231,9 @@ import Station from "./Station.svelte";
                             _units[0].counts = [...counts];
                         }
 
-                        const stationaryStations = test.getRandomStationaryStationsRelated(
-                            Math.ceil(unitsCount /* / 10 + 2*/), i+1, _units[0].position.lat, _units[0].position.lng); 
-                        const res = await api.algorithm(selectAlgorithm, ranges, _counts, stationaryStations, _units);
+                        const stationaryStations = [];//test.getRandomStationaryStationsRelated(
+                            //Math.ceil(unitsCount /* / 10 + 2*/), i+1, _units[0].position.lat, _units[0].position.lng); 
+                        const res = await api.algorithm(selectAlgorithm, ranges, _counts, stationaryStations, _units, optimized);
                         if(!res) {
                             //console.log('request failed');
                             return;

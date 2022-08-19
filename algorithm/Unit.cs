@@ -46,6 +46,8 @@ namespace algorithm
 
         public void RemoveAttachment()
         {
+            if (Attachment == null) return;
+
             Attachment.Detach();
             Attachment = null;
         }

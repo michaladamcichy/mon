@@ -32,13 +32,13 @@ api.isConnected = async (stationRanges, stationCounts, stations, units) => {
     return parsed;
 };
 
-api.algorithm = async (type, stationRanges, stationCounts, stations, units) => {
+api.algorithm = async (type, stationRanges, stationCounts, stations, units, optimized = false) => {
     let _i = 1; //alert
     stations.forEach(station => {
         station.id = _i++;
     });
     //console.log(stations);
-    const instance = {stationRanges/*: RANGES*/, stationCounts/*: parseCounts(stationCounts)*/, stations, units};
+    const instance = {stationRanges/*: RANGES*/, stationCounts/*: parseCounts(stationCounts)*/, stations, units, optimized};
     // console.log(units);
     //console.log(`${api.url}/${type}Algorithm`);
     const result = await fetch(`${api.url}/${type}Algorithm`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
