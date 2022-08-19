@@ -262,6 +262,28 @@ namespace algorithm
             return true;
         }
 
+        public bool CanChangeRangeMin(Station station, double minRange = 0.0)
+        {
+            return QueryChangeRangeMin(station, minRange) != null;
+        }
+
+        public double? QueryChangeRangeMin(Station station, double minRange = 0.0)
+        {
+            foreach (var range in Ranges)
+            {
+                if (range < minRange) continue;
+                if (CanChangeRange(station, range)) return range;
+            }
+            return null;
+        }
+
+        public bool ChangeRangeMin(Station station, double minRange = 0.0)
+        {
+            var range = QueryChangeRangeMin(station, minRange);
+            if (range == null) return false;
+            return ChangeRange(station, range.Value);
+        }
+
         public bool CanChangeRange(List<Station> stations, double newRange)
         {
             if (stations.Any(station => station.IsStationary)) return false;
@@ -315,7 +337,7 @@ namespace algorithm
                 var middleStation = new Station(middlePoint, middlePointRange.Value);
                 if (MapObject.AreInRange(smaller, middleStation) && MapObject.AreInRange(middleStation, bigger))
                 {
-                    Get(middlePointRange.Value);
+                    //Get(middlePointRange.Value);
                     return middleStation;
                 }
             }
@@ -352,17 +374,53 @@ namespace algorithm
 
         public static bool IsCheaperThan(List<Station> item1, List<Station> item2)
         {
-            if (item1.Count != item2.Count) return item1.Count < item2.Count;
-            return item1.Aggregate(0.0, (sum, item) => sum + item.Range) < item2.Aggregate(0.0, (sum, item) => sum + item.Range);
+            return CalculateCost(item1) < CalculateCost(item2);
         }
         public static List<Station> GetCheaper(List<Station> path1, List<Station> path2)
         {
-            if(path1.Count != path2.Count) return path1.Count < path2.Count ? path1 : path2;
-            return path1.Aggregate(0.0, (sum, item) => sum + item.Range) < path2.Aggregate(0.0, (sum, item) => sum + item.Range) ? path1 : path2;
+            return CalculateCost(path1) < CalculateCost(path2) ? path1 : path2;
         }
         public static List<Station> GetCheapest(List<List<Station>> paths)
         {
             return paths.Aggregate((curMin, item) => GetCheaper(curMin, item));
         }
-    }
+
+        public static double CalculateCost(List<Station> stations)
+        {
+            return stations.Aggregate(0.0, (sum, item) => sum + item.Range);
+        }
+
+        public static double CalculateCostPerStation(List<Station> stations)
+        {
+            return CalculateCost(stations) / stations.Count;
+        }
+
+        public bool CanMakeGroup(List<Station> _stations, MapObject center, double range)
+        {
+            var stations = _stations.Select(station => new Station(station)).ToList();
+            Cost cost = new Cost(this);
+
+            if(!cost.Get(range)) return false;
+            
+            foreach(var station in stations)
+            {
+                if (!cost.ChangeRangeMin(station, station.GetDistanceFrom(center))) return false;
+            }
+            return true;
+        }
+
+        public bool MakeGroup(List<Station> stations, MapObject center, double range)
+        {
+            if (!CanMakeGroup(stations, center, range)) return false;
+
+            Get(range);
+
+            foreach(var station in stations)
+            {
+                ChangeRangeMin(station, station.GetDistanceFrom(center));
+            }
+
+            return true;
+        }
+     }
 }

@@ -347,15 +347,12 @@ const loadGSM = async (percentage = percentageOfStations) => {
     if(percentage == 0) {
         return [];
     }
-    
-    let stationaryStations = [];
-    for(let i = 0; i < _stationaryStations.length; i++) {
-        //console.log(Math.round(1/ (percentage/100)));
-        if(i % Math.ceil(1/ (percentage/100)) != 0) continue;
+    const stationaryStations = [];
+    for(let i = 0; i < Math.floor(percentage/100 * _stationaryStations.length); i++) {
         stationaryStations.push(_stationaryStations[i]);
     }
 
-    return stationaryStations.map(ss => ({position: ss.position, range: ss.range, isStationary: true}));
+    return stationaryStations.map(ss => ({position: ss.position, range: ss.range/*[20, 30, 50][Math.floor(Math.random() * 3)]*/, isStationary: true}));
 };
 
 const real = async (N, k, ranges, counts) => {
@@ -409,7 +406,7 @@ test.run = async () => {
     console.log('TEST');
     //await naiveVsSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
     //await existingSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
-    //await simplePriority([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
+    await simplePriority([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
     //await simplesimpleOptimize([50, 100, /*200, 300, 400, 500, 600, 700, 800, 900, 1000*/], 3, [20, 30, 50], [10000,10000,10000]);
     //await real([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], 1, [20, 30, 50], [10000,10000,10000]);
     

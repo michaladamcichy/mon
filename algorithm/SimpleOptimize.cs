@@ -9,7 +9,7 @@ namespace algorithm
 {
     public class _
     {
-        static bool enabled = false;
+        static bool enabled = true;
         public static void Print(List<Station> stations, string message = "")
         {
             if (!enabled) return;
@@ -19,101 +19,6 @@ namespace algorithm
             Debug.Write("]\n");
         }
     }
-    /*public class PriorityQueue<X, Y>
-    {
-        Dictionary<Y, List<X>> queue = new Dictionary<Y, List<X>>();
-        public PriorityQueue()
-        {
-
-        }
-
-        public bool Contains(X item)
-        {
-            return queue.Any(keyValue => keyValue.Value.Contains(item));
-        }
-
-        public void Add(X item, Y priority)
-        {
-            if(!queue.ContainsKey(priority)) queue[priority] = new List<X>();
-            queue[priority].Add(item); 
-        }
-
-        public int Count
-        {
-            get
-            {
-                return queue.Aggregate(0, (sum, item) => sum + item.Value.Count);
-            }
-        }
-
-        public X GetMin()
-        {
-            var minPriority = queue.Keys.Min();
-            var minValue = queue[minPriority].First();
-            queue[minPriority].RemoveAt(0);
-            if(queue[minPriority].Count == 0) queue.Remove(minPriority);
-            return minValue;
-        }
-    }*/
-    /*public class Dijkstra
-    {
-        //List<Station> queue = new List<Station>();
-        Dictionary<Station, double> d = new Dictionary<Station, double>();
-        Dictionary<Station, Station> previous = new Dictionary<Station, Station>();
-        public List<Station> Run(Instance instance, List<Station> V, Station s, Station t)
-        {
-            Debug.WriteLine("s: " + s.id.ToString());
-            Debug.WriteLine("t: " + t.id.ToString());
-            //Debug.WriteLine("V = {");
-
-            d[s] = 0;
-            var queue = new PriorityQueue<Station, double>();
-            queue.Add(s, d[s]);
-
-            V.ForEach(v =>
-            {
-                if (v != s)
-                {
-                    d[v] = double.PositiveInfinity;
-                    previous[v] = null;
-                    queue.Add(v, d[v]);
-                }
-                //Debug.WriteLine("}\n");
-            });
-
-
-            while (queue.Count > 0)
-            {
-                var u = queue.GetMin();
-                //alert wydajność 
-                foreach(var v in u.Senders.Concat<MapObject>(u.Receivers).Where(item => item is Station && V.Contains(item)).Cast<Station>().Distinct().ToList()) //alert może wcześniej coś takeigo
-                {
-                    var alt = d[u] + u.GetDistanceFrom(v);
-                    if(alt  < d[v] && !double.IsInfinity(d[u]))
-                    {
-                        d[v] = alt;
-                        previous[v] = u;
-                        //if(!queue.Contains(v)) queue.Add(v, alt);
-                    }
-                }
-            }
-
-            var solution = new List<Station>();
-            var current = t;
-            while(previous[current] != s)
-            {
-                Debug.WriteLine(previous[current].id);
-                solution.Add(previous[current]);
-                current = previous[current];
-            }
-
-            solution.Reverse();
-
-            solution = solution.Prepend(s).ToList();
-            solution.Add(t);
-            return solution;
-        } 
-    }*/
 
     class Kruskal
     {
@@ -143,7 +48,6 @@ namespace algorithm
             return selectedEdges;
         }
     }
-
     public class DoubleDictionary<X, Y> : Dictionary<Tuple<X, X>, Y> where X : class where Y : class
     {
         public Y this[X key1, X key2]
@@ -169,25 +73,36 @@ namespace algorithm
             return distinctKeys;
         }
     }
-
     public class Spider
     {
-        public void LittleSpider(Instance instance, Station station, HashSet<List<Station>> paths, List<Station> _path, bool firstTime = true)
+        HashSet<Station> CentralStations;
+
+        public Spider(HashSet<Station> centralStations)
+        {
+            CentralStations = centralStations;
+        }
+
+        bool IsCentral(Station station )
+        {
+            return CentralStations.Contains(station);
+        }
+
+        public void LittleSpider(Station station, HashSet<List<Station>> paths, List<Station> _path, bool firstTime = true)
         {
             var path = new List<Station>(_path);
             paths.Add(path);
             path.Add(station);
 
-            if (station.IsPrivate && firstTime == false)
+            if (IsCentral(station) && firstTime == false)
             {
                 return;
             }
 
-            foreach (var neighbor in station.Neighbors)
+            foreach (var neighbor in station.Neighbors.Where(neighbor => neighbor.IsCore))
             {
                 //if(visited.Contains(neighbor)) continue;
                 if (path.Contains(neighbor)) continue; //alert!
-                LittleSpider(instance, neighbor, paths, path, false);
+                LittleSpider(neighbor, paths, path, false);
             }
             paths.Remove(path); //alert! wydajność!
         }
@@ -197,10 +112,10 @@ namespace algorithm
 
         bool Validate(Station station, List<Station> path)
         {
-            if (path.Count <= 2) return false;
-            if(!path.First().IsPrivate || !path.Last().IsPrivate) return false;
+            if (path.Count < 2) return false;
+            if(!IsCentral(path.First()) || !IsCentral(path.Last())) return false;
             Debug.Assert(station == path.First()); //alert
-            if (path.Any(item => item != path.First() && item != path.Last() && item.IsPrivate)) return false; //alert to niekonieczne, tylko dla sprawdzenia czy działą
+            if (path.Any(item => item != path.First() && item != path.Last() && IsCentral(item))) return false; //alert to niekonieczne, tylko dla sprawdzenia czy działą
             return true;
         }
 
@@ -228,17 +143,20 @@ namespace algorithm
             });
         }
 
-        public DoubleDictionary<Station, List<Station>> Run(Instance instance)
+        public DoubleDictionary<Station, List<Station>> Run(List<Station> centralStations)
         {
             Debug.WriteLine("Spider running");
             var edges = new DoubleDictionary<Station, List<Station>>();
-            foreach(var privateStation in instance.PrivateStations)
+            foreach (var centralStation in centralStations)
             {
                 var paths = new HashSet<List<Station>>();
-                LittleSpider(instance, privateStation, paths, new List<Station>());
-                AddEdges(privateStation, edges, paths);
+                LittleSpider(centralStation, paths, new List<Station>());
+                AddEdges(centralStation, edges, paths);
             }
             return edges;
+
+            //new PowerfulOptimizer().Run(instance);
+            //return new DoubleDictionary<Station, List<Station>>();
         }
     }
 
@@ -257,8 +175,10 @@ namespace algorithm
             //return new List<Station>();
             Debug.WriteLine("Simple optimize");
 
-            if(edges == null) edges = new Spider().Run(instance);
-            var necessaryEdges = new Kruskal().Run(instance.PrivateStations, edges);
+            var centralStations = new RecoverGroups().Run(instance).Select(group => group.CentralStation).ToList();
+
+            if (edges == null) edges = new Spider(centralStations.ToHashSet()).Run(centralStations);
+            var necessaryEdges = new Kruskal().Run(centralStations, edges);
             var necessaryStations = new HashSet<Station>();
 
             foreach(var necessaryEdge in necessaryEdges)
@@ -266,8 +186,9 @@ namespace algorithm
                 edges[necessaryEdge].ForEach(station => necessaryStations.Add(station)); 
             }
 
-            var centralStations = new RecoverGroups().Run(instance).Select(group => group.CentralStation).ToList();
+            /*var centralStations = new RecoverGroups().Run(instance).Select(group => group.CentralStation).ToList();*/
             centralStations.ForEach(centralStation => necessaryStations.Add(centralStation));
+            instance.PrivateStations.ForEach(privateStation => necessaryStations.Add(privateStation));
 
             instance.Stations = instance.Stations.Where(station => necessaryStations.Contains(station)).ToList();
             foreach (var station in instance.Stations)

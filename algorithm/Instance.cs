@@ -80,6 +80,7 @@ namespace algorithm
 
         public void CreateRelations()
         {
+            //RemoveRelations();
             foreach(var first in Stations)
             {
                 foreach(var second in Stations)
@@ -211,7 +212,8 @@ namespace algorithm
 
         public void RemoveRelations()
         {
-            Stations.ForEach(station => station.Neighbors.Clear()); //alert all czy tylko stations?
+            Stations.ForEach(station => { station.Neighbors.Clear(); if(station.Unit != null) station.Unit.RemoveAttachment(); }); //alert all czy tylko stations?
+            //alert!
         }
 
     }

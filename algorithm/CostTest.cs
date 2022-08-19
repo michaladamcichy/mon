@@ -82,6 +82,35 @@ namespace algorithm
 
 
             }
+
+            {
+                Instance instance = new Instance(new int[] { 1000, 1000, 1000 });
+                Cost cost = new Cost(instance);
+
+                {
+                    Station station = new Station(new Position(), 20.0);
+                    Debug.Assert(cost.CanChangeRangeMin(station, 15.0));
+                    Debug.Assert(cost.CanChangeRangeMin(station, 25.0));
+                    Debug.Assert(cost.CanChangeRangeMin(station, 50.0));
+                }
+
+                {
+                    Station station = new Station(new Position(), 30.0);
+                    Debug.Assert(cost.CanChangeRangeMin(station, 15.0));
+                    Debug.Assert(cost.CanChangeRangeMin(station, 25.0));
+                    Debug.Assert(cost.CanChangeRangeMin(station, 50.0));
+                }
+                {
+                    Station station = new Station(new Position(), 50.0);
+                    cost.ChangeRangeMin(station, 4.0);
+                    Debug.Assert(station.Range == 20.0);
+                    cost.ChangeRangeMin(station, 25);
+                    Debug.Assert(station.Range == 30.0);
+                    cost.ChangeRangeMin(station, 40);
+                    Debug.Assert(station.Range == 50.0);
+                }
+
+            }
             //public double? GetMin(int count = 1, double minRange = 0.0)
             //public double? QueryMax(int count = 1, double maxRange = double.MaxValue)
             //public double? QueryMin(int count = 1, double minRange = 0.0)

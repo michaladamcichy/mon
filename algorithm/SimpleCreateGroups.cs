@@ -23,9 +23,9 @@ namespace algorithm
             while(group.Stations.Count > 1)
             {
                 var minCoveringRange = cost.QueryMinCoveringRange(group.Stations);
-                if (minCoveringRange != null && cost.CanGet(minCoveringRange.Value, group.Stations.Count + 1))
+                var minCoveringCircleCenter = MapObject.MinCoveringCircleCenter(group.Stations);
+                if (cost.MakeGroup(group.Stations, new MapObject(minCoveringCircleCenter), minCoveringRange.Value))
                 {
-                    cost.Get(minCoveringRange.Value, group.Stations.Count);
                     return (group, cost);
                 }
 
@@ -81,12 +81,10 @@ namespace algorithm
             }
 
             var minCoveringRange = cost.QueryMinCoveringRange(group.Stations);
+            var minCoveringCircleCenter = MapObject.MinCoveringCircleCenter(group.Stations);
             if (minCoveringRange == null) throw new Exception();
 
-
-            var temporaryCost = new Cost(cost); //alert można fajniej
-            temporaryCost.Get(minCoveringRange.Value);
-            if (!temporaryCost.CanChangeRange(group.Stations, minCoveringRange.Value))
+            if (!cost.MakeGroup(group.Stations, new MapObject(minCoveringCircleCenter), minCoveringRange.Value))
             {
                 var (adjustedGroup, otherNewCost) = AdjustGroup(group, cost); //alert! critical alert!!!
                 //Group adjustedGroup = null;
@@ -103,9 +101,7 @@ namespace algorithm
                 return (new Group(new List<Station>() { first, new Station(first.Position, range)}), cost);
             }
 
-            group.Stations.ForEach(item => cost.ChangeRange(item, minCoveringRange.Value));
-            cost.Get(minCoveringRange.Value);
-            group.Add(new Station(MapObject.MinCoveringCircleCenter(group.Stations), minCoveringRange.Value));
+            group.Add(new Station(minCoveringCircleCenter, minCoveringRange.Value));
 
             return (group, cost);
         }
@@ -147,7 +143,7 @@ namespace algorithm
                         
                         if(_group != null)
                         {
-                            if(lastGroup == null || _group.Stations.Count >= lastGroup.Stations.Count) //alert dodałem =
+                            if(group == null /*|| Cost.CalculateCostPerStation(_group.Stations) < Cost.CalculateCostPerStation(group.Stations)*/) //alert dodałem =
                             {
                                 group = _group;
                                 groupCost = newCost;

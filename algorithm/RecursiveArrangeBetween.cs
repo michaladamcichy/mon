@@ -79,7 +79,7 @@ namespace algorithm
                 var (newCost, stations) = ArrangeBetween(loopCost, first, last, tolerance);
                 if(stations != null)
                 {
-                    if(optimalStations == null /*|| (optimalStations.Count > stations.Count)*/) //ALERT! alert docelowo tutaj porównanie kosztów 
+                    if(optimalStations == null || Cost.IsCheaperThan(stations, optimalStations))
                     {
                         optimalStations = stations;
                         optimalCost = newCost;

@@ -8,9 +8,17 @@ namespace algorithm
 {
     internal class Program
     {
+        static void f(List<int> path)
+        {
+            path = new List<int> { 2 };
+        }
+
         static void Main(string[] args)
         {
-            //CostTest.Run();
+            var list = new List<int> { 1 };
+            f(list);
+
+            CostTest.Run();
 
             /*var d = new DoubleDictionary<int, double>();
 
