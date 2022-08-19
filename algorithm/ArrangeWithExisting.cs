@@ -54,15 +54,9 @@ namespace algorithm
             var (allStations, otherNewCost, edges) =
                 JoinNearestNeighbors.Run(cost, instance, notConnected, connected);
             cost = new Cost(otherNewCost);
-
+            
             instance.PrivateStations.Where(station => !allStations.Contains(station)).ToList().ForEach(station => allStations.Add(station));
             return allStations;
-
-            // instance.Stations.AddRange(allStations.Where(station => !instance.Stations.Contains(station)));
-
-            // var privateStations = instance.PrivateStations.ToList();
-            // return new SimpleOptimize().Run(instance, edges).Concat<Station>(privateStations).ToList();
-            //return instance.Stations;
         }
 
     }

@@ -52,10 +52,10 @@ namespace algorithm
 
         public Instance(Instance instance)
         {
-            Ranges = instance.Ranges;
-            Counts = instance.Counts;
-            Stations = instance.Stations;
-            Units = instance.Units;
+            Ranges = (double[]) instance.Ranges.Clone();
+            Counts = (int[])instance.Counts.Clone();
+            Stations = new List<Station>(instance.Stations);
+            Units = new List<Unit>(instance.Units);
             CreateRelations();
     }
 

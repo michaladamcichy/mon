@@ -158,6 +158,7 @@ RECURSIVE ARRANGE BETWEEN - wstawić kryterium kosztu!!!
 czy złe koszty nie wynikają z rekurencji w RecursiveArrangeBetween  
 ALERT - kruskal w moim przypadku ma de facto złożoność n*n log n
 POZA TYM OKREŚLENIE LINIOWO LOGARYTMICZNA CHYBA NIE PASUJE DO DWÓCH RÓŻNYCH ZMIENNYCH
+NAIWNY - dużą słabością jest jak się źle dobierze punkt początkowy
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

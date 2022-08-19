@@ -165,29 +165,23 @@ import Station from "./Station.svelte";
                     _units[0].priority = 0;
                     _units[0].counts = [...counts];
                 }
-                //alert teraz bez stacjonarnych
                 const stationaryStations = [];//test.getRandomStationaryStationsRelated(Math.ceil(unitsCount /*/ 10 + 2*/), seed + 1, _units[0].position.lat, _units[0].position.lng); 
-                //console.log(stationaryStations);
-                const res = await api.algorithm(selectAlgorithm, [...stationRanges], [...stationCounts], stationaryStations, _units);
-                //ALERT
-                // const _positions = test.getRandomUnitsRelated(Math.floor(_unitsCount / 2), seed);
-                // const __units = _positions.map(position => {return {position: position, priority: 1}}); 
-                // const __stations = await api.algorithm('arrangeWithExisting', [...stationRanges], [...counts], _stations.concat(stationaryStations), _units.concat(__units));
                 
-                if(!res) {
-                    //console.log('request failed');
-                    return;
-                }
-                const _stations = res.stations;
-                //const isConnected = await api.isConnected([...stationRanges], [...counts], _stations, _units);
-                lastOperation = {name: selectAlgorithm, time: res.milliseconds};
+                //const res = await api.algorithm(selectAlgorithm, [...stationRanges], [...stationCounts], stationaryStations, _units);
+                
+                // if(!res) {
+                //     console.log('request failed');
+                //     return;
+                // }
+                // const _stations = res.stations;
+                // lastOperation = {name: selectAlgorithm, time: res.milliseconds};
 
-                let text = res.milliseconds.toString() + 'ms |' + _stations.filter(item => !item.isStationary).length.toString() + ' ' + getStationsScore(_stations).toString() + ' ';
-                    getStationsStats(_stations).forEach(item => text += item.count.toString() + 'x' + item.range + ' ');
-                    console.log(text);
+                // let text = res.milliseconds.toString() + 'ms |' + _stations.filter(item => !item.isStationary).length.toString() + ' ' + getStationsScore(_stations).toString() + ' ';
+                //     getStationsStats(_stations).forEach(item => text += item.count.toString() + 'x' + item.range + ' ');
+                //     console.log(text);
 
-                updateStations(_stations);
-                updateUnits(_units);
+                //updateStations(_stations); //alert!
+                updateUnits(units.concat(_units));
             }}>
                 Random instance
             </button>

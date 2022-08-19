@@ -117,14 +117,14 @@ namespace algorithm
             //Station._id = 0;//alert
             var groups = new List<Group>();
 
-            foreach (var unit in instance.Units)
+           /* foreach (var unit in instance.Units) //alert tego już nie potrzeba!
             {
                 var minRange = cost.GetMin();
                 if(minRange == null) return (new List<Group>() { new Group(instance.Stations) }, cost) ;
                 var station = new Station(minRange.Value);
                 instance.Stations.Add(station);
                 unit.Attach(station);
-            }
+            }*/
 
             while(instance.Stations.Any(station => groups.All(group => !group.Contains(station)))) //alert może jakoś zgrabniej?
             {

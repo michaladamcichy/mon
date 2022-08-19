@@ -1,6 +1,7 @@
 import {api} from './api.js';
 import {_wpUnits} from './wp.js';
 import {_stationaryStations} from './stationaryStations.js';
+import {saveFile} from './file.js';
 export const test = {};
 
 const startPosition = {lat: 52.2297, lng: 21.0122};
@@ -244,17 +245,18 @@ const existingSimple = async (N, k, ranges, counts) => {
             const _units = test.getRandomUnitsRelated(n / 2).map(position => {return {position: position, priority: 1}});
             //console.log(units);
             const initial = await algorithm("simpleArrange", ranges, counts, [], _units);
-            const isConnected = await api.isConnected(ranges, counts, initial.stations, _units);
-            if(!isConnected) console.log('CRITICAL ERROR!!!');
-            if(!isConnected) console.log('CRITICAL ERROR!!!');
-            if(!isConnected) console.log('CRITICAL ERROR!!!');
-            if(!isConnected) console.log('CRITICAL ERROR!!!');
+            
             const stations = initial.stations;
             
             const moreUnits = test.getRandomUnitsRelated(n / 2).map(position => {return {position: position, priority: 1}});
             const units = _units.concat(moreUnits);
 
             const existingResults = await algorithm("arrangeWithExisting", ranges, counts,  stations, units);
+            const isConnected = await api.isConnected(ranges, counts, existingResults.stations, units);
+            if(!isConnected) console.log('CRITICAL ERROR!!!');
+            if(!isConnected) console.log('CRITICAL ERROR!!!');
+            if(!isConnected) console.log('CRITICAL ERROR!!!');
+            if(!isConnected) console.log('CRITICAL ERROR!!!');
             const simpleResults = await algorithm("simpleArrange", ranges, counts, [], units);
             //console.log(naiveResults.stations);
             //console.log(simpleResults.stations);
@@ -390,6 +392,19 @@ const real = async (N, k, ranges, counts) => {
     printCosts([simpleStations, priorityStations]);
 };
 
+function fisherYates( array ){
+    var count = array.length,
+        randomnumber,
+        temp;
+    while( count ){
+     randomnumber = Math.random() * count-- | 0;
+     temp = array[count];
+     array[count] = array[randomnumber];
+     array[randomnumber] = temp
+    }
+   }
+
+
 test.run = async () => {
     console.log('TEST');
     //await naiveVsSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
@@ -398,4 +413,10 @@ test.run = async () => {
     //await simplesimpleOptimize([50, 100, /*200, 300, 400, 500, 600, 700, 800, 900, 1000*/], 3, [20, 30, 50], [10000,10000,10000]);
     //await real([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], 1, [20, 30, 50], [10000,10000,10000]);
     
+
+
+    
+    // let stations = await loadGSM(100);
+    // fisherYates(stations);
+    // saveFile('experiment', JSON.stringify(stations));
 };

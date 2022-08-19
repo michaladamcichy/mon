@@ -58,19 +58,14 @@
 			return;
 		}
 		
-		let stationaryStations = [];
-		for(let i = 0; i < _stationaryStations.length; i++) {
-			//console.log(Math.round(1/ (percentage/100)));
-			if(i % Math.ceil(1/ (percentage/100)) != 0) continue;
+		const stationaryStations = [];
+		for(let i = 0; i < Math.floor(percentage/100 * _stationaryStations.length); i++) {
 			stationaryStations.push(_stationaryStations[i]);
 		}
 
 		selectedInstance.stations = selectedInstance.stations.concat(
 			stationaryStations.map(ss => ({position: ss.position, range: ss.range/*[20, 30, 50][Math.floor(Math.random() * 3)]*/, isStationary: true}))); //alert CRITICAL ALERT
 		loadInstance(selectedInstance);
-
-
-		console.log(new Set(stationaryStations.map(ss => ss.range)));
 	};
 
 	const updatePercentage = (newValue) => {

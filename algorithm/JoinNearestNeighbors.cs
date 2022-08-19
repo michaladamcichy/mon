@@ -24,9 +24,11 @@ namespace algorithm
             if (notConnected.Count == 0 || !cost.CanGetAny()) return (all, cost, new DoubleDictionary<Station, List<Station>>());
 
             var centralStations = notConnected.Where(item => !(item.IsStationary && !item.Neighbors.Any(neighbor => neighbor.IsPrivate)));
-     /*       var centralStations = notConnected.ToList();
-            centralStations.RemoveAll(item => )*/
-
+            /*       var centralStations = notConnected.ToList();
+                   centralStations.RemoveAll(item => )*/
+            
+            var stationaryStationToSet = new BuildStationarySubtrees().Run(instance.StationaryStations);
+            stationaryStationToSet.Keys.ToList().ForEach(station => stationToSet[station] = stationaryStationToSet[station]);
             //while (all.Any(station => stationToSet[all.First()] != stationToSet[station])) //alert!
             //while (notConnected.Any(station => stationToSet[connected.Count == 0 ? notConnected.First() : connected.First() ] != stationToSet[station])) //alert!
             while (centralStations.Any(station => stationToSet[connected.Count == 0 ? centralStations.First() : connected.First()] != stationToSet[station]))
