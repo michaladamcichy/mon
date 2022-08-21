@@ -33,6 +33,7 @@ api.isConnected = async (stationRanges, stationCounts, stations, units) => {
 };
 
 api.algorithm = async (type, stationRanges, stationCounts, stations, units, optimized = false) => {
+    
     let _i = 1; //alert
     stations.forEach(station => {
         station.id = _i++;

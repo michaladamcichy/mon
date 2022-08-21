@@ -161,6 +161,8 @@ POZA TYM OKREŚLENIE LINIOWO LOGARYTMICZNA CHYBA NIE PASUJE DO DWÓCH RÓŻNYCH 
 NAIWNY - dużą słabością jest jak się źle dobierze punkt początkowy
 WYDAJE MI SIĘ, ŻE POWINIENEM WSTEPNIE SETOWAĆ NIE TYLKO STACJONARNE W ARRANGE WITH EXISTING
 ALERT W EXPAND GROUPS JEST NIEEFEKTYWNE ZAŁOŻENIE CO DO GRUP
+ZŁOŻNOŚC PAMIĘCIOWA - simple optimize ma bardzo dużą!
+TODO - być może w real pomogłoby simpleoptimize bez spidera!
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

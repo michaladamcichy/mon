@@ -161,7 +161,7 @@ const printCosts = seriess => {
     N.forEach(n => {
         let text = `${n.toString()}`;
         seriess.forEach(series => {
-            const counts = series[n].map(item => item.length);
+            const counts = series[n].map(item => item.filter(station => !station.isStationary).length);
             const costs = series[n].map(item => getStationsScore(item));
             
             const avgStationsCount = Math.round(counts.reduce((cur, next) => cur + next, 0) / counts.length * 100.0) / 100;
@@ -182,14 +182,6 @@ const printCosts = seriess => {
 // let text = res.milliseconds.toString() + 'ms |' + res.stations.filter(item => !item.isStationary).length.toString() + ' ' + getStationsScore(res.stations).toString() + ' ';
 //         getStationsStats(res.stations).forEach(item => text += item.count.toString() + 'x' + item.range + ' ');
 //         console.log(text);
-
-const algorithm = async (algorithm, ranges, counts, stations, units, optimized = false) => 
-{
-    let res = await api.algorithm(algorithm, ranges, counts, stations, units, optimized);
-    
-    return {stations: res.stations, time: res.milliseconds};
-}
-
 const assert = async (ranges, counts, stations, units) => {
     const isConnected = await api.isConnected(ranges, counts, stations, units);
     if(!isConnected) {
@@ -199,7 +191,20 @@ const assert = async (ranges, counts, stations, units) => {
     }
 };
 
-const naiveVsSimple = async (N, k, ranges, counts) => {
+const algorithm = async (algorithm, ranges, counts, stations, units, optimized = false) => 
+{
+    let res = await api.algorithm(algorithm, ranges, counts, stations, units);
+    if(optimized) {
+        let _res = await api.algorithm("simpleOptimize", ranges, counts, res.stations, units);
+        res.stations = _res.stations;
+        res.milliseconds += _res.milliseconds;
+    }
+    assert(ranges, counts, res.stations, units);
+    return {stations: res.stations, time: res.milliseconds};
+}
+
+
+const naiveVsSimple = async (N, k, ranges, counts, optimized) => {
     console.log('naiveSimple');
     
     const naiveTimes = {};
@@ -219,10 +224,8 @@ const naiveVsSimple = async (N, k, ranges, counts) => {
         for(let i = 0; i < k; i++) {
             const units = test.getRandomUnitsRelated(n).map(position => {return {position: position, priority: 1}});;
             //console.log(units);
-            const naiveResults = await algorithm("naiveArrange", ranges, counts,  [], units);
-            assert(ranges, counts, naiveResults.stations, units);
-            const simpleResults = await algorithm("simpleArrange", ranges, counts, [], units);
-            assert(ranges, counts, simpleResults.stations, units);
+            const naiveResults = await algorithm("naiveArrange", ranges, counts,  [], units, optimized);
+            const simpleResults = await algorithm("simpleArrange", ranges, counts, [], units, optimized);
             //console.log(naiveResults.stations);
             //console.log(simpleResults.stations);
             naiveTimes[n].push(naiveResults.time);
@@ -235,7 +238,7 @@ const naiveVsSimple = async (N, k, ranges, counts) => {
     printCosts([naiveStations, simpleStations]);
 };
 
-const existingSimple = async (N, k, ranges, counts) => {
+const existingSimple = async (N, k, ranges, counts, optimized) => {
     console.log('simpleExisting');
     
     const existingTimes = {};
@@ -255,17 +258,15 @@ const existingSimple = async (N, k, ranges, counts) => {
         for(let i = 0; i < k; i++) {
             const _units = test.getRandomUnitsRelated(n / 2).map(position => {return {position: position, priority: 1}});
             //console.log(units);
-            const initial = await algorithm("simpleArrange", ranges, counts, [], _units);
+            const initial = await algorithm("simpleArrange", ranges, counts, [], _units, optimized);
             
             const stations = initial.stations;
             
             const moreUnits = test.getRandomUnitsRelated(n / 2).map(position => {return {position: position, priority: 1}});
             const units = _units.concat(moreUnits);
 
-            const existingResults = await algorithm("arrangeWithExisting", ranges, counts,  stations, units);
-            assert(ranges, counts, existingResults.stations, units);
-            const simpleResults = await algorithm("simpleArrange", ranges, counts, [], units);
-            assert(ranges, counts, simpleResults.stations, units);
+            const existingResults = await algorithm("arrangeWithExisting", ranges, counts,  stations, units, optimized);
+            const simpleResults = await algorithm("simpleArrange", ranges, counts, [], units, optimized);
             //console.log(naiveResults.stations);
             //console.log(simpleResults.stations);
             existingTimes[n].push(existingResults.time);
@@ -278,7 +279,7 @@ const existingSimple = async (N, k, ranges, counts) => {
     printCosts([existingStations, simpleStations]);
 };
 
-const simplePriority = async (N, k, ranges, counts) => {
+const simplePriority = async (N, k, ranges, counts, optimized) => {
     console.log('simplePriority');
     
     const naiveTimes = {};
@@ -299,10 +300,8 @@ const simplePriority = async (N, k, ranges, counts) => {
             const units = test.getRandomUnitsRelated(n).map(position => {return {position: position,
                 priority: [0,1,2,3,4][Math.floor(Math.random() * 5)]}});
             //console.log(units);
-            const naiveResults = await algorithm("simpleArrange", ranges, counts,  [], units);
-            assert(ranges, counts, naiveResults.stations, units);
-            const simpleResults = await algorithm("priorityArrange", ranges, counts, [], units);
-            assert(ranges, counts, simpleResults.stations, units);
+            const naiveResults = await algorithm("simpleArrange", ranges, counts,  [], units, optimized);
+            const simpleResults = await algorithm("priorityArrange", ranges, counts, [], units, optimized);
             //console.log(naiveResults.stations);
             //console.log(simpleResults.stations);
             naiveTimes[n].push(naiveResults.time);
@@ -315,7 +314,7 @@ const simplePriority = async (N, k, ranges, counts) => {
     printCosts([naiveStations, simpleStations]);
 };
 
-const simplesimpleOptimize = async (N, k, ranges, counts) => {
+const simplesimpleOptimize = async (N, k, ranges, counts, optimized) => {
     console.log('simpleSimpleOptimize');
     
     const simpleTimes = {};
@@ -335,12 +334,10 @@ const simplesimpleOptimize = async (N, k, ranges, counts) => {
         for(let i = 0; i < k; i++) {
             const _units = test.getRandomUnitsRelated(n).map(position => {return {position: position, priority: 1}});;
             //console.log(units);
-            const simpleResults = await algorithm("simpleArrange", ranges, counts,  [], _units);
-            assert(ranges, counts, simpleResults.stations, _units);
+            const simpleResults = await algorithm("simpleArrange", ranges, counts,  [], _units, optimized);
             const stations = simpleResults.stations;
             const units = _units.filter(unit => _units.indexOf(unit) % 2 == 0);
-            const optimizeResults = await algorithm("simpleOptimize", ranges, counts, stations, units);
-            assert(ranges, counts, optimizeResults.stations, units);
+            const optimizeResults = await algorithm("simpleOptimize", ranges, counts, stations, units, optimized);
             //console.log(naiveResults.stations);
             //console.log(simpleResults.stations);
             simpleTimes[n].push(simpleResults.time);
@@ -365,7 +362,7 @@ const loadGSM = async (percentage = percentageOfStations) => {
     return stationaryStations.map(ss => ({position: ss.position, range: ss.range/*[20, 30, 50][Math.floor(Math.random() * 3)]*/, isStationary: true}));
 };
 
-const real = async (N, k, ranges, counts) => {
+const real = async (N, k, ranges, counts, optimized) => {
     console.log('real');
     
     const simpleTimes = {};
@@ -385,10 +382,8 @@ const real = async (N, k, ranges, counts) => {
         for(let i = 0; i < k; i++) {
             const units = _wpUnits;
             const stations = await loadGSM(n);
-            const simpleResults = await algorithm("simpleArrange", ranges, counts, stations, units);
-            assert(ranges, counts, simpleResults.stations, units);
-            const priorityResults = await algorithm("priorityArrange", ranges, counts, stations, units);
-            assert(ranges, counts, priorityResults.stations, units);
+            const simpleResults = await algorithm("simpleArrange", ranges, counts, stations, units, optimized);
+            const priorityResults = await algorithm("priorityArrange", ranges, counts, stations, units, optimized);
             //console.log(naiveResults.stations);
             //console.log(simpleResults.stations);
             simpleTimes[n].push(simpleResults.time);
@@ -399,6 +394,45 @@ const real = async (N, k, ranges, counts) => {
     }
     printTimes([simpleTimes, priorityTimes]);
     printCosts([simpleStations, priorityStations]);
+};
+
+const all = async (N, k, ranges, counts, optimized) => {
+    console.log('all');
+    
+    const naiveTimes = {};
+    const naiveStations = {};
+    const simpleTimes = {};
+    const simpleStations = {};
+    const priorityTimes = {};
+    const priorityStations = {};
+
+    for(let i = 0; i < N.length; i++)
+    {
+        const n = N[i];
+        console.log(n);
+        naiveTimes[n] = [];
+        naiveStations[n] = [];
+        simpleTimes[n] = [];
+        simpleStations[n] = [];
+        priorityTimes[n] = [];
+        priorityStations[n] = [];
+
+        for(let i = 0; i < k; i++) {
+            const units = _wpUnits;
+            //console.log(units);
+            const naiveResults = await algorithm("naiveArrange", ranges, counts,  [], units, optimized);
+            const simpleResults = await algorithm("simpleArrange", ranges, counts, [], units, optimized);
+            const priorityResults = await algorithm("priorityArrange", ranges, counts, [], units, optimized);
+            naiveTimes[n].push(naiveResults.time);
+            naiveStations[n].push(naiveResults.stations);
+            simpleTimes[n].push(simpleResults.time);
+            simpleStations[n].push(simpleResults.stations);
+            priorityTimes[n].push(priorityResults.time);
+            priorityStations[n].push(priorityResults.stations);
+        }
+    }
+    printTimes([naiveTimes, simpleTimes, priorityTimes]);
+    printCosts([naiveStations, simpleStations, priorityStations]);
 };
 
 function fisherYates( array ){
@@ -416,11 +450,14 @@ function fisherYates( array ){
 
 test.run = async () => {
     console.log('TEST');
-    //await naiveVsSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
-    //await existingSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
-    //await simplePriority([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], 10, [20, 30, 50], [10000,10000,10000]);
-    //await simplesimpleOptimize([50, 75, 100, 125, 150, 175, 200, 225, 250, 250], 10, [20, 30, 50], [10000,10000,10000]);
-    //await real([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], 1, [20, 30, 50], [10000,10000,10000]);
+    const optimized = false;
+    const repetitions = 10;
+    //await naiveVsSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
+    //await existingSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
+    //await simplePriority([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
+    //await simplesimpleOptimize([175], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
+    //await real([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
+    await all([98], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
 
 
 

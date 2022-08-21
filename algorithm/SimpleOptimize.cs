@@ -13,10 +13,10 @@ namespace algorithm
         public static void Print(List<Station> stations, string message = "")
         {
             if (!enabled) return;
-            Debug.Write("\n" + message + ": ");
-            Debug.Write("Count = " + stations.Count.ToString() + "  | [");
+            //Debug.Write("\n" + message + ": ");
+            //Debug.Write("Count = " + stations.Count.ToString() + "  | [");
             stations.ForEach(station => Debug.Write(station.Id.ToString() + ", "));
-            Debug.Write("]\n");
+            //Debug.Write("]\n");
         }
     }
 
@@ -121,7 +121,7 @@ namespace algorithm
 
         void AddEdges(Station first, DoubleDictionary<Station, List<Station>> edges, HashSet<List<Station>> _paths)
         {
-            Debug.WriteLine("station " + first.Id.ToString());
+            //Debug.WriteLine("station " + first.Id.ToString());
             var paths = _paths.ToList();
             paths.ForEach(path => _.Print(path, "Before validation..."));
             paths = paths.Where(path => Validate(first, path)).ToList();
@@ -145,7 +145,7 @@ namespace algorithm
 
         public DoubleDictionary<Station, List<Station>> Run(List<Station> centralStations)
         {
-            Debug.WriteLine("Spider running");
+            //Debug.WriteLine("Spider running");
             var edges = new DoubleDictionary<Station, List<Station>>();
             foreach (var centralStation in centralStations)
             {
@@ -173,7 +173,7 @@ namespace algorithm
                 Concat<Station>(instance.StationaryStations).ToList();
             return new Dijkstra().Run(instance, stations, stations.Where(item => item.IsAttached()).First(), stations.Where(item => item.IsAttached()).Last());*/
             //return new List<Station>();
-            Debug.WriteLine("Simple optimize");
+            //Debug.WriteLine("Simple optimize");
 
             var groups = new RecoverGroups().Run(instance);
             var centralStations = groups.Select(group => group.CentralStation).ToList();

@@ -15,7 +15,7 @@ namespace algorithm
             this.instance = instance;
         }
 
-        (Group?, Cost) AdjustGroup(Group _group, Cost initialCost)
+        (Group, Cost, double) AdjustGroup(Group _group, Cost initialCost)
         {
             var group = new Group(_group);
             Cost cost = new Cost(initialCost);
@@ -24,16 +24,16 @@ namespace algorithm
             {
                 var minCoveringRange = cost.QueryMinCoveringRange(group.Stations);
                 var minCoveringCircleCenter = MapObject.MinCoveringCircleCenter(group.Stations);
-                if (cost.MakeGroup(group.Stations, new MapObject(minCoveringCircleCenter), minCoveringRange.Value))
+                if (minCoveringRange != null && cost.MakeGroup(group.Stations, new MapObject(minCoveringCircleCenter), minCoveringRange.Value))
                 {
-                    return (group, cost);
+                    return (group, cost, minCoveringRange.Value);
                 }
 
                 var furthestFromCenter = group.GetFurthestFromCenter();
                 group.Remove(furthestFromCenter);
             }
 
-            return (null, cost);
+            return (null, cost, 0.0);
         }
 
         (Group?, Cost) CreateGroup(Station first, Cost initialCost, List<Group> groups)
@@ -86,14 +86,13 @@ namespace algorithm
 
             if (!cost.MakeGroup(group.Stations, new MapObject(minCoveringCircleCenter), minCoveringRange.Value))
             {
-                var (adjustedGroup, otherNewCost) = AdjustGroup(group, cost); //alert! critical alert!!!
+                var (adjustedGroup, otherNewCost, centralRange) = AdjustGroup(group, cost); //alert! critical alert!!!
                 //Group adjustedGroup = null;
                 //Cost otherNewCost = new Cost(cost);
 
                 if (adjustedGroup != null)
                 {
-                    var adjustedMinCoveringRange = otherNewCost.GetMinCoveringRange(adjustedGroup.Stations);
-                    adjustedGroup.Add(new Station(MapObject.MinCoveringCircleCenter(adjustedGroup.Stations), adjustedMinCoveringRange.Value));
+                    adjustedGroup.Add(new Station(MapObject.MinCoveringCircleCenter(adjustedGroup.Stations), centralRange));
                     return (adjustedGroup, otherNewCost);
                 }
 

@@ -16,7 +16,7 @@ namespace algorithm
 
         public HashSet<double> ForbiddenRanges { get; private set; } = new HashSet<double>();
         //public List<Station> Stations { get; } = new List<Station>();
-        bool logEnabled = true;
+        bool logEnabled = false;
         public Cost(Instance instance)
         {
             this.Instance = instance;

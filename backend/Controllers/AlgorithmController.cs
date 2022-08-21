@@ -59,7 +59,6 @@ namespace backend.Controllers
             instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
             var instance = new Instance(instanceJSON);
             var ret = Algorithm.ArrangeWithExisting(instance).Select(item => item.GetJSON()).ToList();
-            
             stopwatch.Stop();
             return new Result(ret, stopwatch.ElapsedMilliseconds);// stopwatch.ElapsedMilliseconds);
         }

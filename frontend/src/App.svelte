@@ -46,7 +46,7 @@
 	let bigTestRunning = false;
 	let percentageOfStations = 0.0;
 	let disableMap = false;
-	let optimized = true;
+	let optimized = false;
 
 	const updateOptimized = (newValue) => {
 		optimized = newValue;
