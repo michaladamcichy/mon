@@ -351,12 +351,13 @@ const simplesimpleOptimize = async (N, k, ranges, counts, optimized) => {
 };
 
 const loadGSM = async (percentage = percentageOfStations) => {
+    const __stationaryStations = await JSON.parse(JSON.stringify(_stationaryStations));
     if(percentage == 0) {
         return [];
     }
     const stationaryStations = [];
-    for(let i = 0; i < Math.floor(percentage/100 * _stationaryStations.length); i++) {
-        stationaryStations.push(_stationaryStations[i]);
+    for(let i = 0; i < Math.floor(percentage/100 * __stationaryStations.length); i++) {
+        stationaryStations.push(__stationaryStations[i]);
     }
 
     return stationaryStations.map(ss => ({position: ss.position, range: ss.range/*[20, 30, 50][Math.floor(Math.random() * 3)]*/, isStationary: true}));
@@ -457,7 +458,7 @@ test.run = async () => {
     //await simplePriority([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
     //await simplesimpleOptimize([175], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
     //await real([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
-    await all([98], repetitions, [20, 30, 50], [360,180,90], optimized);
+    //await all([98], repetitions, [20, 30, 50], [360,180,90], optimized);
 
 
 

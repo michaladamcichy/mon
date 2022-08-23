@@ -29,8 +29,8 @@ const onFileSelected =(e)=>{
     };
 }
 
-const loadWP = async () => {
-    instance.units = instance.units.concat(_wpUnits);
+const loadWP = async () => {    
+    instance.units = instance.units.concat(await JSON.parse(JSON.stringify(_wpUnits)));
 
     load(instance);
 };
@@ -40,7 +40,7 @@ const loadWP = async () => {
 <div id="main" class="container" on:click={() => {select(instance);}}>
     <div class={`${instance == selected ? 'selectedRow ' : ""}controlsContainer form-group row d-flex justify-content-center align-items-center`}>
         <label class="col">{`${index + 1}.`}</label>
-        <input type='text' class={`col btn ${selected == instance ? 'btn-light' : 'btn-secondary'}`}
+        <input type='text' class={`col btn ${selected == instance ? 'btn-light' : 'btn-light'}`}
             on:click={() => {
                 if(instance != selected) {
                     input.blur();
@@ -51,12 +51,13 @@ const loadWP = async () => {
             bind:this={input}
             placeholder='type instance name...'
             />
-        <button class="col btn btn-primary" on:click={() => {fileInput.click();}}>Load</button>
-        <button class="col btn btn-primary" on:click={() => {saveFile(instance.name, JSON.stringify(instance));}}>Save</button>
-        <button class="col btn btn-primary" on:click={() => {loadWP();}}>WP</button>
-        <button class="col btn btn-primary" on:click={() => {duplicate(instance);}}>Dupl.</button>
+        <button class="col btn btn-light" on:click={() => {fileInput.click();}}><i class={'fa fa-upload'}></i></button>
+        <button class="col btn btn-light" on:click={() => {saveFile(instance.name, JSON.stringify(instance));}}><i class={'fa fa-download'}></i></button>
+        <button class="col btn btn-light" on:click={() => {loadWP();}}>WP</button>
+        <button class="col btn btn-light" on:click={() => {duplicate(instance);}}><i class="fa fa-clone"></i></button>
         <div class="col"></div>
-        <button class="col btn btn-danger" on:click={() => {remove(instance);}}>X</button>
+        <button class="col btn btn-danger" on:click={() => {remove(instance);}}>
+            <i class={'fa fa-trash'}></i></button>
         <input style="display:none" type="file" accept="*" on:change={(e)=>onFileSelected(e)} bind:this={fileInput} >
     </div>
     <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
@@ -76,7 +77,7 @@ const loadWP = async () => {
     button {
         /* width: 30px; */
         height: 30px;
-        font-size: 10px;
+        font-size: 15px;
         font-weight: bold;
     }
     .row {
@@ -84,6 +85,6 @@ const loadWP = async () => {
         border-radius: 5px;
     }
     .selectedRow {
-        background-color: lightgray;
+        background-color: #198754;
     }
 </style>

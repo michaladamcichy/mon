@@ -1,15 +1,15 @@
 <script>
+	import { onMount } from 'svelte';
+
 
 	import Map from './Map.svelte';
 	import SidePane from './SidePane.svelte';
 	import BottomPane from './BottomPane.svelte';
 	import {_stationaryStations} from '../lib/stationaryStations.js';
 
-	import { onMount } from 'svelte';
-
-	import {maps} from '../lib/maps.js';
 	import {api} from '../lib/api';
 	import { test } from '../lib/test';
+	import { maps } from '../lib/maps';
 
 	export let ready;
 
@@ -23,10 +23,7 @@
 	let instances = [
 		{
 			name: 'instance',
-			ranges: defaultRanges,
-			weights: [1.0, 1.5, 2.5],
 			isConnected: undefined,
-			oldRanges: defaultRanges,
 			stations: [	
 			],
 			units: [
@@ -36,7 +33,7 @@
 
 	let selectedInstance;
 
-	let ranges;
+	let ranges = defaultRanges;
 	let counts = [...defaultCounts];
 	let weights;
 	let isConnected;
@@ -94,10 +91,7 @@
 		bigTestRunning = value;
 	}
 	const updateInstance = instance => {
-		instance.ranges = ranges;
-		instance.weights = weights;
 		instance.isConnected = isConnected;
-		instance.oldRanges = oldRanges; //alert czy to nie może być lokalna zmienna?
 		instance.stations = stations;
 		instance.units = units;
 
@@ -105,10 +99,8 @@
 	};
 
 	const loadInstance = instance => {
-		ranges = instance.ranges;
 		weights = instance.weights;
 		isConnected = instance.isConnected;
-		oldRanges = instance.oldRanges;
 		stations = instance.stations;
 		units = instance.units;
 
@@ -133,10 +125,8 @@
 		if(selectedInstance)
 		updateInstance(selectedInstance);
 
-		ranges = instance.ranges;
 		weights = instance.weights;
 		isConnected = instance.isConnected;
-		oldRanges = instance.oldRanges; //alert czy to nie może być lokalna zmienna?
 		stations = instance.stations;
 		units = instance.units;
 
@@ -180,27 +170,11 @@
 		{priority: 3, icon: 'fa fa-truck'},
 		{priority: 2, icon: 'fa fa-star'},
 		{priority: 1, icon: 'fa fa-male'},
-		{priority: 0, icon: 'fa fa-bitbucket'},
+		{priority: 0, icon: 'fa fa-wrench'},
     ];
 
 	const updateRanges = (ranges) => {
-		for(let i =0; i < ranges.length - 1; i++) {
-			if(ranges[i] >= ranges[i+1]) {
-				ranges = [...oldRanges];
-				return;
-			}
-		}
 		ranges = ranges;
-		updateAllStations(stations.map(station => {
-			const index = oldRanges.indexOf(station.range);
-			if(index >= 0) {
-				station.range = ranges[index];
-			} else {
-				//console.log('custom range');
-			}
-			return station;
-		}));
-		oldRanges = [...ranges];
 	};
 
 	const updateCounts = (_counts) => {
@@ -329,7 +303,7 @@
 			<BottomPane
 				stations={stations}
 				units={units}
-				stationRanges={ranges}
+				ranges={ranges}
 				stationCounts={counts}
 				updateCounts={updateCounts}
 				stationWeights={weights}
@@ -369,7 +343,7 @@
 				updateUnit={updateUnit}
 				removeUnit={removeUnit}
 				updateAllUnits={updateAllUnits}
-				stationRanges={ranges}
+				ranges={ranges}
 				stationCounts={counts}
 				priorities={priorities}
 				bigTestRunning={bigTestRunning}

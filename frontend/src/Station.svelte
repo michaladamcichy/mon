@@ -21,7 +21,8 @@ const latlngStep = 0.1;
         <input type="number" class="col" bind:value={station.position.lat} on:change={() => {update(station);}} step={latlngStep}/>
         <label class="col col-form-label">lng:</label>
         <input type="number" class="col" bind:value={station.position.lng} on:change={() => {update(station);}} step={latlngStep}/>
-        <button id="removeButton" class="btn btn-danger" on:click={() => {remove(station);}}>X</button>
+        <button id="removeButton" class="btn btn-danger" on:click={() => {remove(station);}}>
+            <i class="fa fa-trash"></i></button>
     </div>
     <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
         <label class="col">{''}</label>
@@ -30,14 +31,14 @@ const latlngStep = 0.1;
             <input type="number" class="col" min='0.1' step = 0.1 default='50.0' bind:value={station.range} on:change={() => {update(station);}} />
         {:else}
         {#each ranges as range}
-            <button class={`col btn ${station.range == range ? 'btn-success' : 'btn-primary'}`} on:click={() => {station.range = range; update(station);}}>{range}</button>
+            <button class={`col btn ${station.range == range ? 'btn-success' : 'btn-light'}`} on:click={() => {station.range = range; update(station);}}>{range}</button>
         {/each}
         {/if}
         <label class="col">{'km'}</label>
         
-        <button class={`col btn btn-${station.isStationary ? 'secondary' : 'primary'}`} on:click={() => {station.groupId = -1; station.isStationary = !station.isStationary; update(station);}}>
+        <!-- <button class={`col btn btn-${station.isStationary ? 'secondary' : 'primary'}`} on:click={() => {station.groupId = -1; station.isStationary = !station.isStationary; update(station);}}>
             <i class={station.isStationary ? 'fa fa-star' : 'fa fa-truck'}></i>
-        </button>
+        </button> -->
         {#if station.groupId >= 0 && !station.isStationary}
         <label class="col">{`g${station.groupId + 1}`}</label>
         {:else}

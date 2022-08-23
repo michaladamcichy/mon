@@ -1,6 +1,5 @@
 <script>
 import { onMount } from "svelte";
-import { current_component, validate_component } from "svelte/internal";
 import { api } from "../lib/api";
 import { test } from '../lib/test.js';
 
@@ -9,12 +8,10 @@ import Station from "./Station.svelte";
 
     export let stations;
     export let units;
-    export let stationRanges;
+    export let ranges;
     export let stationCounts;
     export let updateCounts;
-    export let stationWeights;
     export let updateRanges;
-    export let updateWeights;
     export let updateStations;
     export let updateUnits;
     export let checkIsConnected;
@@ -31,7 +28,6 @@ import Station from "./Station.svelte";
 
     let counts = [...stationCounts];
 
-    let oldStationRanges;
     let unitsCount = 50;
     let seed = 0;
 
@@ -44,7 +40,8 @@ import Station from "./Station.svelte";
     let lastI = 0;
 
     onMount(() => {
-        oldStationRanges = [...stationRanges];
+        console.log(ranges);
+        ranges = [...ranges];
     });
 
     const getStationsStats = (_stations) => {
@@ -64,7 +61,7 @@ import Station from "./Station.svelte";
     const getStationsScore = stations => stations.filter(station => !station.isStationary).reduce((current, station) => current + station.range, 0);
 
     const onAlgorithmClicked = async (type) => {
-        const res = await api.algorithm(type, stationRanges, stationCounts, stations, units, optimized);
+        const res = await api.algorithm(type, ranges, stationCounts, stations, units, optimized);
         if(!res) {
             //console.log('request failed');
             return;
@@ -77,20 +74,21 @@ import Station from "./Station.svelte";
         console.log(text);
     };
 </script>
-
 <div class="row">
     <BottomPaneSection title={"Stations' parameters"}>
         <div class="row">
-            {#each stationRanges as range, index}
+            <h5 class="col">Ranges (km)</h5>
+        </div>
+        <div class="row">
+            {#each ranges as range, index}
                 <input type="number"
-                    min={index > 0 ? stationRanges[index - 1] + 1 : 0}
-                    max={index < stationRanges.length - 1 ? stationRanges[index + 1] - 1 : Infinity}
+                    min={index > 0 ? ranges[index - 1] + 1 : 0}
+                    max={index < ranges.length - 1 ? ranges[index + 1] - 1 : Infinity}
                     bind:value={range}
-                    on:change={() => {updateRanges(stationRanges);}}
+                    on:change={() => {updateRanges(ranges);}}
                     class="col"
-                    step={1} disabled/>
+                    step={1} />
             {/each}
-            <p class="col">ranges</p>
         </div>
         <!-- <div class="row">
             {#each stationWeights as weight, index}
@@ -104,6 +102,12 @@ import Station from "./Station.svelte";
             <p class="col">costs</p>
         </div> -->
         <div class="row">
+            <div class="col" style={'visibility: hidden'}>{'_'}</div>
+        </div>
+        <div class="row">
+            <h5 class="col">Counts</h5>
+        </div>
+        <div class="row">
             {#each counts as count, index}
                 <input type="number"
                     min={0}
@@ -113,47 +117,47 @@ import Station from "./Station.svelte";
                     step={1}
                     />
             {/each}
-            <p class="col">counts</p>
         </div>
-        <div class="row">
+        <!-- <div class="row">
             <input class="col" type="number" min='0' max="100" step='10' bind:value={percentageOfStations}
                 on:change={(e) => {updatePercentage(e.target.value); loadGSM(e.target.value);}}>
             <label class="col">% of stationary stations</label>
-        </div>
+        </div> -->
         
     </BottomPaneSection>
     <BottomPaneSection title={'Algorithms'}>
         <div class="row">
-            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("simpleArrange")}>
-                Arrange
+            <button class="col btn btn-light algorithmButton" on:click={() => onAlgorithmClicked("naiveArrange")}>
+                Naive
             </button>
-            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("arrangeWithExisting")}>
-                With existing
+            <button class="col btn btn-light algorithmButton" on:click={() => onAlgorithmClicked("simpleArrange")}>
+                Rationalised
             </button>
+            <!-- <input class="col" type="checkbox" bind:checked={optimized} on:change={() => {updateOptimized(optimized);}}> -->
         </div>
         <div class="row">
-            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("simpleOptimize")}>
-                SimpleOptimize
+            <button class="col btn btn-light algorithmButton" on:click={() => onAlgorithmClicked("arrangeWithExisting")}>
+                Add to existing
             </button>
-            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("priorityArrange")}>
-                Priority arrange
+            <button class="col btn btn-light algorithmButton" on:click={() => onAlgorithmClicked("priorityArrange")}>
+                Priority based
             </button>
         </div>
-        <div class="row">
-            <button class="col btn btn-primary" on:click={() => onAlgorithmClicked("naiveArrange")}>
-                Naive arrange
-            </button>
-            <input class="col" type="checkbox" bind:checked={optimized} on:change={() => {updateOptimized(optimized);}}>
-        </div>
-        <div class="row">
+        <!-- <div class="row">
             <select bind:value={selectAlgorithm}>
                 <option value="simpleArrange"> Arrange </option>
                 <option value="arrangeWithExisting"> With existing </option>
                 <option value="priorityArrange"> Priority arrange </option>
             </select>
-        </div>
+        </div> -->
         <div class="row">
-            <button class="col btn btn-primary" on:click={async () => {
+            <button class="col btn btn-light algorithmButton" on:click={() => onAlgorithmClicked("simpleOptimize")}>
+                Optimize
+            </button>
+        </div>
+        
+        <div class="row">
+            <button class="col btn btn-light algorithmButton" on:click={async () => {
                 updatePercentage(0);
                 const positions = test.getRandomUnitsRelated(unitsCount, seed);
             
@@ -166,29 +170,15 @@ import Station from "./Station.svelte";
                 }
                 const stationaryStations = [];//test.getRandomStationaryStationsRelated(Math.ceil(unitsCount /*/ 10 + 2*/), seed + 1, _units[0].position.lat, _units[0].position.lng); 
                 
-                //const res = await api.algorithm(selectAlgorithm, [...stationRanges], [...stationCounts], stationaryStations, _units);
-                
-                // if(!res) {
-                //     console.log('request failed');
-                //     return;
-                // }
-                // const _stations = res.stations;
-                // lastOperation = {name: selectAlgorithm, time: res.milliseconds};
-
-                // let text = res.milliseconds.toString() + 'ms |' + _stations.filter(item => !item.isStationary).length.toString() + ' ' + getStationsScore(_stations).toString() + ' ';
-                //     getStationsStats(_stations).forEach(item => text += item.count.toString() + 'x' + item.range + ' ');
-                //     console.log(text);
-
-                //updateStations(_stations); //alert!
                 updateUnits(units.concat(_units));
             }}>
-                Random instance
+                Generate random units
             </button>
-            <input type="number" bind:value={unitsCount} class="col" min='0' step='1'>
-            <input type="number" bind:value={lastI} class="col" min='0' step='1'>
+            <input type="number" bind:value={unitsCount} class="col-4 randomUnitsCountInput" min='0' step='1'>
+            <!-- <input type="number" bind:value={lastI} class="col" min='0' step='1'> -->
         </div>
-        <div class="row">
-            <button class={`col btn ${bigTestRunning ? 'btn-warning' : 'btn-primary'}`} on:click={() => {
+        <!-- <div class="row">
+            <button class={`col btn ${bigTestRunning ? 'btn-warning' : 'btn-light'}`} on:click={() => {
                 if(bigTestRunning)
                 {
                     clearTimeout(bigTestTask);
@@ -215,7 +205,7 @@ import Station from "./Station.svelte";
                 //     const isConnected = await checkIsConnected();
                 //     if(isConnected != true) clearInterval(i);
                 //}
-                const ranges = [...stationRanges];
+                const ranges = [...ranges];
                 const _counts = [...counts];
                 bigTestTask = setTimeout(async () => {
                     for(let i = lastI; i < 1000000; i++)
@@ -247,7 +237,7 @@ import Station from "./Station.svelte";
                         const isConnected = await api.isConnected(ranges, counts, __stations.concat(stationaryStations), __units.concat(_units));
                         
                         lastI = i+1;
-                        if(!isConnected || !test.validate(__stations, stationRanges, _units[0].counts) || bigTestRunning == false)
+                        if(!isConnected || !test.validate(__stations, ranges, _units[0].counts) || bigTestRunning == false)
                         {
                             updateStations(__stations);
                             updateUnits(_units.concat(__units));
@@ -262,7 +252,7 @@ import Station from "./Station.svelte";
             }}>
                 Big test
             </button>
-        </div>
+        </div> -->
         <!-- <div class="row">
             {#each counts as count}
                 <input bind:value={count} class="col" type="number" min='0' step='1'/>
@@ -281,16 +271,17 @@ import Station from "./Station.svelte";
             {/if}
         </div>
         <div class="row">
-            <div class="col">
-                <p><b>{units.length}</b> {' units, '}
-                    <b>{stations.filter(station => !station.isStationary).length}</b> {'mobile, '}
-                    <b>{stations.filter(station => station.isStationary).length}</b> {'stationary'}
+            <!-- <div class="col"> -->
+                <p class="col"><b>{units.length}</b> {' units, '}
+                    <b>{stations.filter(station => !station.isStationary).length}</b> {'stations'}
+                    <!-- <b>{stations.filter(station => station.isStationary).length}</b> {'stationary'} -->
                 </p>
-            </div>
+            <!-- </div> -->
         </div>
         <div class="row">
             <p class="col">Total cost:</p>
-            <p class="col"><b>{getStationsScore(stations)}</b></p>
+            <p class="col">
+                <b>{`(${stations.filter(station => !station.IsStationary).length}, ${getStationsScore(stations)})`}</b></p>
         </div>
         <div class="row">
         {#each getStationsStats(stations) as stat}
@@ -316,5 +307,13 @@ import Station from "./Station.svelte";
     {
         color: black;
         background-color: lightgray;
+    }
+    .algorithmButton {
+        border-radius: 40px;
+        margin: 5px;
+    }
+    .randomUnitsCountInput {
+        text-align: center;
+        border-radius: 20px;
     }
 </style>

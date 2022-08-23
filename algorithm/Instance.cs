@@ -47,7 +47,7 @@ namespace algorithm
         public List<Station> MobileCoreStations { get { return Stations.Where(station => station.IsMobile && station.IsCore).ToList(); } }
         public Instance(InstanceJSON instanceJSON, bool initialize = true)
         {
-            this.Ranges = instanceJSON.stationRanges;
+            this.Ranges = instanceJSON.stationRanges ?? new double[] { 20.0, 30.0, 50.0}; //alert!
             this.Counts = instanceJSON.stationCounts;
             Stations = instanceJSON.stations.Select(item => new Station(item)).ToList();
             Units = instanceJSON.units.Select(item => new Unit(item)).ToList();
