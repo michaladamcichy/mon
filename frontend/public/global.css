@@ -86,12 +86,7 @@ button:focus {
 	border-radius: 5px;
 }
 
-button {
-	border-width: 2px !important;
-	border-color: lightgrey !important;
-}
-
-label {
+button, label, .selectButton {
 	border-width: 2px !important;
 	border-color: lightgrey !important;
 }
