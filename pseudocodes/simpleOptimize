@@ -1,0 +1,61 @@
+public void LittleSpider(Station station, HashSet<List<Station>> paths, List<Station> _path, bool firstTime = true)
+        {
+            var path = new List<Station>(_path);
+            paths.Add(path);
+            path.Add(station);
+
+            if (IsCentral(station) && firstTime == false)
+            {
+                return;
+            }
+
+            foreach (var neighbor in station.Neighbors)
+            {
+                //if(visited.Contains(neighbor)) continue;
+                if (neighbor.IsPrivate || path.Contains(neighbor)) continue; //alert!
+                LittleSpider(neighbor, paths, path, false);
+            }
+            paths.Remove(path); //alert! wydajność!
+        }
+
+ZnajdźNajkrótszeŚcieżkiDoSąsiednichCentralnych(stacja, ścieżki, ścieżka, pierwszyRaz):
+    ścieżka = UtwórzKopię(ścieżka)
+    ścieżki.Add(ścieżka)
+    ścieżka.Add(stacja)
+
+    jeżeli stacja jest stacją centralną oraz pierwszyRaz == Fałsz:
+        zakończ
+    
+    dla każdego sąsiada stacji (sąsiada czyli stacji połączonej bezpośrednio):
+        jeżeli sąsiad jest stacją prywatną lub ścieżka zawiera już tego sąsiada:
+            kontynuuj
+        ZnajdźNajkrótszeŚcieżkiDoSąsiednichCentralnych(sąsiad, ścieżki, ścieżka, Fałsz)
+    ścieżki.Remove(ścieżka)
+    
+
+ZnajdźNajkrótszeŚcieżkiŁącząceStacjeCentralne():
+    wszystkie_ścieżki = {}
+    dla każdej stacji centralnej:
+        ścieżki = {} 
+        pusta_lista = utwórz pustą listę
+        ZnajdźNajkrótszeŚcieżkiDoSąsiednichCentralnych(centralna, ścieżki, pusta_lista, Prawda);
+        
+        dla każdej ścieżki ze ścieżek:
+            jeżeli wśród ścieżek jest inna ścieżka łącząca te same stacje i jest krótsza:
+                ścieżki.Remove(ścieżka)  
+        wszystkie_ścieżki = wszystkie_ścieżki U ścieżki
+    
+    zwróć wszystkie_ścieżki
+
+Optymalizuj():
+    ścieżki = ZnajdźNajkrótszeŚcieżkiŁącząceStacjeCentralne();
+
+    wierzchołki = wszystkie stacje centralnej
+    krawędzie = {}
+    dla każdej ścieżki ze ścieżek:
+        jeżeli krawędzie nie zawierają nie uporządkowanej pary {ścieżka[0], ścieżka[ścieżka.długość - 1]}:
+            krawędzie = krawędzie U {{ścieżka[0], ścieżka[ścieżka.długość - 1]}}
+    
+
+
+    MST = Kruskal(krawędzie, wierzchołki) //Algorytm Kruskala, wersja niemodyfikowana

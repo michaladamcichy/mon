@@ -163,6 +163,15 @@ WYDAJE MI SIĘ, ŻE POWINIENEM WSTEPNIE SETOWAĆ NIE TYLKO STACJONARNE W ARRANGE
 ALERT W EXPAND GROUPS JEST NIEEFEKTYWNE ZAŁOŻENIE CO DO GRUP
 ZŁOŻNOŚC PAMIĘCIOWA - simple optimize ma bardzo dużą!
 TODO - być może w real pomogłoby simpleoptimize bez spidera!
+ALERT - w dobudowywaniu zostawiłem nieoptyumalne powiększania grupu
+W ALGORYTMACH ZAPOMNIAŁEM o isConnected
+CHOLERA _ JAKIEŚ TAJEMNICZE PRZESUWANIE SIĘ JEDNSOTEK!s
+TODO dodać założenie, że teren jest płaski!
+TODO - skomentować odchylenia standarodwe oraz dlaczego ich czasem nie widać na wykresach
+PYTANIE - czy nie jest błędem przestawianie na jednym wykresie przed i po optymalizacji
+ALGORYTM TWORZENIA GRUPY _ WARIANTY - cośtam cośtam - zweryfikować zgodność algorytmu i kodu
+PYTANIE - czy mogę sobie przeklejać obrazki z artykułu?
+czy mogę odwołać się do wikipedi?
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń
