@@ -122,24 +122,24 @@ import { resource } from "../lib/resource";
 
             marker.addListener('click', e => {
                 if(info) {
-                    if(info.___isOpen) {
-                        info.close();
-                        delete info.___isOpen;
-                    }
-                    else {
-                        infos.forEach(info => {
-                            if(info.___isOpen)
-                            {
-                                info.close();
-                                delete info.___isOpen;
-                            }
-                        });
+                    // if(info.___isOpen) {
+                    //     info.close();
+                    //     delete info.___isOpen;
+                    // }
+                    // else {
+                    //     infos.forEach(info => {
+                    //         if(info.___isOpen)
+                    //         {
+                    //             info.close();
+                    //             delete info.___isOpen;
+                    //         }
+                    //     });
                         info.open({
                     anchor: marker,
                     map,
                     shouldFocus: false,
                     });
-                    info.___isOpen = true;
+                    //info.___isOpen = true;
                     }
                     
                 }

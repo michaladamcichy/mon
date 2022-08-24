@@ -2,8 +2,12 @@
 import { onMount } from "svelte";
 import { api } from "../lib/api";
 import { test } from '../lib/test.js';
+import App from "./App.svelte";
 
 import BottomPaneSection from "./BottomPaneSection.svelte";
+import Instance from "./Instance.svelte";
+import Map from "./Map.svelte";
+import SidePane from "./SidePane.svelte";
 import Station from "./Station.svelte";
 
     export let stations;
@@ -25,6 +29,7 @@ import Station from "./Station.svelte";
     export let updateDisableMap;
     export let optimized;
     export let updateOptimized;
+    export let updateStationsFromRanges;
 
     let counts = [...stationCounts];
 
@@ -39,15 +44,9 @@ import Station from "./Station.svelte";
     //alert
     let lastI = 0;
 
-    onMount(() => {
-        console.log(ranges);
-        ranges = [...ranges];
-    });
-
     const getStationsStats = (_stations) => {
         const stations = [..._stations].filter(station => !station.isStationary);
         const sizes = stations.map(item => item.range);
-        //console.log(stations);
         let uniqueSizes = [...(new Set(sizes))];
         uniqueSizes.sort();
         let counts = [];
@@ -73,6 +72,9 @@ import Station from "./Station.svelte";
         getStationsStats(res.stations).forEach(item => text += item.count.toString() + 'x' + item.range + ' ');
         console.log(text);
     };
+
+    let localRanges = [...ranges];
+    let oldRanges = [...ranges];
 </script>
 <div class="row">
     <BottomPaneSection title={"Stations' parameters"}>
@@ -80,12 +82,16 @@ import Station from "./Station.svelte";
             <h5 class="col">Ranges (km)</h5>
         </div>
         <div class="row">
-            {#each ranges as range, index}
+            {#each localRanges as range, index}
                 <input type="number"
-                    min={index > 0 ? ranges[index - 1] + 1 : 0}
-                    max={index < ranges.length - 1 ? ranges[index + 1] - 1 : Infinity}
-                    bind:value={range}
-                    on:change={() => {updateRanges(ranges);}}
+                    min={index > 0 ? localRanges[index - 1] + 1 : 0}
+                    max={index < localRanges.length - 1 ? localRanges[index + 1] - 1 : Infinity}
+                    bind:value={localRanges[index]}
+                    on:change={() => {
+                        updateStationsFromRanges(oldRanges, localRanges);
+                        updateRanges(ranges);
+                        oldRanges = [...localRanges]; 
+                        }}
                     class="col"
                     step={1} />
             {/each}

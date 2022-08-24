@@ -37,7 +37,6 @@
 	let counts = [...defaultCounts];
 	let weights;
 	let isConnected;
-	let oldRanges;
 	let stations;
 	let units;
 	let bigTestRunning = false;
@@ -174,7 +173,29 @@
     ];
 
 	const updateRanges = (ranges) => {
-		ranges = ranges;
+		ranges = [...ranges];
+	};
+
+	const updateStationsFromRanges = (oldRanges, newRanges) => {
+		let diffs = [];
+		for(let i = 0; i < oldRanges.length; i++) {
+			if(oldRanges[i] != newRanges[i]) {
+				diffs.push(i);
+			}
+		}
+		
+		const _stations = [...stations];
+
+		_stations.forEach(station => {
+			for(let i = 0; i < diffs.length; i++) {
+				if(station.range == oldRanges[diffs[i]]) {
+					station.range = newRanges[diffs[i]];
+					break;
+				}
+			}
+		});
+
+		stations = _stations;
 	};
 
 	const updateCounts = (_counts) => {
@@ -308,6 +329,7 @@
 				updateCounts={updateCounts}
 				stationWeights={weights}
 				updateRanges={updateRanges}
+				updateStationsFromRanges={updateStationsFromRanges}
 				updateStations={updateAllStations}
 				updateUnits={updateAllUnits}
 				checkIsConnected={checkIsConnected}

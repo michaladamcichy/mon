@@ -1,4 +1,6 @@
+<svelte:options accessors />
 <script>
+    import {afterUpdate} from 'svelte';
 import {resource} from '../lib/resource.js';
 import Instance from './Instance.svelte';
 
@@ -46,10 +48,7 @@ import Instance from './Instance.svelte';
     };
 
     const addStation = (range, isStationary = false) => {
-        //console.log('add station');
-        //console.log(stationRanges);
         const newStation = {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: range, isStationary};
-        //console.log(newStation);
         updateAllStations([...stations, newStation]);
     };
 
@@ -67,8 +66,6 @@ import Instance from './Instance.svelte';
             }
         ];
         updateAllUnits(newUnits);
-        //console.log('add unit');
-        //console.log(newUnits);
     };
 
     const toggleUnitsVisibility = () => {
@@ -84,6 +81,12 @@ import Instance from './Instance.svelte';
     const removeAllUnits = () => {
         updateAllUnits([]);
     };
+
+    let localRanges = ranges;
+
+    afterUpdate(() => {
+        localRanges = ranges;
+    });
     
 </script>
 
@@ -126,13 +129,13 @@ import Instance from './Instance.svelte';
     <hr>
     {#if !stationsHidden}
         <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
-            <button class="addButton btn btn-light" on:click={() => {addStation(ranges[0])}}>
+            <button class="addButton btn btn-light" on:click={() => {addStation(localRanges[0])}}>
                 +
             </button>
-            {#each ranges as range}
+            {#each localRanges as range}
                 <button class="col btn btn-light bold" on:click={() => {addStation(range)}}>{range}</button>
             {/each}
-            <div class="col">km</div>
+            <div class="col-1"><p>km</p></div>
             <!-- <button class="col btn btn-light fa fa-star ss" on:click={() => {addStation(100.0, true)}}></button> -->
             <div class="col"></div>
             <div class="col"></div>
@@ -142,7 +145,7 @@ import Instance from './Instance.svelte';
         <hr>
         <hr>
         {#each stations as station, index}
-            <Station index={index} station={station} update={updateStation} remove={removeStation} ranges={ranges}/> 
+            <Station index={index} station={station} update={updateStation} remove={removeStation} ranges={localRanges}/> 
         {/each}
     {/if}
     <hr>
@@ -162,22 +165,28 @@ import Instance from './Instance.svelte';
             </button>
             {#each __reverse(priorities) as priority}
                 <button
-                    class="col btn selectButton btn-light"
+                    class="col btn selectButton btn-light bold"
                     on:click={() => {addUnit(priority.priority)}}>
-                    <i class={priority.icon}></i>
+                    <!-- <i class={priority.icon}></i> -->
+                    {priority.priority}
                     <!-- <img src={priorityToIcon(priority.priority)} alt=""> -->
                 </button>
             {/each}
+            <p class="col"><span>(priority)</span></p>
             <div class="col"></div>
             <div class="col"></div>
             <button class="col btn btn-danger removeAllButton" on:click={() => {removeAllUnits()}}
                 disabled={units.length == 0}><i class={'fa fa-trash'}></i></button>
         </div>
+        <div class="row">
+            <!-- <div class="col"></div> -->
+            
+        </div>
         <hr>
         <hr>
         {#each units as unit, index}
             <Unit index={index} unit={unit} update={updateUnit} remove={removeUnit}
-                ranges={ranges} priorities={priorities} addUnit={addUnit}/>
+                ranges={localRanges} priorities={priorities} addUnit={addUnit}/>
         {/each}
     {/if}
     <hr>

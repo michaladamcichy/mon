@@ -18,44 +18,46 @@ public void LittleSpider(Station station, HashSet<List<Station>> paths, List<Sta
             paths.Remove(path); //alert! wydajność!
         }
 
-ZnajdźNajkrótszeŚcieżkiDoSąsiednichCentralnych(stacja, ścieżki, ścieżka, pierwszyRaz):
-    ścieżka = UtwórzKopię(ścieżka)
-    ścieżki.Add(ścieżka)
-    ścieżka.Add(stacja)
+    ZnajdźNajkrótszeŚcieżkiDoSąsiednichCentralnych(stacja, ścieżki, ścieżka, pierwszyRaz):
+        ścieżka = UtwórzKopię(ścieżka)
+        ścieżki.Add(ścieżka)
+        ścieżka.Add(stacja)
 
-    jeżeli stacja jest stacją centralną oraz pierwszyRaz == Fałsz:
-        zakończ
-    
-    dla każdego sąsiada stacji (sąsiada czyli stacji połączonej bezpośrednio):
-        jeżeli sąsiad jest stacją prywatną lub ścieżka zawiera już tego sąsiada:
-            kontynuuj
-        ZnajdźNajkrótszeŚcieżkiDoSąsiednichCentralnych(sąsiad, ścieżki, ścieżka, Fałsz)
-    ścieżki.Remove(ścieżka)
-    
-
-ZnajdźNajkrótszeŚcieżkiŁącząceStacjeCentralne():
-    wszystkie_ścieżki = {}
-    dla każdej stacji centralnej:
-        ścieżki = {} 
-        pusta_lista = utwórz pustą listę
-        ZnajdźNajkrótszeŚcieżkiDoSąsiednichCentralnych(centralna, ścieżki, pusta_lista, Prawda);
+        jeżeli stacja jest stacją centralną oraz pierwszyRaz == Fałsz:
+            zakończ
         
+        dla każdego sąsiada stacji (sąsiada czyli stacji połączonej bezpośrednio):
+            jeżeli sąsiad jest stacją prywatną lub ścieżka zawiera już tego sąsiada:
+                kontynuuj
+            ZnajdźNajkrótszeŚcieżkiDoSąsiednichCentralnych(sąsiad, ścieżki, ścieżka, Fałsz)
+        ścieżki.Remove(ścieżka)
+        
+
+    ZnajdźNajkrótszeŚcieżkiŁącząceStacjeCentralne():
+        wszystkie_ścieżki = {}
+        dla każdej stacji centralnej:
+            ścieżki = {} 
+            pusta_lista = utwórz pustą listę
+            ZnajdźNajkrótszeŚcieżkiDoSąsiednichCentralnych(centralna, ścieżki, pusta_lista, Prawda);
+            
+            dla każdej ścieżki ze ścieżek:
+                jeżeli wśród ścieżek jest inna ścieżka łącząca te same stacje i jest krótsza:
+                    ścieżki.Remove(ścieżka)  
+            wszystkie_ścieżki = wszystkie_ścieżki U ścieżki
+        
+        zwróć wszystkie_ścieżki
+
+    Optymalizuj():
+        ścieżki = ZnajdźNajkrótszeŚcieżkiŁącząceStacjeCentralne();
+
+        wierzchołki = wszystkie stacje centralnej
+        krawędzie = {}
         dla każdej ścieżki ze ścieżek:
-            jeżeli wśród ścieżek jest inna ścieżka łącząca te same stacje i jest krótsza:
-                ścieżki.Remove(ścieżka)  
-        wszystkie_ścieżki = wszystkie_ścieżki U ścieżki
-    
-    zwróć wszystkie_ścieżki
+            jeżeli krawędzie nie zawierają nie uporządkowanej pary {ścieżka[0], ścieżka[ścieżka.długość - 1]}:
+                krawędzie = krawędzie U {{ścieżka[0], ścieżka[ścieżka.długość - 1]}}
 
-Optymalizuj():
-    ścieżki = ZnajdźNajkrótszeŚcieżkiŁącząceStacjeCentralne();
+        MST = Kruskal(krawędzie, wierzchołki) //Algorytm Kruskala, wersja niemodyfikowana
 
-    wierzchołki = wszystkie stacje centralnej
-    krawędzie = {}
-    dla każdej ścieżki ze ścieżek:
-        jeżeli krawędzie nie zawierają nie uporządkowanej pary {ścieżka[0], ścieżka[ścieżka.długość - 1]}:
-            krawędzie = krawędzie U {{ścieżka[0], ścieżka[ścieżka.długość - 1]}}
-    
-
-
-    MST = Kruskal(krawędzie, wierzchołki) //Algorytm Kruskala, wersja niemodyfikowana
+        dla każdej stacji z obecnej infrastruktury:
+            jeżeli stacja nie należy żadnej ze ścieżek, które łączą którąś parę stacji należącą do MST (para stacji jako krawędź):
+                usuń tę stację

@@ -12,6 +12,11 @@ export let addUnit;
 
 const latlngStep = 0.1;
 
+const __reverse = (arr) => {
+        let _arr = [...arr];
+        return _arr.reverse();
+    };
+
 </script>
 
 <div class="unit container">
@@ -31,7 +36,7 @@ const latlngStep = 0.1;
     </div>
     <div class="controlsContainer form-group row d-flex justify-content-center align-items-center littleSpaceAbove">
         <label class="col">{''}</label>
-        {#each priorities as priority}
+        {#each __reverse(priorities) as priority}
             <div
                 class={`col btn selectButton ${unit.priority == priority.priority ? 'btn-success' : 'btn-light'}`}
                     on:click={() => {
@@ -42,15 +47,16 @@ const latlngStep = 0.1;
                         // }
                         update(unit);
                         }}>
-                <i class={priority.icon}></i>
+                <!-- <i class={priority.icon}></i> -->
+                        {priority.priority}
                     </div>
         {/each}
         <label class="col">{''}</label>
-        {#if unit.priority > 0}
+        <!-- {#if unit.priority > 0}
         <button class="btn btn-light" on:click={() => {addUnit(unit.priority, index)}}>+</button>
-        {:else}
+        {:else} -->
         <label class="col">{''}</label>
-        {/if}
+        <!-- {/if} -->
         <label class="col">{''}</label>
     </div>  
     <div class="row">
@@ -70,7 +76,7 @@ const latlngStep = 0.1;
         width: 60px;
         /* height: 30px; */
         /* font-size: 5px; */
-        font-weight: bold;
+        /* font-weight: bold; */
     }
     button {
         width: 30px;
