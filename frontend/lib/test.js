@@ -456,7 +456,7 @@ test.run = async () => {
     //await naiveVsSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
     //await existingSimple([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
     //await simplePriority([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
-    //await simplesimpleOptimize([175], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
+    //await simplesimpleOptimize([50], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
     //await real([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], repetitions, [20, 30, 50], [10000,10000,10000], optimized);
     //await all([98], repetitions, [20, 30, 50], [360,180,90], optimized);
 

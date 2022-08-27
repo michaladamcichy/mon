@@ -13,7 +13,7 @@ import Station from "./Station.svelte";
     export let stations;
     export let units;
     export let ranges;
-    export let stationCounts;
+    export let counts;
     export let updateCounts;
     export let updateRanges;
     export let updateStations;
@@ -30,8 +30,6 @@ import Station from "./Station.svelte";
     export let optimized;
     export let updateOptimized;
     export let updateStationsFromRanges;
-
-    let counts = [...stationCounts];
 
     let unitsCount = 50;
     let seed = 0;
@@ -60,7 +58,8 @@ import Station from "./Station.svelte";
     const getStationsScore = stations => stations.filter(station => !station.isStationary).reduce((current, station) => current + station.range, 0);
 
     const onAlgorithmClicked = async (type) => {
-        const res = await api.algorithm(type, ranges, stationCounts, stations, units, optimized);
+        console.log(ranges);
+        const res = await api.algorithm(type, ranges, counts, stations, units, optimized);
         if(!res) {
             //console.log('request failed');
             return;
@@ -89,7 +88,7 @@ import Station from "./Station.svelte";
                     bind:value={localRanges[index]}
                     on:change={() => {
                         updateStationsFromRanges(oldRanges, localRanges);
-                        updateRanges(ranges);
+                        updateRanges(localRanges);
                         oldRanges = [...localRanges]; 
                         }}
                     class="col"
@@ -117,7 +116,7 @@ import Station from "./Station.svelte";
             {#each counts as count, index}
                 <input type="number"
                     min={0}
-                    bind:value={count}
+                    bind:value={counts[index]}
                     on:change={() => {updateCounts(counts);}}
                     class="col"
                     step={1}
@@ -168,7 +167,7 @@ import Station from "./Station.svelte";
                 const positions = test.getRandomUnitsRelated(unitsCount, seed);
             
                 // let ____i = 0;
-                const _units = positions.map(position => {return {position: position, priority: positions.indexOf(position)%5}});
+                const _units = positions.map(position => {return {position: position, priority: positions.indexOf(position)%5, name: 'Unit'}});
                 if(_units.length > 0)
                 {
                     _units[0].priority = 0;

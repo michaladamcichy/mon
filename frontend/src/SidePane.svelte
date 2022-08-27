@@ -23,7 +23,7 @@ import Instance from './Instance.svelte';
     export let updateUnit;
     export let removeUnit;
     export let ranges;
-    export let stationCounts;
+    export let counts;
     export let updateAllStations;
     export let updateAllUnits;
     export let priorities;
@@ -81,12 +81,6 @@ import Instance from './Instance.svelte';
     const removeAllUnits = () => {
         updateAllUnits([]);
     };
-
-    let localRanges = ranges;
-
-    afterUpdate(() => {
-        localRanges = ranges;
-    });
     
 </script>
 
@@ -129,10 +123,10 @@ import Instance from './Instance.svelte';
     <hr>
     {#if !stationsHidden}
         <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
-            <button class="addButton btn btn-light" on:click={() => {addStation(localRanges[0])}}>
+            <button class="addButton btn btn-light" on:click={() => {addStation(ranges[0])}}>
                 +
             </button>
-            {#each localRanges as range}
+            {#each ranges as range}
                 <button class="col btn btn-light bold" on:click={() => {addStation(range)}}>{range}</button>
             {/each}
             <div class="col-1"><p>km</p></div>
@@ -145,7 +139,7 @@ import Instance from './Instance.svelte';
         <hr>
         <hr>
         {#each stations as station, index}
-            <Station index={index} station={station} update={updateStation} remove={removeStation} ranges={localRanges}/> 
+            <Station index={index} station={station} update={updateStation} remove={removeStation} ranges={ranges}/> 
         {/each}
     {/if}
     <hr>
@@ -186,7 +180,7 @@ import Instance from './Instance.svelte';
         <hr>
         {#each units as unit, index}
             <Unit index={index} unit={unit} update={updateUnit} remove={removeUnit}
-                ranges={localRanges} priorities={priorities} addUnit={addUnit}/>
+                ranges={ranges} priorities={priorities} addUnit={addUnit}/>
         {/each}
     {/if}
     <hr>

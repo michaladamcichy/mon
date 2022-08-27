@@ -44,7 +44,7 @@ import { resource } from "../lib/resource";
             fillOpacity: 1.0,
             strokeColor: station.isStationary ? 'white' : 'black',
             strokeOpacity: 1.0,
-            strokeWeight: 5.0,
+            strokeWeight: 5.0   ,
             scale: 8,
             fontWeight: 'bold',
         };
@@ -83,7 +83,7 @@ import { resource } from "../lib/resource";
         //return {...unitMarkerIcon, path: goo}
     };
 
-
+    let openInfo = undefined;
     const generateMarkers = (map, mapObjects, update) => {
         //console.log('HERE');
         //console.log(mapObjects);
@@ -102,56 +102,42 @@ import { resource } from "../lib/resource";
             });
 
             let info;
-            if(mapObject.name != undefined) {
-                info = new google.maps.InfoWindow({
-                content: `<span>${mapObject.name }</span>`,
-                disableAutoPan: true});
-                infos.push(info);
+            if(mapObject.name !== undefined) {
+                info = new google.maps.InfoWindow({content: `<span>${mapObject.name }</span>`});
             }
-
+            
             marker.addListener('dragend', e => {
                 mapObject.position.lat = marker.getPosition().lat();
                 mapObject.position.lng = marker.getPosition().lng();
                 update(mapObject);
             });
 
-            // const isInfoWindowOpen =( infoWindow) => {
-            //       var map = infoWindow.getMap();
-            //         return (map !== null && typeof map !== "undefined");
-            // };
-
             marker.addListener('click', e => {
+                console.log('CLICK');
+                
                 if(info) {
-                    // if(info.___isOpen) {
-                    //     info.close();
-                    //     delete info.___isOpen;
-                    // }
-                    // else {
-                    //     infos.forEach(info => {
-                    //         if(info.___isOpen)
-                    //         {
-                    //             info.close();
-                    //             delete info.___isOpen;
-                    //         }
-                    //     });
+                    if(info == openInfo) {
+                        info.close();
+                        openInfo = undefined;
+                    } else {
                         info.open({
-                    anchor: marker,
-                    map,
-                    shouldFocus: false,
-                    });
-                    //info.___isOpen = true;
+      anchor: marker,
+      map,
+      shouldFocus: false,
+    });
+                        if(openInfo) {
+                            openInfo.close();
+                        }
+                        openInfo = info;
                     }
-                    
                 }
-                //console.log('start');
+                
                 if(!e.domEvent.shiftKey) {
-                    //console.log('!shift');
                     selectedToCopyPosition = null;
                     return;
                 }
 
                 if(!selectedToCopyPosition) {
-                    //console.log('!selectedToCopy');
                     selectedToCopyPosition = marker;
                     return;
                 }
@@ -173,7 +159,7 @@ import { resource } from "../lib/resource";
             marker.setMap(null);
         });
         markers = [];
-        infos = [];
+        //infos = [];
 
         generateMarkers(map, stations, updateStation);
         generateMarkers(map, units, updateUnit);

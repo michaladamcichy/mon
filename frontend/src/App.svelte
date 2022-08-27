@@ -101,7 +101,7 @@
 		weights = instance.weights;
 		isConnected = instance.isConnected;
 		stations = instance.stations;
-		units = instance.units;
+		units = [...instance.units];
 
 		instances = instances;
 	};
@@ -172,8 +172,9 @@
 		{priority: 0, icon: 'fa fa-wrench'},
     ];
 
-	const updateRanges = (ranges) => {
-		ranges = [...ranges];
+	const updateRanges = (_ranges) => {
+		ranges = [..._ranges];
+		console.log(ranges);
 	};
 
 	const updateStationsFromRanges = (oldRanges, newRanges) => {
@@ -199,7 +200,7 @@
 	};
 
 	const updateCounts = (_counts) => {
-		counts = _counts;
+		counts = [..._counts];
 	};
 
 	onMount(() => {
@@ -325,7 +326,7 @@
 				stations={stations}
 				units={units}
 				ranges={ranges}
-				stationCounts={counts}
+				counts={counts}
 				updateCounts={updateCounts}
 				stationWeights={weights}
 				updateRanges={updateRanges}
@@ -366,7 +367,7 @@
 				removeUnit={removeUnit}
 				updateAllUnits={updateAllUnits}
 				ranges={ranges}
-				stationCounts={counts}
+				counts={counts}
 				priorities={priorities}
 				bigTestRunning={bigTestRunning}
 				percentageOfStations={percentageOfStations}

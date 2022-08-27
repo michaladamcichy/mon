@@ -91,31 +91,7 @@ HMMMM jak dodam stacje stacjonarne o zasięgach różnych od 20, 30, 50
     Potencjalne zagrożenie: pętle foreach(var range in ranges)
 
 ---------------------------------------------
-WYWALIĆ SAVE SNAPSHOT!!! ŹRÓDŁO PRAWDOPODOBNYCH STRASZNIE TRUDNYCH DO ZNALEZIENIA BŁĘDÓW
-Dodać wybieranie najtańszych stacji na podstawie lokalizacji
-Szlifowanie powyższych po dodaniu tych kosztów
-Zakodowanie w jsonie lokalizacji jednostek
 Algorytmy ze stackoverflow zastąpić siszarpowymi
-ChangeRangeOrBigger! - może zrobić to globalnie
-    i zobaczyć, czy poprawiają się rozwiązania
-CHOLERA tworząc grupy daje wszystkim takie same stacje
-    A bliższe jednostki przecież mogłyby mieć mniejsze!
----
-punkty Steinera?
-
-ALERT - jeśli stacja bazowa jest blisko, jest dołączana nawet,
-jeśli nie ma żadnych stationaryUnits
-
-ALERT - ISCONNECTED TUMANI I KŁAMIE
-ALERT - chyba nie powinienem zwracać bezpośrednio initialCost
-ALERT - niejednoznaczność
-    - raz biorę coreStations jako te z isCore == true
-    a raz po prostu te  bez attachmentów
-
-ALERT USUNĄĆ Z KODU WSZYSTKIE JEDNOKIERUNKOWOŚĆI!!!
-ZUPEŁNIE NOWY CONNECTION CHECK - olewający połączenia powstałe z prywatnych stacji
-    i sprawdzający wszystkie warunki algorytmu
-
 ALERT - w JoinNeigbours może się okazać, że (ale to mąło prawdopodobne)
     że jest połączenie z jakąs dalszą, ale większą stacją, a my mimo to będziemy
     próbowali połączyć z bliższą mniejszą, która nie jest w zasięgu
@@ -123,16 +99,12 @@ ZABLOKOWAĆ PRZEŁĄCZENIE I DUPLIKOWANIE INSTANCJI PODCZAS:
     BIG TESTU
     PODCZAS WYKONYWANIA ALGORYTMÓW
 ZOPTYMALIZOWAĆ PAJĄKA ŻEBY NIE BYŁO TYLE ŚCIEŻEK :D
-IMPLEMENTACJA ALGORYTMU NAIWNEGO
 ALERT MAM TAKĄ WIZJĘ, ŻE CZŁONEK KOMISJI MI MÓWI:
     nie ma Pan wypisanych wszystkich tych założeń w pracy
 
 CanChangeRange i ChangeRange - prawdopodobne ŹRÓDŁO WSZELKIEGO ZŁA
 
 CHOLERA - CO Z TOLERANCJĄ?? 
-MINIMUM COVERING CIRCLE - w sumie może jednak się da?
-ALERT - jednostki w zasięgu stacjonarnej posiadające stacje prywatne -> disconected - poprawić
-PRZYWRÓCIĆ GLOBALNOŚĆ ZASOBÓW
 ALERT SKONFRONTOWAĆ ZAKRES Z KARTY PRACY Z RZECZYWISTOŚCIA
 ALERT - CEL MINIMALIZACJI JEST PROBLEMATYCZNY
 ALERT ALERT - GET ONE NEAREST NIE OBSŁUGUJE PUSTYCH KOLEKCCI LUB ZAWIERAJĄCYECH TEN ELEMENT

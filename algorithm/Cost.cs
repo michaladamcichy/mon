@@ -23,7 +23,7 @@ namespace algorithm
             Counts = (int[]) Instance.Counts.Clone(); //alert czy to działa?
         }
 
-        public Cost(Cost cost, bool logEnabled = true)
+        public Cost(Cost cost, bool logEnabled = false)
         {
             this.Instance = cost.Instance; //alert
             Counts = (int[])(cost.Counts.Clone());

@@ -21,8 +21,8 @@ const parseCounts = (counts) => {
     return [counts[0], counts[1], 0, counts[2], 0, 0];
 };
 
-api.isConnected = async (ranges, stationCounts, stations, units) => {
-    const instance = {ranges/*: RANGES*/, stationCounts/*: parseCounts(stationCounts)*/, stations, units}; //alert!!!
+api.isConnected = async (ranges, counts, stations, units) => {
+    const instance = {ranges/*: RANGES*/, counts/*: parseCounts(stationCounts)*/, stations, units}; //alert!!!
     
     const result = await fetch(`${api.url}/isConnected`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});
 
@@ -32,14 +32,14 @@ api.isConnected = async (ranges, stationCounts, stations, units) => {
     return parsed;
 };
 
-api.algorithm = async (type, ranges, stationCounts, stations, units, optimized = false) => {
+api.algorithm = async (type, ranges, counts, stations, units, optimized = false) => {
     
     let _i = 1; //alert
     stations.forEach(station => {
         station.id = _i++;
     });
     //console.log(stations);
-    const instance = {ranges/*: RANGES*/, stationCounts/*: parseCounts(stationCounts)*/, stations, units, optimized};
+    const instance = {ranges/*: RANGES*/, counts/*: parseCounts(stationCounts)*/, stations, units, optimized};
     // console.log(units);
     //console.log(`${api.url}/${type}Algorithm`);
     const result = await fetch(`${api.url}/${type}Algorithm`, {method: 'POST', headers: api.headers, body: JSON.stringify(instance)});

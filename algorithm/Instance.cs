@@ -8,18 +8,18 @@ namespace algorithm
 {
     public class InstanceJSON
     {
-        public double[] stationRanges { get; set; } = new double[0];
-        public int[] stationCounts { get; set; } = new int[0];
+        public double[] ranges { get; set; } = new double[0];
+        public int[] counts { get; set; } = new int[0];
 
         public List<StationJSON> stations { get; set; } = new List<StationJSON>();
         public List<UnitJSON> units { get; set; } = new List<UnitJSON>();
 
         public bool optimized { get; set; } = false;
 
-        public InstanceJSON(double[] stationRanges, int[] stationCounts, List<StationJSON> stations, List<UnitJSON> units)
+        public InstanceJSON(double[] ranges, int[] counts, List<StationJSON> stations, List<UnitJSON> units)
         {
-            this.stationRanges = stationRanges;
-            this.stationCounts = stationCounts;
+            this.ranges = ranges;
+            this.counts = counts;
             this.stations = stations;
             this.units = units;
             this.optimized = optimized;
@@ -47,8 +47,8 @@ namespace algorithm
         public List<Station> MobileCoreStations { get { return Stations.Where(station => station.IsMobile && station.IsCore).ToList(); } }
         public Instance(InstanceJSON instanceJSON, bool initialize = true)
         {
-            this.Ranges = instanceJSON.stationRanges ?? new double[] { 20.0, 30.0, 50.0}; //alert!
-            this.Counts = instanceJSON.stationCounts;
+            this.Ranges = instanceJSON.ranges; //alert!
+            this.Counts = instanceJSON.counts;
             Stations = instanceJSON.stations.Select(item => new Station(item)).ToList();
             Units = instanceJSON.units.Select(item => new Unit(item)).ToList();
             Optimized = instanceJSON.optimized;
@@ -82,7 +82,7 @@ namespace algorithm
         public Instance(int[] counts, double[] ranges = null)
         {
             this.Counts = counts;
-            this.Ranges = ranges == null ?  new double[] { 20.0, 30.0, 50.0 } : ranges;
+            this.Ranges = ranges;
         }
 
         public void CreateRelations()

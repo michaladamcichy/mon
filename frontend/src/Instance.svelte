@@ -31,7 +31,6 @@ const onFileSelected =(e)=>{
 
 const loadWP = async () => {    
     instance.units = instance.units.concat(await JSON.parse(JSON.stringify(_wpUnits)));
-
     load(instance);
 };
 
