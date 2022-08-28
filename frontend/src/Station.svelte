@@ -10,11 +10,10 @@ export let ranges;
 
 let lat;
 let lng;
-
 const latlngStep = 0.1;
 </script>
 
-<div id="main" class="station container">
+<div id="main" class={`station container`}>
     <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
         <label class="col">{`${index + 1}.`}</label>
         <label class="col col-form-label">lat:</label>
@@ -53,6 +52,7 @@ const latlngStep = 0.1;
     #main {
         margin-top: 5px;
         margin-bottom: 5px;
+        
     }
     input {
         min-width: 100px;

@@ -9,12 +9,12 @@ import { resource } from "../lib/resource";
     export let updateStation;
     export let units;
     export let updateUnit;
+    export let updateFilter;
 
     let container;
     
     let markers = [];
     let circles = [];
-    let infos = [];
 
     let selectedToCopyPosition = null;
 
@@ -28,6 +28,12 @@ import { resource } from "../lib/resource";
                 center: { lat: 53.015959, lng: 18.608620 }, //alert hardcoding
                 zoom: 6,
                 mapId: '4b9343d90f363d08',
+            });
+
+            _map.addListener('click', () => {
+                updateFilter();
+                if(openInfo) openInfo.close();
+                openInfo = undefined;
             });
 
             setMap(_map);
@@ -101,10 +107,7 @@ import { resource } from "../lib/resource";
                 icon: mapObjects == stations ? stationMarkerIcon(mapObject) : mapObjects == units ? unitMarkerIcon(mapObject) : null,
             });
 
-            let info;
-            if(mapObject.name !== undefined) {
-                info = new google.maps.InfoWindow({content: `<span>${mapObject.name }</span>`});
-            }
+            let info = new google.maps.InfoWindow({content: `<span>${mapObject.name === undefined ? 'Station' : mapObject.name  }</span>`});
             
             marker.addListener('dragend', e => {
                 mapObject.position.lat = marker.getPosition().lat();
@@ -113,22 +116,24 @@ import { resource } from "../lib/resource";
             });
 
             marker.addListener('click', e => {
-                console.log('CLICK');
-                
                 if(info) {
                     if(info == openInfo) {
                         info.close();
                         openInfo = undefined;
+                        updateFilter();
                     } else {
-                        info.open({
-      anchor: marker,
-      map,
-      shouldFocus: false,
-    });
                         if(openInfo) {
                             openInfo.close();
+                            updateFilter();
                         }
                         openInfo = info;
+                        info.open({
+                            anchor: marker,
+                            map,
+                            shouldFocus: false,
+                            });
+                            updateFilter(mapObject);
+                        
                     }
                 }
                 
@@ -159,7 +164,6 @@ import { resource } from "../lib/resource";
             marker.setMap(null);
         });
         markers = [];
-        //infos = [];
 
         generateMarkers(map, stations, updateStation);
         generateMarkers(map, units, updateUnit);

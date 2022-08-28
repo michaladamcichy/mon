@@ -194,7 +194,7 @@ namespace algorithm
             instance.Stations = instance.Stations.Where(station => necessaryStations.Contains(station)).ToList();
             foreach (var station in instance.Stations)
             {
-                if(!necessaryStations.Contains(station) && !station.IsStationary)
+                if(!necessaryStations.Contains(station) && !station.IsStationary)   
                 {
                     instance.Stations.Remove(station);
                 }

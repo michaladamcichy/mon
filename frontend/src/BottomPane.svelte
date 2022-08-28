@@ -58,7 +58,6 @@ import Station from "./Station.svelte";
     const getStationsScore = stations => stations.filter(station => !station.isStationary).reduce((current, station) => current + station.range, 0);
 
     const onAlgorithmClicked = async (type) => {
-        console.log(ranges);
         const res = await api.algorithm(type, ranges, counts, stations, units, optimized);
         if(!res) {
             //console.log('request failed');
@@ -69,7 +68,6 @@ import Station from "./Station.svelte";
         
         let text = res.milliseconds.toString() + 'ms |' + res.stations.filter(item => !item.isStationary).length.toString() + ' ' + getStationsScore(res.stations).toString() + ' ';
         getStationsStats(res.stations).forEach(item => text += item.count.toString() + 'x' + item.range + ' ');
-        console.log(text);
     };
 
     let localRanges = [...ranges];

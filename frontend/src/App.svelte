@@ -44,9 +44,30 @@
 	let disableMap = false;
 	let optimized = false;
 
+	let filter = [];
+
+	const distance = (o1, o2) => {
+		return Math.pow(o1.position.lat - o2.position.lat, 2) + Math.pow(o1.position.lng - o2.position.lng, 2); 
+	};
+
+
+	const filterThreshold = 0;
+	const updateFilter = (mapObject) => {
+		if(!mapObject) {
+			filter = [];
+			return;
+		}
+
+		let closeOnes = [];
+		(mapObject.priority !== undefined ? units : stations).forEach(_mapObject => {
+			if(mapObject != _mapObject && distance(mapObject, _mapObject) < filterThreshold) closeOnes.push(mapObject);
+		});
+
+		filter = [mapObject, ...closeOnes];
+	};
+
 	const updateOptimized = (newValue) => {
 		optimized = newValue;
-		console.log(optimized);
 	};
 
 	const updateDisableMap = (newValue) => {
@@ -174,7 +195,6 @@
 
 	const updateRanges = (_ranges) => {
 		ranges = [..._ranges];
-		console.log(ranges);
 	};
 
 	const updateStationsFromRanges = (oldRanges, newRanges) => {
@@ -318,7 +338,9 @@
 				stations={stations}
 				updateStation={updateStation}
 				units={units}
-				updateUnit={updateUnit}/>
+				updateUnit={updateUnit}
+				updateFilter={updateFilter}
+				/>
 			{/if}
 		</div>
 		<div id="leftBottom" class="row">
@@ -371,6 +393,7 @@
 				priorities={priorities}
 				bigTestRunning={bigTestRunning}
 				percentageOfStations={percentageOfStations}
+				filter={filter}
 				/>
 	</div>
 </div>

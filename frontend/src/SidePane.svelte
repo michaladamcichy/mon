@@ -28,6 +28,7 @@ import Instance from './Instance.svelte';
     export let updateAllUnits;
     export let priorities;
     export let percentageOfStations;
+    export let filter;
 
 
     let instancesHidden = false;
@@ -81,10 +82,48 @@ import Instance from './Instance.svelte';
     const removeAllUnits = () => {
         updateAllUnits([]);
     };
-    
+
+    const filterUnits = () => {
+        return filter.length > 0 && filter[0].priority !== undefined;  
+    }
+
+    const filterStations = () => {
+        return filter.length > 0 && filter[0].priority === undefined;
+    };
+
+    // $:{
+    //     if(filter.length > 0) {
+    //         instancesHidden = true;
+    //         unitsHidden = true;
+    //         stationsHidden = true;
+    //     } 
+    // }
 </script>
 
 <div id="main" class="container">
+    
+    {#if filter.length > 0 && (stations.includes(filter[0]) || units.includes(filter[0]))}
+    <div class="row">
+        <h4 class="col">Selection</h4>
+    </div>
+        <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
+            {#if stations.includes(filter[0])}
+            {#each filter as f}
+                <!-- {#if stations.includes(f)} -->
+                <Station index={stations.indexOf(f)} station={f} update={updateStation} remove={removeStation} ranges={ranges}/> 
+                <!-- {/if} -->
+            {/each}
+        {:else}
+            {#each filter as f}
+                {#if units.includes(filter[0])}
+                <Unit index={units.indexOf(f)} unit={f} update={updateUnit} remove={removeUnit}
+                            ranges={ranges} priorities={priorities} addUnit={addUnit} filtered={true}/>
+                {/if}
+            {/each}
+        {/if}    
+        </div>
+    {/if}
+    {#if filter.length == 0 || (!stations.includes(filter[0]) || !units.includes(filter[0]))}
     <div class="row">
         <h4 class="col">Instances</h4>
         <button class="toggleVisibilityButton btn btn-light" on:click={() => {instancesHidden = !instancesHidden;}}>{instancesHidden ? "v" : "^"}</button>
@@ -94,7 +133,7 @@ import Instance from './Instance.svelte';
         <div class="col"></div>
     </div>
     <hr>
-    {#if !instancesHidden}
+    {#if !instancesHidden }
         <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
             <button class="addButton btn btn-light" on:click={() => {addInstance()}}>
                 +
@@ -112,6 +151,7 @@ import Instance from './Instance.svelte';
                 load={loadInstance} percentageOfStations={percentageOfStations}/>
         {/each}
     {/if}
+    
     <div class="row">
         <h4 class="col">Stations</h4>
         <button class="toggleVisibilityButton btn btn-light" on:click={toggleStationsVisibility}>{stationsHidden ? "v" : "^"}</button>
@@ -184,6 +224,7 @@ import Instance from './Instance.svelte';
         {/each}
     {/if}
     <hr>
+    {/if}
 </div>
 
 
@@ -225,5 +266,9 @@ import Instance from './Instance.svelte';
 
     .bold {
         font-weight: bold;
+    }
+
+    .filtered {
+        margin-bottom: 25px;
     }
 </style>
