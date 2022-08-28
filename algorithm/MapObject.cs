@@ -62,9 +62,9 @@ namespace algorithm
             if(mapObjects.Where(item => item != this).Count()==0) return new List<Station>();
             return GetNearest(mapObjects.Cast<MapObject>().ToList()).Cast<Station>().ToList();
         }
-        public virtual bool IsInRange(MapObject other)
+        public virtual bool IsInRange(MapObject other, double tolerance = 0.0)
         {
-            return GetDistanceFrom(other) < other.Range;
+            return GetDistanceFrom(other) < other.Range * (1.0 + tolerance);
         }
 
         //public static bool AreInRange(MapObject o1, MapObject o2)
@@ -72,9 +72,9 @@ namespace algorithm
         //    return o1.IsInRange(o2) && o2.IsInRange(o1);
         //}
 
-        public static bool AreInRange(Station s1, Station s2)
+        public static bool AreInRange(Station s1, Station s2, double tolerance = 0.0)
         {
-            return s1.IsInRange(s2) && s2.IsInRange(s1);
+            return s1.IsInRange(s2, tolerance) && s2.IsInRange(s1, tolerance);
         }
 
         //
@@ -99,8 +99,7 @@ namespace algorithm
             return CenterOfGravity(stations.Cast<MapObject>().ToList());
         }
 
-        public static Position CenterOfGravity(List<MapObject> mapObjects) //alert czy można uśredniać lat i lng??
-            //TODO - lepszy algorytm ze stackoverflow
+        public static Position CenterOfGravity(List<MapObject> mapObjects)
         {
             if (mapObjects.Count == 0)
             {
@@ -123,25 +122,7 @@ namespace algorithm
 
         public static Position MinCoveringCircleCenter(List<MapObject> mapObjects)
         {
-            return CenterOfGravity(mapObjects); //alert alert wielki alert
-            //return SmallestEnclosingCircleAdapter.GetCenter(mapObjects);
-            //if (mapObjects.Count == 0) return null; //alert podstępny null
-            //if (mapObjects.Count == 1) return mapObjects[0].Position;
-
-            //var furthestPair = new Tuple<MapObject, MapObject>(mapObjects.First(), mapObjects.Last());
-            //var maxDistance = 0.0;
-            //mapObjects.ForEach(first => {
-            //    mapObjects.ForEach(second => {
-            //        if (first == second) return;
-            //        var distance = Math.Max(maxDistance, first.GetDistanceFrom(second));
-            //        if (distance > maxDistance)
-            //        {
-            //            maxDistance = distance;
-            //            furthestPair = new Tuple<MapObject, MapObject>(first, second);
-            //        }
-            //}); });
-
-            //return CenterOfGravity(new List<MapObject>() { furthestPair.Item1, furthestPair.Item2 });
+            return CenterOfGravity(mapObjects);
         }
 
         public static Position MinCoveringCircleCenter(List<Station> stations)
@@ -161,39 +142,26 @@ namespace algorithm
 
         public static double Distance(Position first, Position second)
         {
-            //TODO C# geolocation GetDistanceFrom
-            //alert do weryfikacji - zarówno algorytm jak i przekopiowany kod!!!
-            ////wzięte żywcem z js, trzeba zweryfikować
-            //https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
-
-            /*double p = 0.017453292519943295;    // Math.PI / 
-            double a = 0.5 - Math.Cos((second.Lat - first.Lat) * p) / 2 +
-                    Math.Cos(first.Lat * p) * Math.Cos(second.Lat * p) *
-                    (1 - Math.Cos((second.Lng - first.Lng) * p)) / 2;
-
-            return 12742 * Math.Asin(Math.Sqrt(a)); // 2 * R; R = 6371 */
             var lat1 = first.Lat;
-            var lon1 = first.Lng;
+            var lng1 = first.Lng;
             var lat2 = second.Lat;
-            var lon2 = second.Lng;
+            var lng2 = second.Lng;
 
-            lon1 = ToRadians(lon1);
-            lon2 = ToRadians(lon2);
+            lng1 = ToRadians(lng1);
+            lng2 = ToRadians(lng2);
             lat1 = ToRadians(lat1);
             lat2 = ToRadians(lat2);
 
-            double dlon = lon2 - lon1;//alert critical nie mój kod!
+            double dlng = lng2 - lng1;
             double dlat = lat2 - lat1;
-            double a = Math.Pow(Math.Sin(dlat / 2), 2) +
-                       Math.Cos(lat1) * Math.Cos(lat2) *
-                       Math.Pow(Math.Sin(dlon / 2), 2);
+            double a = Math.Pow(Math.Sin(dlat / 2), 2) + Math.Cos(lat1) * Math.Cos(lat2) * Math.Pow(Math.Sin(dlng / 2), 2);
             double c = 2 * Math.Asin(Math.Sqrt(a));
             double r = 6371;
 
             return (c * r);
         }
 
-        public static double? MinCoveringRange(Double[] ranges, List<MapObject> mapObjects) //alert move to mapobject
+        public static double? MinCoveringRange(Double[] ranges, List<MapObject> mapObjects)
         {
             double minCoveringRadius = MinCoveringCircleRadius(mapObjects);
 
@@ -213,7 +181,7 @@ namespace algorithm
             return MinCoveringRange(ranges, stations.Cast<MapObject>().ToList());
         }
 
-        public static MapObject GetNextFromTowards(Station first, Station second, double maxAvailableRange, double tolerance = 0.1)
+        public static MapObject GetNextFromTowards(Station first, Station second, double maxAvailableRange, double tolerance = 0.0)
         {
             //alert smaller bigger nieaktualne!
             var smaller = first; //first.Range < second.Range ? first : second; //alert

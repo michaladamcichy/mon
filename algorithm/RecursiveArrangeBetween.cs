@@ -9,7 +9,7 @@ namespace algorithm
     public class RecursiveArrangeBetween
     {
 
-        public static (Cost, double?) AdjustLast(Cost initialCost, Station first, Station last, double tolerance = 0.1)
+        public static (Cost, double?) AdjustLast(Cost initialCost, Station first, Station last, double tolerance = 0.0)
         {
             Cost cost = new Cost(initialCost);
 
@@ -22,7 +22,7 @@ namespace algorithm
             }
             return (cost, null);
         }
-        public static (Cost, List<Station>) ArrangeBetween(Cost initialCost, Station first, Station last, double tolerance = 0.1)
+        public static (Cost, List<Station>) ArrangeBetween(Cost initialCost, Station first, Station last, double tolerance = 0.0)
         {
 
             Cost cost = new Cost(initialCost);
@@ -57,7 +57,7 @@ namespace algorithm
 
             return (cost, stations);
         }
-        public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station last, double tolerance = 0.1)
+        public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station last, double tolerance = 0.0)
         {
             var cost = new Cost(initialCost);
 

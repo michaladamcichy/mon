@@ -10,6 +10,9 @@ namespace algorithm
     {
         public bool Run(Instance instance)
         {
+            instance.RemoveRelations();
+            instance.CreateRelations(0.1);
+
             var units = instance.Units;
 
             if (units.Any(item => !item.HasAttachement())) return false;

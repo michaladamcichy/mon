@@ -43,7 +43,7 @@ namespace algorithm
             return cost;
         }*/
 
-        static Cost AdjustEnds(Station first, List<Station> middles, Station last, Cost initialCost, double tolerance)
+        static Cost AdjustEnds(Station first, List<Station> middles, Station last, Cost initialCost, double tolerance = 0.0)
         {
             Cost cost = new Cost(initialCost);
             cost.GiveBack(first.Range);
@@ -63,7 +63,7 @@ namespace algorithm
 
             return cost;
         }
-        public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station last, double tolerance= 0.1) //alert ograniczenie zasobów zaimplementowane tylko częściowo
+        public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station last, double tolerance= 0.0) //alert ograniczenie zasobów zaimplementowane tylko częściowo
         {
             Cost cost = new Cost(initialCost);
             var stations = new List<Station>();

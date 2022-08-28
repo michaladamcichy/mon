@@ -85,7 +85,7 @@ namespace algorithm
             this.Ranges = ranges;
         }
 
-        public void CreateRelations()
+        public void CreateRelations(double tolerance = 0.0)
         {
             //RemoveRelations();
             foreach(var first in Stations)
@@ -94,7 +94,7 @@ namespace algorithm
                 {
                     if (first == second) continue;
 
-                    if(MapObject.AreInRange(first, second))
+                    if(MapObject.AreInRange(first, second, tolerance))
                     {
                         first.AddNeighbor(second);
                         second.AddNeighbor(first);

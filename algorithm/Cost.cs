@@ -322,7 +322,7 @@ namespace algorithm
             return true;
         }
 
-        public Station? QueryJoin(Station first, Station second, double tolerance = 0.1) //alert tolerance nie jest uwzlędniony symetrycznie - od strony bigger nie jest
+        public Station QueryJoin(Station first, Station second, double tolerance = 0.0) //alert tolerance nie jest uwzlędniony symetrycznie - od strony bigger nie jest
         {
             if (MapObject.AreInRange(first, second)) return null;
             if(!CanGetAny()) return null;
@@ -351,7 +351,7 @@ namespace algorithm
             return range == null ? null : new Station(potentialJoiningStation.Position, range.Value);
         }
 
-        public Station? Join(Station first, Station second, double tolerance = 0.1)
+        public Station? Join(Station first, Station second, double tolerance = 0.0)
         {
             var station = QueryJoin(first, second, tolerance);
             if(station == null) return null;

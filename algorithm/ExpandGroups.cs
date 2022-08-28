@@ -20,7 +20,7 @@ namespace algorithm
             {
                 var group = lonely.GetOneNearest(groups);
                 //alert teoretycznie nie najbliższa grupa może być najlepsza - ale chrzanić to
-                var minRange = cost.QueryMin(1, lonely.GetDistanceFrom(group.CentralStation) + 0.1); //alert!!! TOLERANCJA!!! ALERT!
+                var minRange = cost.QueryMin(1, lonely.GetDistanceFrom(group.CentralStation)); //alert!!! TOLERANCJA!!! ALERT!
                 if (minRange == null) continue;
 
                 if (!lonely.IsInRange(group.CentralStation))
