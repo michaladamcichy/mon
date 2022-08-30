@@ -169,6 +169,8 @@ namespace algorithm
 
         public List<Station> Run(Instance instance, DoubleDictionary<Station, List<Station>> edges = null)
         {
+            instance.RemoveRelations();
+            instance.CreateRelations(0.1);
             /*var stations = instance.Stations.*//*Where(station => !station.IsAttached()).*//* //alert!
                 Concat<Station>(instance.StationaryStations).ToList();
             return new Dijkstra().Run(instance, stations, stations.Where(item => item.IsAttached()).First(), stations.Where(item => item.IsAttached()).Last());*/

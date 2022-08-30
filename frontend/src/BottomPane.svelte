@@ -134,7 +134,7 @@ import Station from "./Station.svelte";
                 Naive
             </button>
             <button class="col btn btn-light algorithmButton" on:click={() => onAlgorithmClicked("simpleArrange")}>
-                Rationalised
+                Advanced
             </button>
             <!-- <input class="col" type="checkbox" bind:checked={optimized} on:change={() => {updateOptimized(optimized);}}> -->
         </div>

@@ -52,7 +52,7 @@ const loadWP = async () => {
             />
         <button class="col btn btn-light" on:click={() => {fileInput.click();}}><i class={'fa fa-upload'}></i></button>
         <button class="col btn btn-light" on:click={() => {saveFile(instance.name, JSON.stringify(instance));}}><i class={'fa fa-download'}></i></button>
-        <button class="col btn btn-light" on:click={() => {loadWP();}}>WP</button>
+        <button class="col btn btn-light" on:click={() => {loadWP();}}>SZRP</button>
         <button class="col btn btn-light" on:click={() => {duplicate(instance);}}><i class="fa fa-clone"></i></button>
         <div class="col"></div>
         <button class="col btn btn-danger" on:click={() => {remove(instance);}}>
