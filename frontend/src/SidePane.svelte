@@ -104,9 +104,9 @@ import Instance from './Instance.svelte';
     
     {#if filter.length > 0 && (stations.includes(filter[0]) || units.includes(filter[0]))}
     <div class="row">
-        <h4 class="col">Selection</h4>
+        <h4 class="col orangeHeader">Selection</h4>
     </div>
-        <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
+        <div class="controlsContainer form-group row d-flex justify-content-center align-items-center orangeBody">
             {#if stations.includes(filter[0])}
             {#each filter as f}
                 <!-- {#if stations.includes(f)} -->
@@ -270,5 +270,15 @@ import Instance from './Instance.svelte';
 
     .filtered {
         margin-bottom: 25px;
+    }
+
+    .orangeHeader {
+        background-color: orange !important;
+    }
+
+    .orangeBody {
+        //background-color: orange !important;
+        margin-bottom: 10px;
+        /* /padding: 10px; */
     }
 </style>
