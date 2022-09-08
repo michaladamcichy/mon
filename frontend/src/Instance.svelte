@@ -39,7 +39,7 @@ const loadWP = async () => {
 <div id="main" class="container" on:click={() => {select(instance);}}>
     <div class={`${instance == selected ? 'selectedRow ' : ""}controlsContainer form-group row d-flex justify-content-center align-items-center`}>
         <label class="col">{`${index + 1}.`}</label>
-        <input type='text' class={`col btn ${selected == instance ? 'btn-light' : 'btn-light'}`}
+        <input type='text' class={`col btn ${selected == instance ? 'btn-light' : 'btn-light'} outline`}
             on:click={() => {
                 if(instance != selected) {
                     input.blur();
@@ -85,5 +85,9 @@ const loadWP = async () => {
     }
     .selectedRow {
         background-color: #198754;
+    }
+    .outline {
+        border-width: 2px;
+        border-color: lightgrey;
     }
 </style>

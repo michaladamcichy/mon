@@ -38,13 +38,9 @@ const latlngStep = 0.1;
         <!-- <button class={`col btn btn-${station.isStationary ? 'secondary' : 'primary'}`} on:click={() => {station.groupId = -1; station.isStationary = !station.isStationary; update(station);}}>
             <i class={station.isStationary ? 'fa fa-star' : 'fa fa-truck'}></i>
         </button> -->
-        {#if station.groupId >= 0 && !station.isStationary}
-        <label class="col">{`g${station.groupId + 1}`}</label>
-        {:else}
         <label class="col">{''}</label>
         <label class="col">{''}</label>
         <label class="col">{''}</label>
-        {/if}
     </div>
 </div>
 
