@@ -6,66 +6,121 @@ using System.Collections.Generic;
 using System.Linq;
 
 using algorithm;
+using System.Diagnostics;
 
 namespace backend.Controllers
 {
-    public class A
+    public class Result
     {
-        public string x { get; set; } = "hello";
-        public ArrayList arrayList { get; set; } = new ArrayList { "a", "b", "c" };
+        public List<StationJSON> Stations { get; set; }
+        public long Milliseconds { get; set; }
+
+        public Result(List<StationJSON> stations, long milliseconds)
+        {
+            Stations = stations;
+            Milliseconds = milliseconds;
+        }
     }
+
 
     [Route("api/[controller]")]
     [ApiController]
     public class AlgorithmController : ControllerBase
     {
-        // GET: api/<ValuesController>
-        ///[EnableCors("_myAllowSpecificOrigins")]
-        [HttpGet]
-        public A Get()
-        {
-            //return new string[] { "value1", "value2" };
-            //return new string[] { "value1", "value2" };
-            //return new ArrayList { "a", "b", "c" };
-            System.Diagnostics.Debug.WriteLine("HELLO");
-           
-            var a = new A();
-            return a;
-        }
-
-        // GET api/<ValuesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            
-            return "value";
-        }
-
         // POST api/<ValuesController>
         [HttpPost]
         [Route("isConnected")]
-        public bool Post(InstanceJSON instanceJSON) {
+        public bool Post(InstanceJSON instanceJSON)
+        {
             var instance = new Instance(instanceJSON);
             return Algorithm.IsConnected(instance); //alert
-            return false;
+        }
+
+        [HttpPost]
+        [Route("naiveArrangeAlgorithm")]
+        public Result naiveArrangeAlgorithm(InstanceJSON instanceJSON)
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            instanceJSON.stations.RemoveAll(item => !item.isStationary);
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.NaiveArrange(instance).Select(item => item.GetJSON()).ToList();
+
+            stopwatch.Stop();
+            return new Result(ret, stopwatch.ElapsedMilliseconds);// stopwatch.ElapsedMilliseconds);
         }
 
         [HttpPost]
         [Route("simpleArrangeAlgorithm")]
-        public List<StationJSON> simpleArrangeAlgorithm(InstanceJSON instanceJSON)
-        {
+        public Result simpleArrangeAlgorithm(InstanceJSON instanceJSON)
+        { //alert CRITICAL ALERT!
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
             var instance = new Instance(instanceJSON);
-            var ret = Algorithm.SimpleArrange(instance).Select(item => item.GetJSON()).ToList();
-            return ret;
+            var ret = Algorithm.ArrangeWithExisting(instance).Select(item => item.GetJSON()).ToList();
+            stopwatch.Stop();
+            return new Result(ret, stopwatch.ElapsedMilliseconds);// stopwatch.ElapsedMilliseconds);
         }
 
         [HttpPost]
-        [Route("simpleHierarchicalTreeAlgorithm")]
-        public List<StationJSON> simpleHierarchicalTreeAlgorithm(InstanceJSON instanceJSON)
+        [Route("priorityArrangeAlgorithm")]
+        public Result priorityArrangeAlgorithm(InstanceJSON instanceJSON)
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            instanceJSON.stations.RemoveAll(item => !item.isStationary); //alert
             var instance = new Instance(instanceJSON);
-            var ret = Algorithm.SimpleHierarchicalTree(instance).Select(item => item.GetJSON()).ToList();
-            return ret;
+            ///var ret = Algorithm.PriorityArrange(instance).Select(item => item.GetJSON()).ToList();
+
+            var units = new List<Unit>(instance.Units);
+
+            instance.Units = units.Where(unit => unit.Priority >= 4).ToList();
+            var ret = new ArrangeWithExisting().Run(instance);
+            instance.Stations = ret;
+
+            instance.Units = units.Where(unit => unit.Priority >= 3).ToList();
+            ret = new ArrangeWithExisting().Run(instance);
+            instance.Stations = ret;
+
+            instance.Units = units.Where(unit => unit.Priority >= 2).ToList();
+            ret = new ArrangeWithExisting().Run(instance);
+            instance.Stations = ret;
+
+            instance.Units = units.Where(unit => unit.Priority >= 1).ToList();
+            ret = new ArrangeWithExisting().Run(instance);
+            instance.Stations = ret;
+
+            instance.Units = units.Where(unit => unit.Priority >= 0).ToList();
+            ret = new ArrangeWithExisting().Run(instance);
+            instance.Stations = ret;
+
+            stopwatch.Stop();
+            return new Result(ret.Select(item => item.GetJSON()).ToList(), stopwatch.ElapsedMilliseconds);
+        }
+
+        [HttpPost]
+        [Route("arrangeWithExistingAlgorithm")]
+        public Result arrangeWithExisting(InstanceJSON instanceJSON)
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.ArrangeWithExisting(instance).Select(item => item.GetJSON()).ToList();
+            stopwatch.Stop();
+            return new Result(ret, stopwatch.ElapsedMilliseconds);
+        }
+
+        [HttpPost]
+        [Route("simpleOptimizeAlgorithm")]
+        public Result simpleOptimizeAlgorithm(InstanceJSON instanceJSON)
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var instance = new Instance(instanceJSON);
+            var ret = Algorithm.SimpleOptimize(instance).Select(item => item.GetJSON()).ToList();
+            stopwatch.Stop();
+            return new Result(ret, stopwatch.ElapsedMilliseconds);
         }
 
         // PUT api/<ValuesController>/5

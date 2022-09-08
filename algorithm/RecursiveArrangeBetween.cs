@@ -9,7 +9,7 @@ namespace algorithm
     public class RecursiveArrangeBetween
     {
 
-        public static (Cost, double?) AdjustLast(Cost initialCost, Station first, Station last, double tolerance = 0.1)
+        public static (Cost, double?) AdjustLast(Cost initialCost, Station first, Station last, double tolerance = 0.0)
         {
             Cost cost = new Cost(initialCost);
 
@@ -22,8 +22,9 @@ namespace algorithm
             }
             return (cost, null);
         }
-        public static (Cost, List<Station>) ArrangeBetween(Cost initialCost, Station first, Station last, double tolerance = 0.1)
+        public static (Cost, List<Station>) ArrangeBetween(Cost initialCost, Station first, Station last, double tolerance = 0.0)
         {
+
             Cost cost = new Cost(initialCost);
             var stations = new List<Station>();
 
@@ -37,14 +38,14 @@ namespace algorithm
                 return (cost, stations);
             }
 
-            var joiningStation = cost.Join(first, last);
+            var joiningStation = cost.Join(first, last, tolerance);
             if (joiningStation != null)
             {
                 stations.Add(joiningStation);
                 return (cost, stations);
             }
 
-            var next = MapObject.GetNextFromTowards(first, last);
+            var next = MapObject.GetNextFromTowards(first, last, cost.QueryMax() ?? 0.0, tolerance);
             if(!cost.CanGetAny()) return (cost, null);
             var station = new Station(next.Position, cost.GetMax().Value);
 
@@ -56,10 +57,8 @@ namespace algorithm
 
             return (cost, stations);
         }
-        public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station last, double tolerance = 0.1)
+        public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station last, double tolerance = 0.0)
         {
-            if (first.IsStationary && last.IsStationary) return (initialCost, new List<Station>()); //alert
-
             var cost = new Cost(initialCost);
 
             Cost optimalCost = null;
@@ -80,7 +79,7 @@ namespace algorithm
                 var (newCost, stations) = ArrangeBetween(loopCost, first, last, tolerance);
                 if(stations != null)
                 {
-                    if(optimalStations == null /*|| (optimalStations.Count > stations.Count)*/) //alert docelowo tutaj porównanie kosztów 
+                    if(optimalStations == null || Cost.IsCheaperThan(stations, optimalStations))
                     {
                         optimalStations = stations;
                         optimalCost = newCost;

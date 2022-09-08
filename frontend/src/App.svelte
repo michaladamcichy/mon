@@ -1,68 +1,128 @@
 <script>
+	import { onMount } from 'svelte';
+
 
 	import Map from './Map.svelte';
 	import SidePane from './SidePane.svelte';
 	import BottomPane from './BottomPane.svelte';
+	import {_stationaryStations} from '../lib/stationaryStations.js';
 
-	import { onMount } from 'svelte';
-
-	import {maps} from '../lib/maps.js';
 	import {api} from '../lib/api';
+	import { test } from '../lib/test';
+	import { maps } from '../lib/maps';
 
 	export let ready;
 
 	let map;
 
 	const defaultRanges = [20, 30, 50];
-	const defaultCounts = [0,0,0];
+	const defaultCounts = [10000,10000,10000];
 	const defaultWeights = [1.0, 1.5, 2.5];
 	const defaultStations = [];
 	const defaultUnits = [];
 	let instances = [
 		{
-			ranges: defaultRanges,
-			counts: [0,0,0],
-			weights: [1.0, 1.5, 2.5],
+			name: 'instance',
 			isConnected: undefined,
-			oldRanges: defaultRanges,
-			stations: [
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
-				{position: {lat: 52.2297, lng: 21.0122}, range: defaultRanges[0], isStationary: false },
+			stations: [	
 			],
 			units: [
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
-				{position: {lat: 51.2297, lng: 21.0122 }, priority: 1, master: undefined},
 			],
 		}
 	];
 
 	let selectedInstance;
 
-	let ranges;
-	let counts;
+	let ranges = defaultRanges;
+	let counts = [...defaultCounts];
 	let weights;
 	let isConnected;
-	let oldRanges;
 	let stations;
 	let units;
 	let bigTestRunning = false;
+	let percentageOfStations = 0.0;
+	let disableMap = false;
+	let optimized = false;
+
+	let filter = [];
+
+	const distance = (o1, o2) => {
+		return Math.pow(o1.position.lat - o2.position.lat, 2) + Math.pow(o1.position.lng - o2.position.lng, 2); 
+	};
 
 
+	const filterThreshold = 0;
+	const updateFilter = (mapObject) => {
+		if(!mapObject) {
+			filter = [];
+			return;
+		}
+
+		let closeOnes = [];
+		(mapObject.priority !== undefined ? units : stations).forEach(_mapObject => {
+			if(mapObject != _mapObject && distance(mapObject, _mapObject) < filterThreshold) closeOnes.push(mapObject);
+		});
+
+		filter = [mapObject, ...closeOnes];
+	};
+
+	const updateOptimized = (newValue) => {
+		optimized = newValue;
+	};
+
+	const updateDisableMap = (newValue) => {
+		disableMap = newValue;
+	}
+
+	function fisherYates( array ){
+    var count = array.length,
+        randomnumber,
+        temp;
+    while( count ){
+     randomnumber = Math.random() * count-- | 0;
+     temp = array[count];
+     array[count] = array[randomnumber];
+     array[randomnumber] = temp
+    }
+   }
+
+	const loadGSM = async (percentage = percentageOfStations) => {
+		selectedInstance.stations = selectedInstance.stations.filter(station => !station.isStationary);
+		if(percentage == 0) {
+			loadInstance(selectedInstance);
+			return;
+		}
+		
+		fisherYates(_stationaryStations);
+		const stationaryStations = [];
+		for(let i = 0; i < Math.floor(percentage/100 * _stationaryStations.length); i++) {
+			stationaryStations.push(_stationaryStations[i]);
+		}
+
+		selectedInstance.stations = selectedInstance.stations.concat(
+			stationaryStations.map(ss => ({position: ss.position, range: ss.range/*[20, 30, 50][Math.floor(Math.random() * 3)]*/, isStationary: true}))); //alert CRITICAL ALERT
+		loadInstance(selectedInstance);
+	};
+
+	const updatePercentage = (newValue) => {
+		percentageOfStations = newValue;
+	};
 	const updateBigTestRunning = (value) => {
 		bigTestRunning = value;
 	}
 	const updateInstance = instance => {
-		instance.ranges = ranges;
-		instance.counts = counts;
-		instance.weights = weights;
 		instance.isConnected = isConnected;
-		instance.oldRanges = oldRanges; //alert czy to nie może być lokalna zmienna?
 		instance.stations = stations;
 		instance.units = units;
+
+		instances = instances;
+	};
+
+	const loadInstance = instance => {
+		weights = instance.weights;
+		isConnected = instance.isConnected;
+		stations = instance.stations;
+		units = [...instance.units];
 
 		instances = instances;
 	};
@@ -85,11 +145,8 @@
 		if(selectedInstance)
 		updateInstance(selectedInstance);
 
-		ranges = instance.ranges;
-		counts = instance.counts;
 		weights = instance.weights;
 		isConnected = instance.isConnected;
-		oldRanges = instance.oldRanges; //alert czy to nie może być lokalna zmienna?
 		stations = instance.stations;
 		units = instance.units;
 
@@ -97,18 +154,18 @@
 		
 		instances = instances;
 		connectionCheck();
-		console.log(instances);
+		//console.log(instances);
 	};
 
 	selectInstance(instances[0]);
 
 	const addInstance = () => {
-		console.log('addInstance');
-		console.log(instances);
+		//console.log('addInstance');
+		//console.log(instances);
 		instances.push(
 			{
+			name: 'instance',
 			ranges: [...defaultRanges],
-			counts: defaultCounts,
 			weights: [...defaultWeights],
 			isConnected: undefined,
 			oldRanges: defaultRanges,
@@ -133,58 +190,53 @@
 		{priority: 3, icon: 'fa fa-truck'},
 		{priority: 2, icon: 'fa fa-star'},
 		{priority: 1, icon: 'fa fa-male'},
-		{priority: 0, icon: 'fa fa-bitbucket'},
+		{priority: 0, icon: 'fa fa-wrench'},
     ];
 
-	const updateRanges = (ranges) => {
-		for(let i =0; i < ranges.length - 1; i++) {
-			if(ranges[i] >= ranges[i+1]) {
-				ranges = [...oldRanges];
-				return;
-			}
-		}
-		ranges = ranges;
-		updateAllStations(stations.map(station => {
-			const index = oldRanges.indexOf(station.range);
-			if(index >= 0) {
-				station.range = ranges[index];
-			} else {
-				console.log('custom range');
-			}
-			return station;
-		}));
-		oldRanges = [...ranges];
+	const updateRanges = (_ranges) => {
+		ranges = [..._ranges];
 	};
 
-	const updateCounts = () => {
-		let runningCounts = [0,0,0];
-		units.forEach(unit => {
-			if(unit.priority === 0)
-			{
-				unit.counts.forEach((count, index) => {
-					runningCounts[index] += count;
-				});
+	const updateStationsFromRanges = (oldRanges, newRanges) => {
+		let diffs = [];
+		for(let i = 0; i < oldRanges.length; i++) {
+			if(oldRanges[i] != newRanges[i]) {
+				diffs.push(i);
+			}
+		}
+		
+		const _stations = [...stations];
+
+		_stations.forEach(station => {
+			for(let i = 0; i < diffs.length; i++) {
+				if(station.range == oldRanges[diffs[i]]) {
+					station.range = newRanges[diffs[i]];
+					break;
+				}
 			}
 		});
 
-		counts = runningCounts;
+		stations = _stations;
+	};
+
+	const updateCounts = (_counts) => {
+		counts = [..._counts];
 	};
 
 	onMount(() => {
+		test.run();
 	});
 
 	// let serverNotResponding = true;
 	$: {
-		units; stations;
-		connectionCheck();
+		units; stations; ranges;
+		updateInstance(selectedInstance);
 	};
 
 	$: {
-		units;
-		updateCounts();
+		units; stations; ranges;
+		connectionCheck();
 	}
-
-
 
 	const updateAllStations = _stations => {
 		stations = _stations;
@@ -196,23 +248,23 @@
             stations[index] = station;
             updateAllStations(stations);
         } else {
-            console.log('error');
+            //console.log('error');
         }
     };
 
 	const removeStation = station => {
-		console.log('removing');
+		//console.log('removing');
 		const index = stations.indexOf(station);
         if(index >= 0) {
 			stations = stations.filter((item, _index) => _index != index);
             updateAllStations(stations);
         } else {
-            console.log('error');
+            //console.log('error');
         }
 	}
 
 	const removeInstance = instance => {
-		console.log('removing');
+		//console.log('removing');
 		const index = instances.indexOf(instance);
         if(index >= 0) {
 			instances = instances.filter((item, _index) => _index != index);
@@ -229,7 +281,7 @@
 				selectInstance(instances[0]);
 			}
         } else {
-            console.log('error');
+            //console.log('error');
         }
 	}
 
@@ -249,24 +301,24 @@
             units[index] = unit;
             updateAllUnits(units);
         } else {
-            console.log('error');
+            //console.log('error');
         }
 	};
 
 	const removeUnit = unit => {
-		console.log('removing');
+		//console.log('removing');
 		const index = units.indexOf(unit);
         if(index >= 0) {
             units = units.filter((item, _index) => _index != index); 
             updateAllUnits(units);
         } else {
-            console.log('error');
+            //console.log('error');
         }
-	}
+	};
 
 	const setMap = _map => {
 		map = _map;
-	}
+	};
 </script>
 
 <svelte:head>
@@ -277,8 +329,7 @@
 </svelte:head>
 
 <div class="row">
-
-	<div id="leftCol" class="col-8">
+	<div id="leftCol" class="col-7">
 		<div id="leftTop" class="row">
 			{#if ready}
 			<Map
@@ -287,32 +338,44 @@
 				stations={stations}
 				updateStation={updateStation}
 				units={units}
-				updateUnit={updateUnit}/>
+				updateUnit={updateUnit}
+				updateFilter={updateFilter}
+				/>
 			{/if}
 		</div>
 		<div id="leftBottom" class="row">
 			<BottomPane
 				stations={stations}
 				units={units}
-				stationRanges={ranges}
-				stationCounts={counts}
+				ranges={ranges}
+				counts={counts}
+				updateCounts={updateCounts}
 				stationWeights={weights}
 				updateRanges={updateRanges}
+				updateStationsFromRanges={updateStationsFromRanges}
 				updateStations={updateAllStations}
 				updateUnits={updateAllUnits}
 				checkIsConnected={checkIsConnected}
 				isConnected={isConnected}
 				bigTestRunning={bigTestRunning}
 				updateBigTestRunning={updateBigTestRunning}
+				percentageOfStations={percentageOfStations}
+				updatePercentage={updatePercentage}
+				loadGSM={loadGSM}
+				disableMap={disableMap}
+				updateDisableMap={updateDisableMap}
+				optimized={optimized}
+				updateOptimized={updateOptimized}
 				/>
 		</div>
 	</div>
-	<div id="rightCol" class="col-4">
+	<div id="rightCol" class="col-5">
 			<SidePane
 				map={map}
 				instances={instances}
 				addInstance={addInstance}
 				selectInstance={selectInstance}
+				loadInstance={loadInstance}
 				removeInstance={removeInstance}
 				duplicateInstance={duplicateInstance}
 				removeAllInstances={removeAllInstances}
@@ -325,10 +388,12 @@
 				updateUnit={updateUnit}
 				removeUnit={removeUnit}
 				updateAllUnits={updateAllUnits}
-				stationRanges={ranges}
-				stationCounts={counts}
+				ranges={ranges}
+				counts={counts}
 				priorities={priorities}
 				bigTestRunning={bigTestRunning}
+				percentageOfStations={percentageOfStations}
+				filter={filter}
 				/>
 	</div>
 </div>

@@ -26,6 +26,7 @@ namespace algorithm
     public class Unit : MapObject
     {
         public int Priority = 1;
+        public Station Attachment { get; private set; } = null;
         public Unit(UnitJSON unitJSON) : base(unitJSON.position)
         {
             this.Priority = unitJSON.priority;
@@ -33,15 +34,27 @@ namespace algorithm
 
         public void Attach(Station station)
         {
-            Receivers.Clear();
-            station.Senders.Add(this); //alert alert!
+            Attachment = station;
             station.Position = Position;
-            Receivers.Add(station);
+            station.AttachTo(this);
+        }
+
+        public Station GetAttachment()
+        {
+            return Attachment; //alert
+        }
+
+        public void RemoveAttachment()
+        {
+            if (Attachment == null) return;
+
+            Attachment.Detach();
+            Attachment = null;
         }
 
         public bool HasAttachement()
         {
-            return Receivers.Count > 0;
+            return Attachment != null;
         }
     }
 }

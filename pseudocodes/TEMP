@@ -1,0 +1,7 @@
+DostosujGrupe(grupa):
+\indent Usuwaj stacje w kolejności od najdalszej do bieżącego środka grupy, dopóki koszt stacji centralnej
+\indent obejmującej zasięgiem wszystkie stacje w grupie oraz koszt dostosowania stacji prywatnych, aby były połączone
+\indent ze tą stacją centralną, będzie dopuszczalny.
+
+MinimalnyZasięg(grupa):
+\indent zwróć zasięg możliwie najmniejszej dostępnej stacji, która jest w stanie pokryć wszystkie stacje z grupy 

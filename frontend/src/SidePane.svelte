@@ -1,9 +1,12 @@
+<svelte:options accessors />
 <script>
+    import {afterUpdate} from 'svelte';
+import {resource} from '../lib/resource.js';
 import Instance from './Instance.svelte';
 
     import Station from './Station.svelte';
     import Unit from './Unit.svelte';
-
+    
     export let map;
     export let instances;
     export let addInstance;
@@ -12,28 +15,41 @@ import Instance from './Instance.svelte';
     export let duplicateInstance;
     export let removeAllInstances;
     export let selectedInstance;
+    export let loadInstance;
     export let stations;
     export let updateStation;
     export let removeStation;
     export let units;
     export let updateUnit;
     export let removeUnit;
-    export let stationRanges;
-    export let stationCounts;
+    export let ranges;
+    export let counts;
     export let updateAllStations;
     export let updateAllUnits;
     export let priorities;
+    export let percentageOfStations;
+    export let filter;
 
 
     let instancesHidden = false;
     let stationsHidden = false;
     let unitsHidden = false;
 
-    const addStation = range => {
-        console.log('add station');
-        console.log(stationRanges);
-        const newStation = {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: range, isStationary: false};
-        console.log(newStation);
+    const priorityToIcon = (priority) => {
+        if(priority == 4) return resource.CHIEF_ICON;
+        if(priority == 3) return resource.LADDER_ICON;
+        if(priority == 2) return resource.STAR_ICON;
+        if(priority == 1) return resource.SOLDIER_ICON;
+        if(priority == 0) return resource.SPANNER_ICON;
+    };
+
+    const __reverse = (arr) => {
+        let _arr = [...arr];
+        return _arr.reverse();
+    };
+
+    const addStation = (range, isStationary = false) => {
+        const newStation = {position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, range: range, isStationary};
         updateAllStations([...stations, newStation]);
     };
 
@@ -46,13 +62,11 @@ import Instance from './Instance.svelte';
             {
                 position: {lat: map.getCenter().lat(), lng: map.getCenter().lng()}, 
                 priority: priority != undefined ? priority : 1, //alert
-                counts: priority == 0 ? [1000, 1000, 1000] : undefined, //alert
                 master: priority > 0 ? master : undefined,
+                name: 'Unit',
             }
         ];
         updateAllUnits(newUnits);
-        console.log('add unit');
-        console.log(newUnits);
     };
 
     const toggleUnitsVisibility = () => {
@@ -60,44 +74,87 @@ import Instance from './Instance.svelte';
     };
 
     const removeAllStations = () => {
-        updateAllStations([]);
+        const stationary= stations.filter(station => station.isStationary);
+        const _stations = stationary.length != stations.length ? stationary : [];
+        updateAllStations(_stations);
     };
 
     const removeAllUnits = () => {
         updateAllUnits([]);
     };
-    
+
+    const filterUnits = () => {
+        return filter.length > 0 && filter[0].priority !== undefined;  
+    }
+
+    const filterStations = () => {
+        return filter.length > 0 && filter[0].priority === undefined;
+    };
+
+    // $:{
+    //     if(filter.length > 0) {
+    //         instancesHidden = true;
+    //         unitsHidden = true;
+    //         stationsHidden = true;
+    //     } 
+    // }
 </script>
 
 <div id="main" class="container">
+    
+    {#if filter.length > 0 && (stations.includes(filter[0]) || units.includes(filter[0]))}
+    <div class="row">
+        <h4 class="col orangeHeader">Selection</h4>
+    </div>
+        <div class="controlsContainer form-group row d-flex justify-content-center align-items-center orangeBody">
+            {#if stations.includes(filter[0])}
+            {#each filter as f}
+                <!-- {#if stations.includes(f)} -->
+                <Station index={stations.indexOf(f)} station={f} update={updateStation} remove={removeStation} ranges={ranges}/> 
+                <!-- {/if} -->
+            {/each}
+        {:else}
+            {#each filter as f}
+                {#if units.includes(filter[0])}
+                <Unit index={units.indexOf(f)} unit={f} update={updateUnit} remove={removeUnit}
+                            ranges={ranges} priorities={priorities} addUnit={addUnit} filtered={true}/>
+                {/if}
+            {/each}
+        {/if}    
+        </div>
+    {/if}
+    {#if filter.length == 0 || (!stations.includes(filter[0]) || !units.includes(filter[0]))}
     <div class="row">
         <h4 class="col">Instances</h4>
-        <button class="toggleVisibilityButton btn btn-primary" on:click={() => {instancesHidden = !instancesHidden;}}>{instancesHidden ? "v" : "^"}</button>
+        <button class="toggleVisibilityButton btn btn-light" on:click={() => {instancesHidden = !instancesHidden;}}>{instancesHidden ? "v" : "^"}</button>
         <div class="col"></div>
         <div class="col"></div>
         <div class="col"></div>
         <div class="col"></div>
     </div>
     <hr>
-    {#if !instancesHidden}
+    {#if !instancesHidden }
         <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
-            <button class="addButton btn btn-primary" on:click={() => {addInstance()}}>
+            <button class="addButton btn btn-light" on:click={() => {addInstance()}}>
                 +
             </button>
             <div class="col"></div>
             <div class="col"></div>
             <div class="col"></div>
-            <button class="col btn btn-danger removeAllButton" on:click={() => {removeAllInstances();}} disabled={instances.length == 0}>X</button>
+            <button class="col btn btn-danger removeAllButton big"  on:click={() => {removeAllInstances();}} disabled={instances.length == 0}>
+                <i class={'fa fa-trash'}></i></button>
         </div>
         <hr>
         <hr>
         {#each instances as instance, index}
-            <Instance index={index} instance={instance} select={selectInstance} remove={removeInstance} selected={selectedInstance} duplicate={duplicateInstance}/>
+            <Instance index={index} instance={instance} select={selectInstance} remove={removeInstance} selected={selectedInstance} duplicate={duplicateInstance}
+                load={loadInstance} percentageOfStations={percentageOfStations}/>
         {/each}
     {/if}
+    
     <div class="row">
         <h4 class="col">Stations</h4>
-        <button class="toggleVisibilityButton btn btn-primary" on:click={toggleStationsVisibility}>{stationsHidden ? "v" : "^"}</button>
+        <button class="toggleVisibilityButton btn btn-light" on:click={toggleStationsVisibility}>{stationsHidden ? "v" : "^"}</button>
         <div class="col"></div>
         <div class="col"></div>
         <div class="col"></div>
@@ -106,27 +163,29 @@ import Instance from './Instance.svelte';
     <hr>
     {#if !stationsHidden}
         <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
-            <button class="addButton btn btn-primary" on:click={() => {addStation(stationRanges[0])}}>
+            <button class="addButton btn btn-light" on:click={() => {addStation(ranges[0])}}>
                 +
             </button>
-            {#each stationRanges as range}
-                <button class="col btn btn-primary" on:click={() => {addStation(range)}}>{range}</button>
+            {#each ranges as range}
+                <button class="col btn btn-light bold" on:click={() => {addStation(range)}}>{range}</button>
             {/each}
-            <div class="col">km</div>
+            <div class="col-1"><p>km</p></div>
+            <!-- <button class="col btn btn-light fa fa-star ss" on:click={() => {addStation(100.0, true)}}></button> -->
             <div class="col"></div>
             <div class="col"></div>
-            <button class="col btn btn-danger removeAllButton" on:click={() => {removeAllStations()}} disabled={stations.length == 0}>X</button>
+            <button class="col btn btn-danger removeAllButton" on:click={() => {removeAllStations()}} disabled={stations.length == 0}>
+                <i class={'fa fa-trash'}></i></button>
         </div>
         <hr>
         <hr>
         {#each stations as station, index}
-            <Station index={index} station={station} update={updateStation} remove={removeStation} ranges={stationRanges}/> 
+            <Station index={index} station={station} update={updateStation} remove={removeStation} ranges={ranges}/> 
         {/each}
     {/if}
     <hr>
     <div class="row">
         <h4 class="col">Units</h4>
-        <button class="toggleVisibilityButton btn btn-primary" on:click={toggleUnitsVisibility}>{unitsHidden ? 'v' : '^'}</button>
+        <button class="toggleVisibilityButton btn btn-light" on:click={toggleUnitsVisibility}>{unitsHidden ? 'v' : '^'}</button>
         <div class="col"></div>
         <div class="col"></div>
         <div class="col"></div>
@@ -135,29 +194,37 @@ import Instance from './Instance.svelte';
     <hr>
     {#if !unitsHidden}
         <div class="controlsContainer form-group row d-flex justify-content-center align-items-center">
-            <button class="addButton btn btn-primary" on:click={() => {addUnit();}}>
+            <button class="addButton btn btn-light" on:click={() => {addUnit();}}>
                 +
             </button>
-            {#each priorities as priority}
+            {#each __reverse(priorities) as priority}
                 <button
-                    class="col btn selectButton btn-primary"
+                    class="col btn selectButton btn-light bold"
                     on:click={() => {addUnit(priority.priority)}}>
-                    <i class={priority.icon}></i>
+                    <!-- <i class={priority.icon}></i> -->
+                    {priority.priority}
+                    <!-- <img src={priorityToIcon(priority.priority)} alt=""> -->
                 </button>
             {/each}
+            <p class="col"><span>(priority)</span></p>
             <div class="col"></div>
             <div class="col"></div>
             <button class="col btn btn-danger removeAllButton" on:click={() => {removeAllUnits()}}
-                disabled={units.length == 0}>X</button>
+                disabled={units.length == 0}><i class={'fa fa-trash'}></i></button>
+        </div>
+        <div class="row">
+            <!-- <div class="col"></div> -->
+            
         </div>
         <hr>
         <hr>
         {#each units as unit, index}
             <Unit index={index} unit={unit} update={updateUnit} remove={removeUnit}
-                ranges={stationRanges} priorities={priorities} addUnit={addUnit}/>
+                ranges={ranges} priorities={priorities} addUnit={addUnit}/>
         {/each}
     {/if}
     <hr>
+    {/if}
 </div>
 
 
@@ -183,5 +250,35 @@ import Instance from './Instance.svelte';
     .removeAllButton {
         max-width: 40px !important;
         min-width: 40px !important;
+    }
+
+    #x:nth-child(even) {
+        background-color: lightblue;
+    }
+
+    .ss {
+       font-size: 20px;
+    }
+    
+    .big {
+        font-size: 20px;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .filtered {
+        margin-bottom: 25px;
+    }
+
+    .orangeHeader {
+        background-color: orange !important;
+    }
+
+    .orangeBody {
+        //background-color: orange !important;
+        margin-bottom: 10px;
+        /* /padding: 10px; */
     }
 </style>

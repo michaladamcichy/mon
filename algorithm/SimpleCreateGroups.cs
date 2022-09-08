@@ -15,7 +15,7 @@ namespace algorithm
             this.instance = instance;
         }
 
-        (Group?, Cost) AdjustGroup(Group _group, Cost initialCost)
+        (Group, Cost, double) AdjustGroup(Group _group, Cost initialCost)
         {
             var group = new Group(_group);
             Cost cost = new Cost(initialCost);
@@ -23,17 +23,17 @@ namespace algorithm
             while(group.Stations.Count > 1)
             {
                 var minCoveringRange = cost.QueryMinCoveringRange(group.Stations);
-                if (minCoveringRange != null && cost.CanGet(minCoveringRange.Value, group.Stations.Count + 1))
+                var minCoveringCircleCenter = MapObject.MinCoveringCircleCenter(group.Stations);
+                if (minCoveringRange != null && cost.MakeGroup(group.Stations, new MapObject(minCoveringCircleCenter), minCoveringRange.Value))
                 {
-                    cost.Get(minCoveringRange.Value, group.Stations.Count);
-                    return (group, cost);
+                    return (group, cost, minCoveringRange.Value);
                 }
 
                 var furthestFromCenter = group.GetFurthestFromCenter();
                 group.Remove(furthestFromCenter);
             }
 
-            return (null, cost);
+            return (null, cost, 0.0);
         }
 
         (Group?, Cost) CreateGroup(Station first, Cost initialCost, List<Group> groups)
@@ -44,22 +44,20 @@ namespace algorithm
             if (!cost.CanGetAny()) return (null, initialCost);
 
             var nearestStations = first.GetNearest(instance.Stations);
-            
+            if(nearestStations.Count == 0) return (new Group(new List<Station>() { first, new Station(first.Position, cost.GetMin().Value) }), cost);
             foreach (var station in nearestStations)
             {
-                if (station == first || groups.Any(item => item.Contains(station))) continue; //alert nie powinienem przeglądać wszystkich stacji, tylko najbliższe
-                                                                               //tylko jakim warunkiem to sprawdzać?
+                if (station == first || groups.Any(item => item.Contains(station))) continue;
 
                 var minCoveringRangeAfterAdding = cost.QueryMinCoveringRange(group.Stations.Concat<Station>(new List<Station>() { station }).ToList());
                 if (minCoveringRangeAfterAdding == null) continue; //alert co ze stacjami nie należacymi do grupy a istniejącymi?
                 group.Add(station);
 
-
                 //probujemy usunac i patrzymy czy poprawia sie skupienie
                 if (group.Stations.Count > 2)
                 {
-                    var furthestFromCenter = MapObject.GetFurthestFrom(group.Stations, MapObject.CenterOfGravity(group.Stations)); //alert zamienić na metodę Group
-                    if (furthestFromCenter == station) continue; //alert to z jakiegoś powodu było potrzebne, aby zachować właściwość pływania
+                    var furthestFromCenter = MapObject.GetFurthestFrom(group.Stations, MapObject.MinCoveringCircleCenter(group.Stations)); //alert zamienić na metodę Group
+                    if (furthestFromCenter == station) continue; //alert to było potrzebne, aby zachować właściwość pływania
                     var minCoveringCircleRadiusBeforeRemoving = MapObject.MinCoveringCircleRadius(group.Stations);
                     group.Remove(furthestFromCenter);
                     var minCoveringCircleRadiusAfterRemoving = MapObject.MinCoveringCircleRadius(group.Stations);
@@ -83,21 +81,18 @@ namespace algorithm
             }
 
             var minCoveringRange = cost.QueryMinCoveringRange(group.Stations);
+            var minCoveringCircleCenter = MapObject.MinCoveringCircleCenter(group.Stations);
             if (minCoveringRange == null) throw new Exception();
 
-
-            var temporaryCost = new Cost(cost); //alert można fajniej
-            temporaryCost.Get(minCoveringRange.Value);
-            if (!temporaryCost.CanChangeRange(group.Stations, minCoveringRange.Value))
+            if (!cost.MakeGroup(group.Stations, new MapObject(minCoveringCircleCenter), minCoveringRange.Value))
             {
-                var (adjustedGroup, otherNewCost) = AdjustGroup(group, cost); //alert! critical alert!!!
+                var (adjustedGroup, otherNewCost, centralRange) = AdjustGroup(group, cost); //alert! critical alert!!!
                 //Group adjustedGroup = null;
                 //Cost otherNewCost = new Cost(cost);
 
                 if (adjustedGroup != null)
                 {
-                    var adjustedMinCoveringRange = otherNewCost.GetMinCoveringRange(adjustedGroup.Stations);
-                    adjustedGroup.Add(new Station(MapObject.MinCoveringCircleCenter(adjustedGroup.Stations), adjustedMinCoveringRange.Value));
+                    adjustedGroup.Add(new Station(MapObject.MinCoveringCircleCenter(adjustedGroup.Stations), centralRange));
                     return (adjustedGroup, otherNewCost);
                 }
 
@@ -105,9 +100,7 @@ namespace algorithm
                 return (new Group(new List<Station>() { first, new Station(first.Position, range)}), cost);
             }
 
-            group.Stations.ForEach(item => cost.ChangeRange(item, minCoveringRange.Value));
-            cost.Get(minCoveringRange.Value);
-            group.Add(new Station(MapObject.MinCoveringCircleCenter(group.Stations), minCoveringRange.Value));
+            group.Add(new Station(minCoveringCircleCenter, minCoveringRange.Value));
 
             return (group, cost);
         }
@@ -116,17 +109,17 @@ namespace algorithm
         {
             Cost cost = new Cost(initialCost);
             //if nie rozbudowujemy tylko zaczynamy od zera //alert!
-            Station._id = 0;//alert
+            //Station._id = 0;//alert
             var groups = new List<Group>();
 
-            foreach (var unit in instance.Units)
+           /* foreach (var unit in instance.Units) //alert tego już nie potrzeba!
             {
                 var minRange = cost.GetMin();
                 if(minRange == null) return (new List<Group>() { new Group(instance.Stations) }, cost) ;
                 var station = new Station(minRange.Value);
-                instance.MapObjects.Add(station);
+                instance.Stations.Add(station);
                 unit.Attach(station);
-            }
+            }*/
 
             while(instance.Stations.Any(station => groups.All(group => !group.Contains(station)))) //alert może jakoś zgrabniej?
             {
@@ -138,7 +131,7 @@ namespace algorithm
                     Dictionary<Station, double> groupSnapshot = null;
                     Group group = null;
                     Cost groupCost = null;
-                    var reversedRanges = new List<double>(instance.StationRanges.ToList());
+                    var reversedRanges = new List<double>(instance.Ranges.ToList());
                     reversedRanges.Reverse();
 
                     var rangesSnapshot = instance.SaveRangesSnapshot(); //alert!
@@ -149,7 +142,7 @@ namespace algorithm
                         
                         if(_group != null)
                         {
-                            if(lastGroup == null || _group.Stations.Count > lastGroup.Stations.Count)
+                            if(group == null /*|| Cost.CalculateCostPerStation(_group.Stations) < Cost.CalculateCostPerStation(group.Stations)*/) //alert dodałem =
                             {
                                 group = _group;
                                 groupCost = newCost;

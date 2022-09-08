@@ -8,7 +8,7 @@ namespace algorithm
 {
     public class ArrangeBetween
     {
-        static Cost MakeBothStationsBigger(Cost initialCost, Station first, Station second) //alert powinno zwracać proponowane range'e
+        /*static Cost MakeBothStationsBigger(Cost initialCost, Station first, Station second) //alert powinno zwracać proponowane range'e
         {
             Cost cost = new Cost(initialCost);
             while (first.Range < second.Range && cost.CanMakeBigger(first))
@@ -41,9 +41,9 @@ namespace algorithm
             }
 
             return cost;
-        }
+        }*/
 
-        static Cost AdjustEnds(Station first, List<Station> middles, Station last, Cost initialCost, double tolerance)
+        static Cost AdjustEnds(Station first, List<Station> middles, Station last, Cost initialCost, double tolerance = 0.0)
         {
             Cost cost = new Cost(initialCost);
             cost.GiveBack(first.Range);
@@ -63,11 +63,12 @@ namespace algorithm
 
             return cost;
         }
-        public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station last, double tolerance= 0.1) //alert ograniczenie zasobów zaimplementowane tylko częściowo
+        public static (Cost, List<Station>) Run(Cost initialCost, Station first, Station last, double tolerance= 0.0) //alert ograniczenie zasobów zaimplementowane tylko częściowo
         {
             Cost cost = new Cost(initialCost);
             var stations = new List<Station>();
 
+            if (!cost.CanGetAny()) return (cost, new List<Station>());
             cost.ChangeRange(first, cost.QueryMax().Value);
             cost.ChangeRange(last, cost.QueryMax().Value);
             if (MapObject.AreInRange(first, last) || !cost.CanGetAny()) return (cost, new List<Station>());

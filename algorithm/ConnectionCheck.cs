@@ -10,37 +10,38 @@ namespace algorithm
     {
         public bool Run(Instance instance)
         {
+            instance.RemoveRelations();
+            instance.CreateRelations(0.1);
+
             var units = instance.Units;
 
             if (units.Any(item => !item.HasAttachement())) return false;
+            if (instance.PrivateStations.Any(station => station.Neighbors.Where(neighbor => neighbor.IsCore).Count() == 0)) return false;
 
-            foreach (var attachedStation in instance.Stations.FindAll(station => station.IsAttached()))
+            var neighbors = new HashSet<Station>();
+            instance.PrivateStations.ForEach(station => station.Neighbors.ForEach(neighbor => { if (neighbor.IsCore) neighbors.Add(neighbor); }));
+
+            foreach (var station in neighbors)
             {
                 var visited = new Dictionary<Station, bool>();
                 instance.Stations.ForEach(station => visited[station] = false);
-                instance.StationaryStations.ForEach(station => visited[station] = false); //alert wchodzę tutaj na bardzo grząski grunt //czy to w ogóle coś zmienia?
 
-                DFS(attachedStation, visited);
-                bool notAllConnected = visited.Any(item => ((Station)item.Key).IsAttached() && item.Value == false);
+                DFS(station, visited);
+                bool notAllConnected = instance.PrivateStations.Any(station => !visited[station]);
 
                 if (notAllConnected)
                 {
                     return false;
                 }
             }
-
+            
             return true;
-        }
-
-        public bool Run(List<Station> stations, int[] counts)
-        {
-            return Run(new Instance(stations, counts));
         }
         public void DFS(Station start, Dictionary<Station, bool> visited)
         {
             visited[start] = true;
 
-            foreach (var mapObject in start.Receivers.FindAll(mapObject => mapObject is Station).Cast<Station>().ToList())
+            foreach (var mapObject in start.Neighbors)
             {
                 if (visited[mapObject] == true) continue;
 

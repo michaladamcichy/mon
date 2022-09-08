@@ -8,110 +8,74 @@ namespace algorithm
 {
     public class JoinNearestNeighbors
     {
-        /*public static (List<Station>, Cost) RunX(Cost initialCost, List<Station> coreStations, List<Station> stationaryStations, List<Unit> unitsConnectedToStationaryStations)
-        {
-            if (coreStations.Count == 0 || !initialCost.CanGetAny()) return (new List<Station>(), initialCost);
-            Cost cost = new Cost(initialCost);
-
-            var connected = new HashSet<Station>();
-            var additionalStations = new List<Station>();
-
-            var stations = new List<Station>(coreStations);
-
-            if (unitsConnectedToStationaryStations.Count > 0)
-            {
-                stations.AddRange(stationaryStations);
-            }
-            connected.Add(coreStations.First());
-
-
-            while (stations.Any(station => !connected.Contains(station)))
-            {
-                Tuple<Station, Station> nearest = null;
-                var nearestDistance = 0.0;
-
-                var notConnected = stations.FindAll(item => !connected.Contains(item));
-                foreach (var notConnectedStation in notConnected) //alert zrobić kurde jednolinijkowca!
-                {
-                    if (notConnectedStation.IsStationary && unitsConnectedToStationaryStations.Count > 0 && stationaryStations.Any(station => connected.Contains(station)))
-                    {
-                        continue;
-                    }
-
-                    foreach (var connectedStation in connected.ToList().Concat(additionalStations)) //alert pozwalam na dołączanie do infrastruktury
-                    {
-                        if (nearest == null || notConnectedStation.GetDistanceFrom(connectedStation) < nearestDistance)
-                        {
-                            nearest = new Tuple<Station, Station>(connectedStation, notConnectedStation);
-                            nearestDistance = notConnectedStation.GetDistanceFrom(connectedStation); //alert optymalizacja
-                        }
-                    }
-                }
-                if (coreStations.Any(station => !connected.Contains(station))) //alert COREstations, nie stations
-                {
-                    if (nearest == null) continue;
-
-                    connected.Add(nearest.Item2); //alert nieczytelne
-                    var (newCost, moreAdditionalStations) = RecursiveArrangeBetween.Run(cost, nearest.Item1, nearest.Item2);
-                    cost = new Cost(newCost);
-                    additionalStations.AddRange(moreAdditionalStations);
-                }
-                else
-                {
-                    break; //alert DKWIMD
-                }
-
-                if (!cost.CanGetAny()) break;
-            }
-
-            return (additionalStations, cost);
-        }*/
-
-
-        public static (List<Station>, Cost) Run(Cost initialCost, List<Station> coreStations, List<Station> stationaryStations,
-            List<Unit> unitsConnectedToStationaryStations, HashSet<Station> _connected = null)
+        public static (List<Station>, Cost, DoubleDictionary<Station, List<Station>>) Run(Cost initialCost, Instance instance, List<Station> notConnected, List<Station> connected)
         {
             var cost = new Cost(initialCost);
-            if (coreStations.Count == 0 || !cost.CanGetAny()) return (new List<Station>(), cost);
+            if(connected == null) connected = new List<Station>();
 
-            var connected = _connected == null ? new HashSet<Station>() : _connected;
-            var stations = new List<Station>();
             var additionalStations = new List<Station>();
+            var stationToSet = new Dictionary<Station, HashSet<Station>>();
+            var connectedAsSet = connected.ToHashSet();
+            connected.ForEach(station => stationToSet[station] = connectedAsSet);
+            notConnected.ForEach(station => stationToSet[station] = new HashSet<Station> { station });
+            var edges = new DoubleDictionary<Station, List<Station>>();
+            var all = connected.Concat<Station>(notConnected).ToList();
 
-            stations.AddRange(coreStations);
-            stations.AddRange(stationaryStations);
-            if(unitsConnectedToStationaryStations.Count > 0) //alert chyba jednak nie powinno tak być
-                stationaryStations.ForEach(stationaryStation => connected.Add(stationaryStation));
+            if (notConnected.Count == 0 || !cost.CanGetAny()) return (all, cost, new DoubleDictionary<Station, List<Station>>());
 
-            if (connected.Count == 0) connected.Add(coreStations.First());
-
-            while (coreStations.Any(station => !connected.Contains(station)))
+            var centralStations = notConnected.Where(item => !(item.IsStationary && !item.Neighbors.Any(neighbor => neighbor.IsPrivate)));
+            /*       var centralStations = notConnected.ToList();
+                   centralStations.RemoveAll(item => )*/
+            
+            var stationaryStationToSet = new BuildStationarySubtrees().Run(instance.StationaryStations);
+            stationaryStationToSet.Keys.ToList().ForEach(station => stationToSet[station] = stationaryStationToSet[station]);
+            //while (all.Any(station => stationToSet[all.First()] != stationToSet[station])) //alert!
+            //while (notConnected.Any(station => stationToSet[connected.Count == 0 ? notConnected.First() : connected.First() ] != stationToSet[station])) //alert!
+            while (centralStations.Any(station => stationToSet[connected.Count == 0 ? centralStations.First() : connected.First()] != stationToSet[station]))
             {
                 Tuple<Station, Station> nearest = null;
                 var nearestDistance = 0.0;
 
-                var notConnected = stations.FindAll(item => !connected.Contains(item));
-                foreach (var notConnectedStation in notConnected) //alert zrobić kurde jednolinijkowca!
+                foreach (var first in all) //alert zrobić kurde jednolinijkowca!
                 {
-                    foreach (var connectedStation in connected.ToList().Concat(additionalStations)) //alert pozwalam na dołączanie do infrastruktury
+                    foreach (var second in all) //alert pozwalam na dołączanie do infrastruktury
                     {
-                        if (nearest == null || notConnectedStation.GetDistanceFrom(connectedStation) < nearestDistance)
+                        if (first == second) continue;
+                        
+                        if(!stationToSet.ContainsKey(first)) stationToSet[first] = new HashSet<Station> { first };
+                        if(!stationToSet.ContainsKey(second)) stationToSet[second] = new HashSet<Station> { second };
+                        var set1 = stationToSet[first];
+                        var set2 = stationToSet[second];
+
+                        if (set1 == set2) continue;
+                        var distance = first.GetDistanceFrom(second);
+                        if (nearest == null || distance < nearestDistance)
                         {
-                            nearest = new Tuple<Station, Station>(connectedStation, notConnectedStation);
-                            nearestDistance = notConnectedStation.GetDistanceFrom(connectedStation); //alert optymalizacja
+                            nearest = new Tuple<Station, Station>(first, second);
+                            nearestDistance = distance; //alert optymalizacja
                         }
                     }
                 }
+                if (nearest == null)
+                    break;
 
-                connected.Add(nearest.Item2); //alert nieczytelne
-                var (newCost, moreAdditionalStations) = RecursiveArrangeBetween.Run(cost, nearest.Item1, nearest.Item2);
+                var (f, s) = nearest;
+                var s1 = stationToSet[f];
+                var s2 = stationToSet[s];
+                var mergedSet = s1.Concat(s2).ToHashSet();
+                mergedSet.ToList().ForEach(station => { stationToSet[station] = mergedSet; });
+                
+                var (newCost, moreAdditionalStations) = RecursiveArrangeBetween.Run(cost, f, s);
                 cost = new Cost(newCost);
                 additionalStations.AddRange(moreAdditionalStations);
+                all.AddRange(moreAdditionalStations);
+                edges[f, s] = new List<Station> { f }.Concat<Station>(moreAdditionalStations).Concat<Station>(new List<Station>{ s }).ToList();
 
                 if (!cost.CanGetAny()) break;
             }
 
-            return (additionalStations, cost);
+            return (all, cost, edges);
         }
     }
 }
+

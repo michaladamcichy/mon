@@ -13,8 +13,8 @@ namespace algorithm
         public override Position Position { get { return MapObject.MinCoveringCircleCenter(Stations); } set { } }  //alert empty set
         public override double Range { get { return 0.0; } set { throw new Exception(); } } //alert brzydko oraz 0.0
         
-        public Station CoreStation { get {
-                var core = Stations.FindAll(item => !item.IsAttached());
+        public Station CentralStation { get {
+                var core = Stations.FindAll(item => item.IsCore);
                 if (core.Count != 1) return null; //alert podstępny null
                 return core.First();
             } }
@@ -113,7 +113,7 @@ namespace algorithm
                     list.Add(station);
                 }
             }
-            list.Sort((item1, item2) => item1.id - item2.id); //alert opakować to, alert straciłem kolejność, czemu?
+            list.Sort((item1, item2) => item1.Id - item2.Id); //alert opakować to, alert straciłem kolejność, czemu?
 
             return list;
         }

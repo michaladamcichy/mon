@@ -1,3 +1,3 @@
 export const maps = {
-    apiKey: 'AIzaSyDnqGHngoi64_4EX-9dcdD-KFGAj34Livg',
+    apiKey: 'AIzaSyAGfYUfpBp2kZkQKVw_hq-nHq1q1NhJTwo',
 };

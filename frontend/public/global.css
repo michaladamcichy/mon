@@ -65,3 +65,41 @@ button:focus {
 * {
 	font-size: 13px;
 }
+
+.unit:nth-of-type(even) {
+	background-color: lightgrey;
+	border-radius: 5px;
+}
+
+.unit:nth-of-type(odd) {
+	background-color: #f8f9fa;
+	border-radius: 5px;
+}
+
+.station:nth-of-type(even) {
+	background-color: lightgrey;
+	border-radius: 5px;
+}
+
+.station:nth-of-type(odd) {
+	background-color: #f8f9fa;
+	border-radius: 5px;
+}
+
+button, label, .selectButton {
+	border-width: 2px !important;
+	border-color: lightgrey !important;
+}
+
+p {
+	background-color: white;
+}
+
+
+h1, h2, h3, h4, h5 {
+	background-color:  white;
+}
+
+.btn-danger {
+	border-width: 0 !important;
+}

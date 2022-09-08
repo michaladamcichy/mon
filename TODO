@@ -91,30 +91,62 @@ HMMMM jak dodam stacje stacjonarne o zasięgach różnych od 20, 30, 50
     Potencjalne zagrożenie: pętle foreach(var range in ranges)
 
 ---------------------------------------------
-WYWALIĆ SAVE SNAPSHOT!!! ŹRÓDŁO PRAWDOPODOBNYCH STRASZNIE TRUDNYCH DO ZNALEZIENIA BŁĘDÓW
-Dodać wybieranie najtańszych stacji na podstawie lokalizacji
-Szlifowanie powyższych po dodaniu tych kosztów
-Zakodowanie w jsonie lokalizacji stacji stacjonarnych
-Zakodowanie w jsonie lokalizacji jednostek
 Algorytmy ze stackoverflow zastąpić siszarpowymi
-Algorytm dobudowywania do istniejącej infrastruktury
-Algorytm z drzewem hierarchicznym
-Prawdziwe MST
-ChangeRangeOrBigger! - może zrobić to globalnie
-    i zobaczyć, czy poprawiają się rozwiązania
-CHOLERA tworząc grupy daje wszystkim takie same stacje
-    A bliższe jednostki przecież mogłyby mieć mniejsze!
-Usuwanie nadmiarowych stacji z końców palców rozgwiazdy?
-    Tylko to sprawia dodatkowe problemy...
----
-punkty Steinera?
+ALERT - w JoinNeigbours może się okazać, że (ale to mąło prawdopodobne)
+    że jest połączenie z jakąs dalszą, ale większą stacją, a my mimo to będziemy
+    próbowali połączyć z bliższą mniejszą, która nie jest w zasięgu
+ZABLOKOWAĆ PRZEŁĄCZENIE I DUPLIKOWANIE INSTANCJI PODCZAS:
+    BIG TESTU
+    PODCZAS WYKONYWANIA ALGORYTMÓW
+ZOPTYMALIZOWAĆ PAJĄKA ŻEBY NIE BYŁO TYLE ŚCIEŻEK :D
+ALERT MAM TAKĄ WIZJĘ, ŻE CZŁONEK KOMISJI MI MÓWI:
+    nie ma Pan wypisanych wszystkich tych założeń w pracy
 
-ALERT - jeśli stacja bazowa jest blisko, jest dołączana nawet,
-jeśli nie ma żadnych stationaryUnits
+CanChangeRange i ChangeRange - prawdopodobne ŹRÓDŁO WSZELKIEGO ZŁA
 
-ALERT - BARDZO WAŻNE - w PrepareMapObjects
-    należy dodawać MNIEJSZĄ stację do jednostki!!
-    bez tego może dochodzić do bardzo dziwnych błędów
+CHOLERA - CO Z TOLERANCJĄ?? 
+ALERT SKONFRONTOWAĆ ZAKRES Z KARTY PRACY Z RZECZYWISTOŚCIA
+ALERT - CEL MINIMALIZACJI JEST PROBLEMATYCZNY
+ALERT ALERT - GET ONE NEAREST NIE OBSŁUGUJE PUSTYCH KOLEKCCI LUB ZAWIERAJĄCYECH TEN ELEMENT
+ALERT - stacja stacjonarna mająca w zasięgu prywatną może być uznana za centralną, choć nie jest potrzebna
+ALERT - sprawdzić czy gdzieś nie ma próby zmiany zasięgu stacji stacjonarnej
+ZAPOMNIAŁEM DODAĆ DO PRACY CONNECTION CHECK
+CHCIAŁBYM, ŻEBY SIMPLE O
+PTIMIZE zwracało ucięte końce ośmiornicy
+ALERT - NIE MAM ŻADNEGO TESTU Z OGRANICZONYMI STACJAMI - może priorytetowy??
+ALERT - UWAGA, nie napisałem nic o trzykrotnym uruchamianiu Creategroups
+ALERT - dodałem dołączanie do infrastrukury także w naive - OPISZ TO
+ALERT - NAIWNY MA TERAZ ZBYT DŁUGI CZAS WYKOANIA
+ALERT - napisać przy każdym algorytmie, które tego wymaga, że JEST URUCHAMIANY 3 RAZY!
+ALERT - w recursive arrange between ostatecznie nie porównuję moim kryterium! a powinieniem!
+ALERT - ujednolicić location i postiion
+WAŻNE- to, że czasmi algorytmowi braknie stacji mimo że są dostępne wynika z jakiegoś błędu w RecursiveArrangeBetween!
+ALERT - PRZYPAŁ - budowanie od zera jest gorsze niż dobudowywanie! :D
+ALERT - OBOWIĄZKOWA OPTYMALIZACJA PO SIMPLE ARRANGE
+TODO wspomnieć, że wbudowałem optymalizację w simple arrange
+ALERT - kosekwencja (u,v) a {u, v}
+ZROBIĆ TO CHRZANIONE DRZEWO PRIORYTETOWE
+RECURSIVE ARRANGE BETWEEN - wstawić kryterium kosztu!!!
+czy złe koszty nie wynikają z rekurencji w RecursiveArrangeBetween  
+ALERT - kruskal w moim przypadku ma de facto złożoność n*n log n
+POZA TYM OKREŚLENIE LINIOWO LOGARYTMICZNA CHYBA NIE PASUJE DO DWÓCH RÓŻNYCH ZMIENNYCH
+NAIWNY - dużą słabością jest jak się źle dobierze punkt początkowy
+WYDAJE MI SIĘ, ŻE POWINIENEM WSTEPNIE SETOWAĆ NIE TYLKO STACJONARNE W ARRANGE WITH EXISTING
+ALERT W EXPAND GROUPS JEST NIEEFEKTYWNE ZAŁOŻENIE CO DO GRUP
+ZŁOŻNOŚC PAMIĘCIOWA - simple optimize ma bardzo dużą!
+TODO - być może w real pomogłoby simpleoptimize bez spidera!
+ALERT - w dobudowywaniu zostawiłem nieoptyumalne powiększania grupu
+W ALGORYTMACH ZAPOMNIAŁEM o isConnected
+CHOLERA _ JAKIEŚ TAJEMNICZE PRZESUWANIE SIĘ JEDNSOTEK!s
+TODO dodać założenie, że teren jest płaski!
+TODO - skomentować odchylenia standarodwe oraz dlaczego ich czasem nie widać na wykresach
+PYTANIE - czy nie jest błędem przestawianie na jednym wykresie przed i po optymalizacji
+ALGORYTM TWORZENIA GRUPY _ WARIANTY - cośtam cośtam - zweryfikować zgodność algorytmu i kodu
+PYTANIE - czy mogę sobie przeklejać obrazki z artykułu?
+czy mogę odwołać się do wikipedi?
+ALERT! - teraz zmiana rangów wywala program!
+HRUBIESZÓW _ ZMERGOWAŁY SIĘ 2 jednostki
+TODO - podpisy przestają działać
 --------------------------------------------
 
 Algorytm priorytetowy - hierarchiczny - naturalnie - może jedynie z dobieraniem najpierw najtańszych połączeń

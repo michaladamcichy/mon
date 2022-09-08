@@ -1,0 +1,76 @@
+PołączGrupy(centralne):
+    połączone = {}
+    dodatkowe = {}
+    stacjaDoZbioru = utwórz tablicę asocjacyjną
+    dla każdej centralnej z centralne:
+        stacjaDoZbioru U= [centralna => {centralna}]
+    
+    wykonuj, aż dla każdego klucza ze stacjaDoZbioru będzie taka sama wartość:
+        (stacja1, stacja2) = znajdź parę najbliższych stacji spośród centralne U dodatkowe, takich, że stacjaDoZbioru[stacja1] != stacjaDoZbioru[stacja2]
+        dodatkowe U= ArrangeBetween(stacja1, stacja2)
+
+        scalonyZbiór = stacjaDoZbioru[stacja1] U stacjaDoZbioru[stacja2]
+        dla każdej stacji należącej do scalonyZbiór:
+            stacjaDoZbioru[stacja] = scalonyZbiór        
+
+
+public static (List<Station>, Cost) Run(Cost initialCost, Instance instance, List<Station> coreStations, HashSet<Station> _connected = null)
+{
+    var stationToSet = new Dictionary<Station, HashSet<Station>>();
+    connected.ToList().ForEach(station => { stationToSet[station] = connected; });
+
+    var allStations = new List<Station>(coreStations);
+    /*var edges = new Dictionary<Tuple<Station, Station>, double>();
+    allStations.ForEach(first => { allStations.ForEach(second =>
+    {
+        if(first == second || edges.ContainsKey(new Tuple<Station, Station>(second, first))) return;
+    }); });*/
+    coreStations.ForEach(station => {
+        if(!stationToSet.ContainsKey(station)) stationToSet[station] = new HashSet<Station> { station };
+    });
+
+    if (coreStations.Count == 0) return (additionalStations, cost);
+
+    while (coreStations.Any(station => stationToSet[coreStations.First()] != stationToSet[station]))
+    {
+        Tuple<Station, Station> nearest = null;
+        var nearestDistance = 0.0;
+
+        foreach (var first in allStations) //alert zrobić kurde jednolinijkowca!
+        {
+            foreach (var second in allStations) //alert pozwalam na dołączanie do infrastruktury
+            {
+                if (first == second) continue;
+                
+                if(!stationToSet.ContainsKey(first)) stationToSet[first] = new HashSet<Station> { first };
+                if(!stationToSet.ContainsKey(second)) stationToSet[second] = new HashSet<Station> { second };
+                var set1 = stationToSet[first];
+                var set2 = stationToSet[second];
+
+                if (set1 == set2) continue;
+                var distance = first.GetDistanceFrom(second);
+                if (nearest == null || distance < nearestDistance)
+                {
+                    nearest = new Tuple<Station, Station>(first, second);
+                    nearestDistance = distance; //alert optymalizacja
+                }
+            }
+        }
+        if (nearest == null) break;
+
+        var (f, s) = nearest;
+        var s1 = stationToSet[f];
+        var s2 = stationToSet[s];
+        var mergedSet = s1.Concat(s2).ToHashSet();
+        mergedSet.ToList().ForEach(station => { stationToSet[station] = mergedSet; });
+        
+        var (newCost, moreAdditionalStations) = RecursiveArrangeBetween.Run(cost, f, s);
+        cost = new Cost(newCost);
+        additionalStations.AddRange(moreAdditionalStations);
+        allStations.AddRange(moreAdditionalStations);
+
+        if (!cost.CanGetAny()) break;
+    }
+
+    return (additionalStations, cost);
+}

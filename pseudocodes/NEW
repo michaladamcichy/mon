@@ -1,0 +1,179 @@
+DostosujGrupe(grupa):
+    Usuwaj stacje w kolejności od najdalszej do bieżącego środka grupy, dopóki koszt stacji centralnej
+    obejmującej zasięgiem wszystkie stacje w grupie oraz koszt dostosowania stacji prywatnych, aby były połączone
+    ze tą stacją centralną, będzie dopuszczalny.
+
+MinimalnyZasięg(grupa):
+    zwróć zasięg możliwie najmniejszej dostępnej stacji, która jest w stanie pokryć wszystkie stacje z grupy 
+
+CreateGroup(Station first, Cost initialCost, List<Group> groups)
+    grupa = {first};
+    najbliższe - lista stacji mobilnych posortowanych rosnąco wg odległości od first
+    dla każdej stacji z listy najbliższe:
+        jeżeli stacja == first lub stacja należy już do jakiejś grupy:
+            kontynuuj //(w rozumieniu: przejdź do kolejnej iteracji pętli) //alert czy wiadomo o co chodzi?
+
+        jeśli MinimalnyZasięg(grupa U {stacja} ) == null:
+            kontynuuj
+
+        grupa U= {stacja}
+        
+        jeśli rozmiar grupy <= 2:
+            kontynuuj
+        
+        najdalsza = stacja z grupy najdalsza od bieżącego środka grupy
+        jeżeli najdalsza == stacja:
+            kontynuuj
+        
+        usuń najdalszą z grupy
+
+    dla każdej stacji spośród dotychczas usuniętych z grupy:
+        jeżeli MinimalnyZasięg(grupa U {usunięta}) == null:
+            kontynuuj
+        grupa U= {usunięta}
+
+    
+    minimalnyZasięg = MinimalnyZasięg(grupa)
+
+    sukces = spróbuj dodać do grupy stację centralną z lokalizacją w środku ciężkości grupy i zmienić zasięg każdej stacji z grupy na minimalnyZasięg
+    jeżeli sukces = true:
+        zwróć grupę
+
+    
+    sukces = DostosujGrupe(grupa);
+    jeżeli sukces = true:
+        zwróć grupę
+    
+    stacjaCentralna = nowa stacja o najmniejszym dostępnym zasięgu, o lokalizacji takiej samej jak first
+    zwróć {first, stacjaCentralna}
+
+            {
+                if (station == first || NieNależyDoŻadnejGrupy(station)) continue;
+
+                var minCoveringRangeAfterAdding = ZnajdźNajmniejsząDostępnąStacjęPokrywającąWszystkieStacjeZGrupy();
+                if (minCoveringRangeAfterAdding == null) continue;
+                group.Add(station);
+
+                if (group.Count > 2)
+                {
+
+                    var furthestFromCenter = MapObject.GetFurthestFrom(group.Stations, MapObject.MinCoveringCircleCenter(group.Stations)); //alert zamienić na metodę Group
+                    if (furthestFromCenter == station) continue; //alert to było potrzebne, aby zachować właściwość pływania
+                    var minCoveringCircleRadiusBeforeRemoving = MapObject.MinCoveringCircleRadius(group.Stations);
+                    group.Remove(furthestFromCenter);
+                    var minCoveringCircleRadiusAfterRemoving = MapObject.MinCoveringCircleRadius(group.Stations);
+
+                    if (minCoveringCircleRadiusAfterRemoving < minCoveringCircleRadiusBeforeRemoving)
+                    {
+                        removedStations.Add(furthestFromCenter);
+                        continue;
+                    }
+
+                    group.Add(furthestFromCenter);
+                }
+            }
+
+            foreach (var removedStation in removedStations)
+            {
+                var minCoveringRangeAfterAdding = cost.QueryMinCoveringRange(group.Stations.Concat<Station>(new List<Station>() { removedStation }).ToList());
+
+                if (minCoveringRangeAfterAdding == null) continue;
+                group.Add(removedStation);
+            }
+
+            var minCoveringRange = cost.QueryMinCoveringRange(group.Stations);
+            if (minCoveringRange == null) throw new Exception();
+
+
+            var temporaryCost = new Cost(cost); //alert można fajniej
+            temporaryCost.Get(minCoveringRange.Value);
+            if (!temporaryCost.CanChangeRange(group.Stations, minCoveringRange.Value))
+            {
+                var (adjustedGroup, otherNewCost) = AdjustGroup(group, cost); //alert! critical alert!!!
+                //Group adjustedGroup = null;
+                //Cost otherNewCost = new Cost(cost);
+
+                if (adjustedGroup != null)
+                {
+                    var adjustedMinCoveringRange = otherNewCost.GetMinCoveringRange(adjustedGroup.Stations);
+                    adjustedGroup.Add(new Station(MapObject.MinCoveringCircleCenter(adjustedGroup.Stations), adjustedMinCoveringRange.Value));
+                    return (adjustedGroup, otherNewCost);
+                }
+
+                var range = cost.GetMin().Value;
+                return (new Group(new List<Station>() { first, new Station(first.Position, range)}), cost);
+            }
+
+            group.Stations.ForEach(item => cost.ChangeRange(item, minCoveringRange.Value));
+            cost.Get(minCoveringRange.Value);
+            group.Add(new Station(MapObject.MinCoveringCircleCenter(group.Stations), minCoveringRange.Value));
+
+            return (group, cost);
+        }
+
+        public (List<Group>, Cost) Run(Cost initialCost)    
+        {
+            Cost cost = new Cost(initialCost);
+            //if nie rozbudowujemy tylko zaczynamy od zera //alert!
+            Station._id = 0;//alert
+            var groups = new List<Group>();
+
+            foreach (var unit in instance.Units)
+            {
+                var minRange = cost.GetMin();
+                if(minRange == null) return (new List<Group>() { new Group(instance.Stations) }, cost) ;
+                var station = new Station(minRange.Value);
+                instance.MapObjects.Add(station);
+                unit.Attach(station);
+            }
+
+            while(instance.Stations.Any(station => groups.All(group => !group.Contains(station)))) //alert może jakoś zgrabniej?
+            {
+                foreach (var station in instance.Stations)
+                {
+                    if (groups.Any(group => group.Contains(station))) continue;
+
+                    Group lastGroup = null;
+                    Dictionary<Station, double> groupSnapshot = null;
+                    Group group = null;
+                    Cost groupCost = null;
+                    var reversedRanges = new List<double>(instance.StationRanges.ToList());
+                    reversedRanges.Reverse();
+
+                    var rangesSnapshot = instance.SaveRangesSnapshot(); //alert!
+                    foreach (var range in reversedRanges)
+                    {
+                        Instance.RestoreRangesSnapshot(rangesSnapshot);
+                        var (_group, newCost) = CreateGroup(station, cost, groups);
+                        
+                        if(_group != null)
+                        {
+                            if(lastGroup == null || _group.Stations.Count > lastGroup.Stations.Count)
+                            {
+                                group = _group;
+                                groupCost = newCost;
+                                groupSnapshot = instance.SaveRangesSnapshot();
+                            }
+
+                            lastGroup = _group;
+                        }
+                        cost.AddForbiddenRange(range);
+                    }
+                    cost.RemoveAllForbiddenRanges();
+                    
+                    if (group == null)
+                    {
+                        group = new Group(new List<Station>() { station }); //alert nie przemyślane 
+                    }
+                    else
+                    {
+                        Instance.RestoreRangesSnapshot(groupSnapshot);
+                        groupCost.RemoveAllForbiddenRanges();
+                        cost = new Cost(groupCost);
+                    }
+                    groups.Add(group);
+                }
+            }
+
+            return (groups, cost); //alert
+        }
