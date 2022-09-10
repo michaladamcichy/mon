@@ -100,9 +100,7 @@ import Instance from './Instance.svelte';
     // }
 </script>
 
-<div id="main" class="container">
-    
-    {#if filter.length > 0 && (stations.includes(filter[0]) || units.includes(filter[0]))}
+{#if filter.length > 0 && (stations.includes(filter[0]) || units.includes(filter[0]))}
     <div class="row">
         <h4 class="col orangeHeader">Selection</h4>
     </div>
@@ -123,6 +121,8 @@ import Instance from './Instance.svelte';
         {/if}    
         </div>
     {/if}
+<div class={`container ${filter.length > 0 && (stations.includes(filter[0]) || units.includes(filter[0])) ? 
+    'mainSmaller' : 'mainBigger'}`}>
     {#if filter.length == 0 || (!stations.includes(filter[0]) || !units.includes(filter[0]))}
     <div class="row">
         <h4 class="col">Instances</h4>
@@ -242,11 +242,17 @@ import Instance from './Instance.svelte';
         height: 20px;
         font-size: 10px;
     }
-    #main {
+    .mainBigger {
         height: 98vh;
         overflow-y: auto;
         overflow-x: hidden;
     }
+    .mainSmaller {
+        height: 70vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
     .removeAllButton {
         max-width: 40px !important;
         min-width: 40px !important;
@@ -277,7 +283,6 @@ import Instance from './Instance.svelte';
     }
 
     .orangeBody {
-        //background-color: orange !important;
         margin-bottom: 10px;
         /* /padding: 10px; */
     }

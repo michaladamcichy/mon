@@ -23,7 +23,7 @@ const __reverse = (arr) => {
     <div class="form-group row d-flex justify-content-center align-items-center">
         <!-- to align middle nic nie daje -->
         <label class="col col-form-label align-middle">{`${index + 1}. ${unit.master != undefined ? `[${unit.master + 1}]` : ''}`}</label>
-        <input type='text col-form-label align-middle' class="col-10 unitName align-middle" bind:value={unit.name} />
+        <input type='text col-form-label align-middle' class="col-10 unitName align-middle" bind:value={unit.name} on:change={() => {update(unit);}} />
     </div>
     <div class="form-group row d-flex justify-content-center align-items-center">
         
